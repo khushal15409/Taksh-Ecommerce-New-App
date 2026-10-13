@@ -1,0 +1,92 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.38.5"
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      # pubspec.lock is committed, so resolution is reproducible.
+      - name: Install dependencies
+        run: flutter pub get
+
+      # *.g.dart / *.freezed.dart are gitignored, so they must be generated in CI.
+      - name: Generate code (build_runner)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # Errors fail the job; pre-existing lint infos/warnings do not.
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      # Production entry point (lib/main.dart). No flavors are defined in this project.
+      - name: Build release APK
+        run: flutter build apk --release -t lib/main.dart
+
+      - name: Locate APK
+        id: apk
+        run: |
+          APK=$(find build/app/outputs -name '*.apk' -path '*release*' | head -n 1)
+          if [ -n "$APK" ]; then
+            echo "path=$APK" >> "$GITHUB_OUTPUT"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Found APK: $APK ($(du -h "$APK" | cut -f1))"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::error::No release APK found under build/app/outputs"
+            exit 1
+          fi
+
+      - name: Upload APK artifact
+        if: steps.apk.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: taksh-app-apk
+          path: ${{ steps.apk.outputs.path }}
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Summary
+        if: steps.apk.outputs.found == 'true'
+        run: |
+          {
+            echo "## Android APK built"
+            echo ""
+            echo "- Artifact name: \`taksh-app-apk\` (retained 14 days)"
+            echo "- File: \`$(basename "${{ steps.apk.outputs.path }}")\`"
+            echo "- Commit: \`${GITHUB_SHA::7}\`"
+            echo ""
+            echo "**Download:** Actions → this run → *Artifacts* section at the bottom of this page → \`taksh-app-apk\`."
+            echo ""
+            echo "> Release build signed with the **debug key** (no release keystore configured). Fine for testing, not for Play Store."
+          } >> "$GITHUB_STEP_SUMMARY"
