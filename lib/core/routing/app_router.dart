@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
+import 'package:taksh_e_commerce/features/notifications/domain/entities/app_notification.dart';
+import 'package:taksh_e_commerce/features/notifications/presentation/pages/notification_detail_page.dart';
+import 'package:taksh_e_commerce/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:taksh_e_commerce/features/address/presentation/pages/add_address_page.dart';
 import 'package:taksh_e_commerce/features/address/presentation/pages/address_list_page.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cubit.dart';
@@ -338,11 +341,24 @@ class AppRouter {
       ),
     ),
     GoRoute(
-      path: '${AppRoutes.profile}/notifications',
+      path: AppRoutes.notifications,
       name: 'notifications',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: const NotificationsPage(),
+        transitionsBuilder: _slideTransition,
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.notificationDetail,
+      name: 'notification-detail',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: NotificationDetailPage(
+          notification: state.extra is AppNotification
+              ? state.extra as AppNotification
+              : null,
+        ),
         transitionsBuilder: _slideTransition,
       ),
     ),
@@ -882,17 +898,6 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(child: Text('Favorites Page - To be implemented')),
-    );
-  }
-}
-
-class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Notifications Page - To be implemented')),
     );
   }
 }

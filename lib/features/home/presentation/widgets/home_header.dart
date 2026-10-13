@@ -243,6 +243,7 @@ class _HomeHeaderState extends State<HomeHeader>
         _log.infoWithContext('Notification button tapped', {
           'action': 'user_action',
         });
+        context.push(AppRoutes.notifications);
       },
       child: Container(
         width: 36,
@@ -253,6 +254,7 @@ class _HomeHeaderState extends State<HomeHeader>
         ),
         child: Stack(
           alignment: Alignment.center,
+          clipBehavior: Clip.none,
           children: [
             const Icon(
               Icons.notifications_none_rounded,
@@ -260,15 +262,26 @@ class _HomeHeaderState extends State<HomeHeader>
               size: 22,
             ),
             Positioned(
-              top: 7,
-              right: 8,
+              top: -4,
+              right: -4,
               child: Container(
-                width: 7,
-                height: 7,
+                width: 18,
+                height: 18,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: Colors.redAccent,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1),
+                ),
+                // Static count until notifications are API-backed.
+                child: const Text(
+                  '3',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    height: 1,
+                  ),
                 ),
               ),
             ),

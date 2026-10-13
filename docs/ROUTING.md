@@ -126,6 +126,8 @@ Widget: `lib/core/widgets/guest_auth_wall.dart`
 |----------|------|------|
 | addresses list / add | `/addresses`, `/addresses/add` | AddressListPage, AddAddressPage |
 | wishlist | `/wishlist` (see AppRoutes) | WishlistPage |
+| notifications | `/profile/notifications` | NotificationsPage (static data, UI only) |
+| notification-detail | `/profile/notifications/detail` | NotificationDetailPage (`extra`: AppNotification) |
 
 ### Placeholders still in `app_router.dart`
 

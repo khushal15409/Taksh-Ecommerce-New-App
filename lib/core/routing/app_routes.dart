@@ -143,6 +143,7 @@ class AppRoutes {
   static const String favorites = '/profile/favorites';
   static const String wishlist = '/profile/wishlist';
   static const String notifications = '/profile/notifications';
+  static const String notificationDetail = '/profile/notifications/detail';
 
   // Other routes
   static const String about = '/about';
