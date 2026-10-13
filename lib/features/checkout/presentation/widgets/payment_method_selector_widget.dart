@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
@@ -35,17 +36,7 @@ class _PaymentMethodSelectorWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: festiveCardDecoration(),
       child: Column(
         children: [
           // COD Payment Method
@@ -84,9 +75,18 @@ class _PaymentMethodSelectorWidgetState
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
         padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryOrange.withOpacity(0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryOrange : Colors.transparent,
+          ),
+        ),
         child: Row(
           children: [
             // Icon

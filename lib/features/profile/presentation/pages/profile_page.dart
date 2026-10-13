@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/core/widgets/guest_auth_wall.dart';
 import 'package:taksh_e_commerce/core/widgets/user_initials_avatar.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
@@ -83,14 +84,27 @@ class _ProfilePageState extends State<ProfilePage> {
         SliverAppBar(
           expandedHeight: 220,
           pinned: true,
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.secondaryGreen,
+          foregroundColor: Colors.white,
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
               decoration: const BoxDecoration(
-                gradient: IndiaGradients.profileHeaderGradient,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF4DB45E), Color(0xFF8ED57F)],
+                ),
               ),
-              child: SafeArea(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    FestiveHeaderBackdrop.festiveGreenAsset,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  ),
+                  SafeArea(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -101,6 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
+                        border: Border.all(color: Colors.white, width: 2),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
@@ -124,9 +139,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               ? state.user.name!
                               : 'Your account',
                           style: const TextStyle(
-                            fontSize: 28,
+                            fontSize: 26,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.black,
+                            color: Colors.white,
                           ),
                         ),
                         Text(
@@ -135,8 +150,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               : 'Your account',
                           style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.black,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -144,7 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 100,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryGreen,
+                            color: Colors.amber,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -152,6 +167,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
+              ),
+                ],
               ),
             ),
           ),
@@ -857,8 +874,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   const Icon(
-                    Icons.cake,
-                    size: 40,
+                    Icons.card_giftcard_rounded,
+                    size: 44,
                     color: Color(0xFFFFA340), // Orange cake icon
                   ),
                 ],

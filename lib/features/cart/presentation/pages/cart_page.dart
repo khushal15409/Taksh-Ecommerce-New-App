@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/core/widgets/guest_auth_wall.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
@@ -105,15 +106,22 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildCartContent(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.cart),
+        title: Text(
+          AppLocalizations.of(context)!.cart,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+          ),
+        ),
         centerTitle: false,
-        backgroundColor: Theme.of(context).brightness == Brightness.light
-            ? AppColors.primaryOrange
-            : Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Theme.of(context).brightness == Brightness.light
-            ? Colors.white
-            : Theme.of(context).appBarTheme.foregroundColor,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        foregroundColor: Colors.white,
         actions: [
           BlocBuilder<CartCubit, CartState>(
             builder: (context, state) {
@@ -134,15 +142,7 @@ class _CartPageState extends State<CartPage>
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: Theme.of(context).brightness == Brightness.light
-              ? IndiaGradients.subtleTricolor
-              : null,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).scaffoldBackgroundColor
-              : null,
-        ),
+      body: FestiveHeaderBackdrop(
         child: BlocConsumer<CartCubit, CartState>(
           listener: (context, state) {
             if (state is CartError) {
@@ -197,28 +197,29 @@ class _CartPageState extends State<CartPage>
 
             return Column(
               children: [
-                Material(
-                  color: Colors.transparent,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: Theme.of(context).brightness == Brightness.light
-                        ? AppColors.primaryOrange
-                        : Theme.of(context).colorScheme.primary,
-                    unselectedLabelColor: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.color,
-                    indicatorColor:
-                        Theme.of(context).brightness == Brightness.light
-                        ? AppColors.primaryOrange
-                        : Theme.of(context).colorScheme.primary,
-                    tabs: [
-                      Tab(
-                        text:
-                            '${AppLocalizations.of(context)!.quickDelivery} (${quickCart.totalItems})',
+                SizedBox(
+                  height: MediaQuery.of(context).padding.top + kToolbarHeight,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildDeliveryChip(
+                          index: 0,
+                          icon: Icons.bolt_rounded,
+                          label:
+                              '${AppLocalizations.of(context)!.quickDelivery} (${quickCart.totalItems})',
+                        ),
                       ),
-                      Tab(
-                        text:
-                            '${AppLocalizations.of(context)!.standardDelivery} (${standardCart.totalItems})',
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildDeliveryChip(
+                          index: 1,
+                          icon: Icons.local_shipping_outlined,
+                          label:
+                              '${AppLocalizations.of(context)!.standardDelivery} (${standardCart.totalItems})',
+                        ),
                       ),
                     ],
                   ),
@@ -238,19 +239,73 @@ class _CartPageState extends State<CartPage>
     );
   }
 
+  Widget _buildDeliveryChip({
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
+    final selected = _tabController.index == index;
+    return GestureDetector(
+      onTap: () => _tabController.animateTo(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          gradient: selected ? festiveOrangeGradient : null,
+          color: selected ? null : Colors.white.withOpacity(0.95),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: selected ? Colors.white : AppColors.grey800,
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: selected ? Colors.white : AppColors.grey900,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCartBody(BuildContext context, Cart cart) {
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: cart.items.length,
+            itemCount: cart.items.length + 1,
             itemBuilder: (context, index) {
+              if (index == cart.items.length) {
+                return _buildBillDetails(context, cart);
+              }
               return _buildCartItem(context, cart.items[index]);
             },
           ),
         ),
-        _buildCartSummary(context, cart),
+        _buildCheckoutBar(context, cart),
       ],
     );
   }
@@ -330,10 +385,9 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildCartItem(BuildContext context, CartItem item) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: festiveCardDecoration(),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -567,126 +621,119 @@ class _CartPageState extends State<CartPage>
     );
   }
 
-  Widget _buildCartSummary(BuildContext context, Cart cart) {
+  Widget _buildBillDetails(BuildContext context, Cart cart) {
     final displayTotal = (cart.totalWithDelivery ?? cart.total) +
         ExtraCharge.platformFeeAmount;
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+      decoration: festiveCardDecoration(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.receipt_long_outlined,
+                size: 18,
+                color: AppColors.primaryOrange,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Bill Details',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _buildSummaryRow(
+            context,
+            AppLocalizations.of(context)!.subtotal,
+            '₹${cart.total}',
+          ),
+          _buildSummaryRow(
+            context,
+            AppLocalizations.of(context)!.deliveryCharges,
+            AppLocalizations.of(context)!.free,
+            valueColor: AppColors.secondaryGreen,
+          ),
+          for (final charge in cart.extraCharges)
+            _buildSummaryRow(
+              context,
+              charge.label,
+              '${charge.isDiscount ? '- ' : ''}₹${charge.amount}',
+              valueColor: charge.isDiscount ? AppColors.secondaryGreen : null,
+            ),
+          _buildSummaryRow(
+            context,
+            AppLocalizations.of(context)!.platformFees,
+            '₹${ExtraCharge.platformFeeAmount}',
+          ),
+          const Divider(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.totalItemsLabel(cart.totalItems),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                '₹$displayTotal',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryOrange,
+                ),
+              ),
+            ],
           ),
         ],
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildSummaryRow(
-              context,
-              AppLocalizations.of(context)!.subtotal,
-              '₹${cart.total}',
-            ),
-            _buildSummaryRow(
-              context,
-              AppLocalizations.of(context)!.deliveryCharges,
-              AppLocalizations.of(context)!.free,
-              valueColor: AppColors.secondaryGreen,
-            ),
-            for (final charge in cart.extraCharges)
-              _buildSummaryRow(
-                context,
-                charge.label,
-                '${charge.isDiscount ? '- ' : ''}₹${charge.amount}',
-                valueColor: charge.isDiscount ? AppColors.secondaryGreen : null,
-              ),
-            _buildSummaryRow(
-              context,
-              AppLocalizations.of(context)!.platformFees,
-              '₹${ExtraCharge.platformFeeAmount}',
-            ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.totalItemsLabel(cart.totalItems),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  '₹$displayTotal',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryOrange,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: IndiaGradients.saffronGradient,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryOrange.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (cart.items.isEmpty) {
-                      return;
-                    }
+    );
+  }
 
-                    context.push(
-                      AppRoutes.checkout,
-                      extra: SelectedCheckoutItems(
-                        items: cart.items,
-                        itemIds: cart.items.map((item) => item.id).toList(),
-                        subtotal: cart.total,
-                        totalQuantity: cart.totalItems,
-                        extraCharges: cart.extraCharges,
-                        deliveryType: _selectedDeliveryType,
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.proceedToCheckout,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+  Widget _buildCheckoutBar(BuildContext context, Cart cart) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      color: Colors.transparent,
+      child: SafeArea(
+        top: false,
+        child: FestiveGradientButton(
+          onPressed: () {
+            if (cart.items.isEmpty) {
+              return;
+            }
+
+            context.push(
+              AppRoutes.checkout,
+              extra: SelectedCheckoutItems(
+                items: cart.items,
+                itemIds: cart.items.map((item) => item.id).toList(),
+                subtotal: cart.total,
+                totalQuantity: cart.totalItems,
+                extraCharges: cart.extraCharges,
+                deliveryType: _selectedDeliveryType,
+              ),
+            );
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.proceedToCheckout,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_forward_rounded, size: 20),
+            ],
+          ),
         ),
       ),
     );

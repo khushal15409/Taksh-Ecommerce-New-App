@@ -7,6 +7,7 @@ import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/services/razorpay_service.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
@@ -223,15 +224,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.checkout),
+        title: Text(
+          AppLocalizations.of(context)!.checkout,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+          ),
+        ),
         centerTitle: false,
-        backgroundColor: Theme.of(context).brightness == Brightness.light
-            ? AppColors.primaryOrange
-            : Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Theme.of(context).brightness == Brightness.light
-            ? Colors.white
-            : Theme.of(context).appBarTheme.foregroundColor,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        foregroundColor: Colors.white,
       ),
       body: MultiBlocListener(
         listeners: [
@@ -358,17 +366,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            return Container(
-              decoration: BoxDecoration(
-                gradient: Theme.of(context).brightness == Brightness.light
-                    ? IndiaGradients.subtleTricolor
-                    : null,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).scaffoldBackgroundColor
-                    : null,
-              ),
+            return FestiveHeaderBackdrop(
               child: Column(
                 children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).padding.top + kToolbarHeight,
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(16),
@@ -423,7 +426,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       title,
       style: Theme.of(
         context,
-      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
     );
   }
 }
@@ -493,10 +496,8 @@ class _OrderItemsSectionState extends State<_OrderItemsSection> {
 
         final items = state.summary.items;
 
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+        return Container(
+          decoration: festiveCardDecoration(),
           child: Column(
             children: [
               InkWell(
@@ -617,7 +618,8 @@ class _CheckoutBottomBar extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -631,7 +633,7 @@ class _CheckoutBottomBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
+                IntrinsicWidth(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -660,41 +662,51 @@ class _CheckoutBottomBar extends StatelessWidget {
                     ],
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: canPlaceOrder && !isProcessing && !hasNoAddresses
-                      ? () => context
-                            .findAncestorStateOfType<_CheckoutPageState>()
-                            ?._processCheckout()
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).brightness == Brightness.light
-                        ? AppColors.primaryOrange
-                        : AppColors.primaryOrangeDark,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                  ),
-                  child: isProcessing
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: FestiveGradientButton(
+                    onPressed: canPlaceOrder && !isProcessing && !hasNoAddresses
+                        ? () => context
+                              .findAncestorStateOfType<_CheckoutPageState>()
+                              ?._processCheckout()
+                        : null,
+                    child: isProcessing
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  hasNoAddresses
+                                      ? AppLocalizations.of(context)!.addAddress
+                                      : (paymentMethod.type ==
+                                                PaymentMethodType.cod
+                                            ? AppLocalizations.of(
+                                                context,
+                                              )!.placeOrder
+                                            : AppLocalizations.of(
+                                                context,
+                                              )!.proceedToPay),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 20),
+                            ],
                           ),
-                        )
-                      : Text(
-                          hasNoAddresses
-                              ? AppLocalizations.of(context)!.addAddress
-                              : (paymentMethod.type == PaymentMethodType.cod
-                                    ? AppLocalizations.of(context)!.placeOrder
-                                    : AppLocalizations.of(
-                                        context,
-                                      )!.proceedToPay),
-                        ),
+                  ),
                 ),
               ],
             ),

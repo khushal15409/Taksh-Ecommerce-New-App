@@ -9,6 +9,7 @@ import 'package:taksh_e_commerce/core/routing/app_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/core/utils/validators.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_event.dart';
@@ -146,17 +147,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
           }
         },
         builder: (context, state) {
-          return Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: Theme.of(context).brightness == Brightness.light
-                  ? IndiaGradients.subtleTricolor
-                  : null,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : null,
-            ),
+          return FestiveAuthBackground(
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppConstants.defaultPadding),
@@ -260,47 +251,105 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                         ),
                         child: Column(
                           children: [
-                            // OTP input
-                            TextFormField(
-                              controller: _otpController,
-                              keyboardType: TextInputType.number,
-                              maxLength: AppConstants.otpLength,
-                              enabled: !_isLoading,
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                letterSpacing: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(
-                                  AppConstants.otpLength,
+                            // OTP input: transparent real field on top of
+                            // visual digit boxes (keeps controller/validator).
+                            Stack(
+                              children: [
+                                Positioned(
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  height: 56,
+                                  child: IgnorePointer(
+                                    child: ValueListenableBuilder<
+                                      TextEditingValue
+                                    >(
+                                      valueListenable: _otpController,
+                                      builder: (context, value, _) {
+                                        return Row(
+                                          children: List.generate(
+                                            AppConstants.otpLength,
+                                            (i) {
+                                              final filled =
+                                                  i < value.text.length;
+                                              final active =
+                                                  i == value.text.length;
+                                              return Expanded(
+                                                child: Container(
+                                                  margin: EdgeInsets.only(
+                                                    left: i == 0 ? 0 : 10,
+                                                  ),
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.grey50,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          14,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: active
+                                                          ? AppColors
+                                                                .primaryOrange
+                                                          : theme.dividerColor,
+                                                      width: active ? 2 : 1,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    filled
+                                                        ? value.text[i]
+                                                        : '',
+                                                    style: theme
+                                                        .textTheme
+                                                        .titleLarge
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                TextFormField(
+                                  controller: _otpController,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: AppConstants.otpLength,
+                                  enabled: !_isLoading,
+                                  showCursor: false,
+                                  enableInteractiveSelection: false,
+                                  style: const TextStyle(
+                                    color: Colors.transparent,
+                                    fontSize: 24,
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(
+                                      AppConstants.otpLength,
+                                    ),
+                                  ],
+                                  decoration: const InputDecoration(
+                                    counterText: '',
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  validator: (value) => Validators.getOtpError(
+                                    context,
+                                    value ?? '',
+                                  ),
+                                  textInputAction: TextInputAction.done,
+                                  onFieldSubmitted: (_) => _handleVerifyOtp(),
                                 ),
                               ],
-                              decoration: InputDecoration(
-                                hintText: AppLocalizations.of(context)!.otpHint,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: theme.dividerColor,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: const BorderSide(
-                                    color: AppColors.secondaryGreen,
-                                    width: 2,
-                                  ),
-                                ),
-                                counterText: '',
-                              ),
-                              validator: (value) =>
-                                  Validators.getOtpError(context, value ?? ''),
-                              textInputAction: TextInputAction.done,
-                              onFieldSubmitted: (_) => _handleVerifyOtp(),
                             ),
 
                             const SizedBox(
@@ -308,58 +357,31 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                             ),
 
                             // Verify button with green gradient
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: _isLoading
-                                    ? null
-                                    : IndiaGradients.greenGradient,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: _isLoading
-                                    ? null
-                                    : [
-                                        BoxShadow(
-                                          color: AppColors.secondaryGreen
-                                              .withOpacity(0.3),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                              ),
-                              child: FilledButton(
-                                onPressed: _isLoading ? null : _handleVerifyOtp,
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  disabledBackgroundColor: theme.disabledColor,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: AppConstants.defaultPadding,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                child: _isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.verifyOtpButton,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            FestiveGradientButton(
+                              gradient: festiveGreenGradient,
+                              shadowColor: AppColors.secondaryGreen,
+                              onPressed: _isLoading ? null : _handleVerifyOtp,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
-                              ),
+                                    )
+                                  : Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.verifyOtpButton,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),

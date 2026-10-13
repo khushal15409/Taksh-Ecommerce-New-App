@@ -72,14 +72,29 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         value: _deliveryCheckCubit,
         child: Scaffold(
           backgroundColor: Colors.white,
+          extendBodyBehindAppBar: true,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
             elevation: 0,
             scrolledUnderElevation: 0,
-            title: Text(AppLocalizations.of(context)!.productDetails),
-            leading: IconButton(
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            centerTitle: true,
+            title: Text(
+              AppLocalizations.of(context)!.productDetails,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+              ),
+            ),
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: IconButton(
+                onPressed: () => Navigator.of(context).maybePop(),
+                style: IconButton.styleFrom(backgroundColor: Colors.white),
+                color: AppColors.grey900,
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+              ),
             ),
             actions: [
               BlocBuilder<WishlistCubit, WishlistState>(
@@ -100,32 +115,69 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       (wishlistState is RemovingFromWishlist &&
                           wishlistState.productId == productId);
 
-                  return IconButton(
-                    onPressed: productId == null || isLoading
-                        ? null
-                        : () {
-                            context.read<WishlistCubit>().toggleWishlist(
-                              productId: productId!,
-                            );
-                          },
-                    icon: isLoading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Icon(
-                            isWishlisted
-                                ? Icons.favorite_rounded
-                                : Icons.favorite_border_rounded,
-                            color: isWishlisted ? Colors.red : null,
-                          ),
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                      onPressed: productId == null || isLoading
+                          ? null
+                          : () {
+                              context.read<WishlistCubit>().toggleWishlist(
+                                productId: productId!,
+                              );
+                            },
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        disabledBackgroundColor: Colors.white70,
+                      ),
+                      icon: isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              isWishlisted
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              color: isWishlisted
+                                  ? Colors.red
+                                  : AppColors.grey900,
+                            ),
+                    ),
+                  );
+                },
+              ),
+              BlocBuilder<CartCubit, CartState>(
+                builder: (context, _) {
+                  final cartCubit = context.read<CartCubit>();
+                  final count =
+                      cartCubit.quickCart.totalItems +
+                      cartCubit.standardCart.totalItems;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Badge(
+                      isLabelVisible: count > 0,
+                      label: Text('$count'),
+                      child: IconButton(
+                        onPressed: () => context.go(AppRoutes.cart),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white,
+                        ),
+                        color: AppColors.grey900,
+                        icon: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 22,
+                        ),
+                      ),
+                    ),
                   );
                 },
               ),
             ],
           ),
-          body: BlocConsumer<ProductCubit, ProductState>(
+          body: _buildFestiveFrame(
+            context,
+            BlocConsumer<ProductCubit, ProductState>(
             listener: (context, state) {
               // Fetch similar products when product details are loaded
               if (state is ProductDetailsLoaded) {
@@ -166,15 +218,63 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
               return const SizedBox.shrink();
             },
+            ),
           ),
         ),
       ),
     );
   }
 
+  /// Diwali artwork behind the app bar with the content in a rounded white
+  /// sheet, matching the home / categories screens.
+  Widget _buildFestiveFrame(BuildContext context, Widget content) {
+    final topInset = MediaQuery.of(context).padding.top + kToolbarHeight;
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: IgnorePointer(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Image.asset(
+                'assets/images/diwali/home_categories_diwali_bg.jpg',
+                width: double.infinity,
+                fit: BoxFit.fitWidth,
+                gaplessPlayback: true,
+              ),
+            ),
+          ),
+        ),
+        Column(
+          children: [
+            SizedBox(height: topInset + 4),
+            Expanded(
+              child: Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 14,
+                      offset: const Offset(0, -3),
+                    ),
+                  ],
+                ),
+                child: content,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildProductContent(BuildContext context, Product product) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -326,16 +426,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       return const SizedBox.shrink();
     }
 
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AddToCartButton(
-          productVariantId: variantId,
-          productId: product.id,
-          size: 'large',
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
+        Expanded(
           child: OutlinedButton(
             onPressed: _isBuyNowLoading
                 ? null
@@ -375,8 +469,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   )
                 : const Text(
                     'Buy Now',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: AddToCartButton(
+            productVariantId: variantId,
+            productId: product.id,
+            size: 'large',
           ),
         ),
       ],
@@ -534,8 +636,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Container(
       height: 280,
       decoration: BoxDecoration(
-        color: AppColors.grey100,
-        borderRadius: BorderRadius.circular(28),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.primaryOrange.withOpacity(0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryOrange.withOpacity(0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: PageView.builder(

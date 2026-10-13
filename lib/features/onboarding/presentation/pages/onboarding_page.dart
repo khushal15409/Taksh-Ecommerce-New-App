@@ -237,12 +237,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
             SafeArea(
               child: Align(
                 alignment: Alignment.topRight,
-                child: TextButton(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 16, 0),
+                  child: TextButton(
                   onPressed: _completeOnboarding,
                   style: TextButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.55),
+                    shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
+                      horizontal: 18,
+                      vertical: 6,
                     ),
                   ),
                   child: Text(
@@ -253,6 +257,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                ),
                 ),
               ),
             ),
@@ -289,12 +294,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                             elevation: 0,
                           ),
-                          child: Text(
-                            isLastPage ? l10n.getStarted : l10n.next,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                isLastPage ? l10n.getStarted : l10n.next,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              if (!isLastPage) ...[
+                                const SizedBox(width: 6),
+                                const Icon(Icons.arrow_forward_rounded, size: 18),
+                              ],
+                            ],
                           ),
                         ),
                       ),

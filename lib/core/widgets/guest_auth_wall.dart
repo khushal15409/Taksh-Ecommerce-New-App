@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Shows a creative "Login to access" placeholder for guest users.
@@ -46,13 +47,7 @@ class GuestAuthWall extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: isDark ? null : IndiaGradients.subtleTricolor,
-          color: isDark ? theme.scaffoldBackgroundColor : null,
-        ),
+      body: FestiveAuthBackground(
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -148,38 +143,21 @@ class GuestAuthWall extends StatelessWidget {
                 const SizedBox(height: 40),
 
                 // ── Login Button ──
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: IndiaGradients.saffronGradient,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryOrange.withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: FilledButton.icon(
-                      onPressed: () => _goToLogin(context),
-                      icon: const Icon(Icons.login_rounded),
-                      label: Text(
+                FestiveGradientButton(
+                  onPressed: () => _goToLogin(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.login_rounded, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
                         l10n.guestWallLoginButton,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
                 ),
 

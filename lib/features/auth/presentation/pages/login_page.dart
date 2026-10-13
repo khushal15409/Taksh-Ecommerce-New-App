@@ -7,6 +7,7 @@ import 'package:taksh_e_commerce/core/constants/app_constants.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/utils/validators.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
@@ -103,12 +104,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         builder: (context, state) {
-          return Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: IndiaGradients.subtleTricolor,
-            ),
+          return FestiveAuthBackground(
             child: SafeArea(
               child: Stack(
                 children: [
@@ -282,24 +278,41 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ],
                               decoration: InputDecoration(
-                                labelText: AppLocalizations.of(
-                                  context,
-                                )!.phoneNumber,
                                 hintText: AppLocalizations.of(
                                   context,
-                                )!.enterPhoneNumberHint,
-                                prefixIcon: Container(
-                                  margin: const EdgeInsets.all(12),
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    gradient: IndiaGradients.saffronGradient,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Icon(
-                                    Icons.phone,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
+                                )!.phoneNumber,
+                                filled: true,
+                                fillColor: AppColors.grey50,
+                                prefixIcon: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(
+                                        10,
+                                        10,
+                                        8,
+                                        10,
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        gradient: festiveOrangeGradient,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.phone,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                    ),
+                                    Text(
+                                      '+91',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ],
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -331,58 +344,30 @@ class _LoginPageState extends State<LoginPage> {
                               height: AppConstants.defaultPadding * 1.5,
                             ),
 
-                            // Send OTP button with gradient
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: _isLoading
-                                    ? null
-                                    : IndiaGradients.saffronGradient,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: _isLoading
-                                    ? null
-                                    : [
-                                        BoxShadow(
-                                          color: AppColors.primaryOrange
-                                              .withOpacity(0.3),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                              ),
-                              child: FilledButton(
-                                onPressed: _isLoading
-                                    ? null
-                                    : () => _handleSendOtp(context),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  disabledBackgroundColor: theme.disabledColor,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: AppConstants.defaultPadding,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                child: _isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : Text(
-                                        AppLocalizations.of(context)!.sendOtp,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            // Send OTP button
+                            FestiveGradientButton(
+                              onPressed: _isLoading
+                                  ? null
+                                  : () => _handleSendOtp(context),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
-                              ),
+                                    )
+                                  : Text(
+                                      AppLocalizations.of(context)!.sendOtp,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),

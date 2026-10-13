@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/price_breakdown.dart';
 
@@ -16,10 +17,7 @@ class PriceBreakdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return festiveCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

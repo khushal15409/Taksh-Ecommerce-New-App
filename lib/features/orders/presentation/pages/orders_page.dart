@@ -6,6 +6,7 @@ import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/core/widgets/guest_auth_wall.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
@@ -57,10 +58,12 @@ class _OrdersPageState extends State<OrdersPage> {
   Widget _buildOrdersContent(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
+        scrolledUnderElevation: 0,
         toolbarHeight: 100,
-        backgroundColor: AppColors.secondaryGreen,
+        backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         flexibleSpace: SafeArea(
           child: Padding(
@@ -125,9 +128,11 @@ class _OrdersPageState extends State<OrdersPage> {
           ),
         ),
       ),
-      body: Container(
-        color: const Color(0xFFF5F5F5),
-        child: BlocConsumer<OrdersCubit, OrdersState>(
+      body: FestiveHeaderBackdrop(
+        asset: FestiveHeaderBackdrop.festiveGreenAsset,
+        child: Padding(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 100),
+          child: BlocConsumer<OrdersCubit, OrdersState>(
           listener: (context, state) {
             if (state is OrdersError) {
               AppErrorToast.show(context);
@@ -185,6 +190,7 @@ class _OrdersPageState extends State<OrdersPage> {
             return _buildEmptyOrders(context);
           },
         ),
+        ),
       ),
     );
   }
@@ -223,7 +229,6 @@ class _OrdersPageState extends State<OrdersPage> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       width: double.infinity,
-      decoration: const BoxDecoration(color: AppColors.secondaryGreen),
       child: Row(
         children: [
           Expanded(

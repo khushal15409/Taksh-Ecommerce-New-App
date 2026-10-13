@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_state.dart';
@@ -48,8 +49,7 @@ class AddressSelectorWidget extends StatelessWidget {
   }
 
   Widget _buildNoAddressCard(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return festiveCard(
       child: InkWell(
         onTap: () => _showAddressSelector(context),
         borderRadius: BorderRadius.circular(12),
@@ -86,8 +86,7 @@ class AddressSelectorWidget extends StatelessWidget {
   }
 
   Widget _buildAddressCard(BuildContext context, Address address) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return festiveCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -95,6 +94,18 @@ class AddressSelectorWidget extends StatelessWidget {
           children: [
             Row(
               children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryOrange.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.home_rounded,
+                    color: AppColors.primaryOrange,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -125,7 +136,13 @@ class AddressSelectorWidget extends StatelessWidget {
                 const Spacer(),
                 TextButton(
                   onPressed: () => _showAddressSelector(context),
-                  child: const Text('Change'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primaryOrange,
+                  ),
+                  child: const Text(
+                    'Change',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             ),
@@ -327,7 +344,7 @@ class _AddressListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return festiveCard(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: onSelect,
