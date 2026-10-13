@@ -54,41 +54,16 @@ class ProductSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Section title with decorative accent
         Expanded(
-          child: Row(
-            children: [
-              // Decorative accent bar
-              Container(
-                width: 3,
-                height: 18,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.primaryOrange,
-                      AppColors.secondaryGreen,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              // Section title
-              Expanded(
-                child: Text(
-                  section.key,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.black,
-                    letterSpacing: -0.3,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+          child: Text(
+            section.key,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: AppColors.black,
+              letterSpacing: -0.3,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         // View All button with modern styling
@@ -99,49 +74,29 @@ class ProductSection extends StatelessWidget {
 
   /// Builds the modern View All button
   Widget _buildViewAllButton(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onViewAllTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xxs + 2,
-          ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primaryOrange.withOpacity(0.1),
-                AppColors.primaryOrangeLight.withOpacity(0.08),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.primaryOrange.withOpacity(0.2),
-              width: 1,
-            ),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'View All',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              SizedBox(width: 2),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 10,
+    return InkWell(
+      onTap: onViewAllTap,
+      borderRadius: BorderRadius.circular(8),
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'View All',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
                 color: AppColors.black,
               ),
-            ],
-          ),
+            ),
+            SizedBox(width: 2),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 12,
+              color: AppColors.black,
+            ),
+          ],
         ),
       ),
     );

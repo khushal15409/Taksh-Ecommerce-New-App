@@ -50,12 +50,12 @@ class CategoryProductCard extends StatelessWidget {
             outOfStockMessage: product.outOfStockMessage,
           ),
         ),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         child: Ink(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(22),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -69,7 +69,7 @@ class CategoryProductCard extends StatelessWidget {
             children: [
               Expanded(
                 flex: 8,
-                child: _buildVisualCard(context, imageUrl),
+                child: _buildVisualCard(context, imageUrl, discount),
               ),
               const SizedBox(height: 8),
               if (showDeliveryTime) ...[
@@ -135,6 +135,7 @@ class CategoryProductCard extends StatelessWidget {
   Widget _buildVisualCard(
     BuildContext context,
     String? imageUrl,
+    int? discount,
   ) {
     const outerRadius = 18.0;
 
@@ -167,6 +168,27 @@ class CategoryProductCard extends StatelessWidget {
             ),
           ),
         ),
+        if (discount != null)
+          Positioned(
+            top: 6,
+            left: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE5242B),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '$discount% OFF',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
+                  height: 1,
+                ),
+              ),
+            ),
+          ),
         if (!product.inStock)
           Positioned.fill(
             child: ClipRRect(

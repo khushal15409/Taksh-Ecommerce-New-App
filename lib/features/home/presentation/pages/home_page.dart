@@ -24,6 +24,7 @@ import 'package:taksh_e_commerce/features/home/presentation/widgets/dashboard_sh
 import 'package:taksh_e_commerce/features/home/presentation/widgets/express_dashboard_content.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/home_header.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/home_mode_theme.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/mode_promo_banner.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/widgets/home_service_content.dart';
 
@@ -375,50 +376,11 @@ class _HomePageState extends State<_HomePageContent> {
       case DeliveryType.standard:
         return Column(
           children: [
-            // Standard delivery badge with green gradient
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 4, 16, 2),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: HomeModeTheme.standard.accent.withOpacity(0.35),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: HomeModeTheme.standard.accentSoft,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.local_shipping,
-                      color: HomeModeTheme.standard.accent,
-                      size: 14,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Flexible(
-                    child: Text(
-                      'Standard Delivery - Shop Your Favorites!',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+            const ModePromoBanner(
+              asset: 'assets/images/diwali/banner_standard.jpg',
+              title: 'Diwali Shopping\nFestival',
+              subtitle: 'Shop your favourites, delivered to your door',
+              shadowColor: Color(0xFFF26A0E),
             ),
             BlocBuilder<DashboardBloc, DashboardState>(
               builder: (context, state) {
@@ -446,50 +408,11 @@ class _HomePageState extends State<_HomePageContent> {
       case DeliveryType.quick:
         return Column(
           children: [
-            // Quick delivery badge with orange gradient
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 4, 16, 2),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: HomeModeTheme.quick.accent.withOpacity(0.35),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: HomeModeTheme.quick.accentSoft,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.bolt,
-                      color: HomeModeTheme.quick.accent,
-                      size: 12,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Flexible(
-                    child: Text(
-                      'Quick Delivery - Express 30',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+            const ModePromoBanner(
+              asset: 'assets/images/diwali/banner_quick.jpg',
+              title: 'Express Delivery\nin 30 Minutes!',
+              subtitle: 'Daily essentials at your doorstep',
+              shadowColor: Color(0xFF138A4A),
             ),
             BlocBuilder<ExpressDashboardBloc, ExpressDashboardState>(
               builder: (context, state) {

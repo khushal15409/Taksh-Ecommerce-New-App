@@ -9,6 +9,7 @@ import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_s
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/courier_booking_page.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/general_service_page.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/mode_promo_banner.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Content widget shown in the home tab when home services are selected.
@@ -153,22 +154,13 @@ class _ServicesView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n.homeServices,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.black,
-                ),
+              ModePromoBanner(
+                asset: 'assets/images/diwali/banner_services.jpg',
+                title: l10n.homeServices,
+                subtitle: l10n.homeServicesSubtitle,
+                shadowColor: const Color(0xFF6A1FD0),
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                l10n.homeServicesSubtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[700],
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
               if (services.isEmpty)
                 _EmptyView(subtitle: l10n.homeServicesSubtitle)
               else
@@ -240,12 +232,6 @@ class _ServiceCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _ServiceVisual(service: service, style: style),
-                  const Spacer(),
-                  Icon(
-                    Icons.arrow_outward_rounded,
-                    size: 20,
-                    color: style.gradient.first,
-                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -272,14 +258,37 @@ class _ServiceCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              if (service.serviceCharge > 0)
-                Text(
-                  'From ₹${_formatPrice(service.serviceCharge)}',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: style.gradient.first,
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  if (service.serviceCharge > 0)
+                    Expanded(
+                      child: Text(
+                        'From ₹${_formatPrice(service.serviceCharge)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: style.gradient.first,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    )
+                  else
+                    const Spacer(),
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: style.gradient.first.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 16,
+                      color: style.gradient.first,
+                    ),
                   ),
-                ),
+                ],
+              ),
             ],
           ),
         ),

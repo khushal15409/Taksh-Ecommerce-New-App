@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:taksh_e_commerce/core/routing/app_routes.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
+import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
@@ -143,6 +150,7 @@ class _ProductCardState extends State<ProductCard>
     final product = widget.product;
     final isCompact = widget.variant == ProductCardVariant.compact;
     final discount = _discountPercentage(product);
+    final hasRating = (product.averageRating ?? 0) > 0;
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -154,40 +162,34 @@ class _ProductCardState extends State<ProductCard>
         builder: (context, child) =>
             Transform.scale(scale: _scaleAnimation.value, child: child),
         child: Container(
-          color: Colors.transparent,
+          padding: EdgeInsets.all(isCompact ? 6 : 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildVisualCard(product, isCompact),
-              SizedBox(height: isCompact ? 1 : 3),
+              _buildVisualCard(product, isCompact, discount),
+              SizedBox(height: isCompact ? 8 : 10),
               if (widget.showDeliveryTime) ...[
-                SizedBox(height: isCompact ? 5 : 6),
                 _buildDeliveryChip(isCompact),
-                SizedBox(height: isCompact ? 5 : 6),
-              ] else ...[
-                SizedBox(height: isCompact ? 8 : 10),
+                const SizedBox(height: 4),
               ],
               _buildName(product, isCompact),
-              SizedBox(height: isCompact ? 4 : 5),
-              _buildRatingStars(product, isCompact),
-              SizedBox(height: isCompact ? 4 : 5),
-              _buildDiscountRow(discount, isCompact),
-              SizedBox(height: isCompact ? 2 : 3),
-              _buildFinalPrice(product, isCompact),
-              if (discount != null)
-                Padding(
-                  padding: EdgeInsets.only(top: isCompact ? 1 : 2),
-                  child: Text(
-                    '₹${product.originalPrice.toStringAsFixed(1)}',
-                    style: TextStyle(
-                      fontSize: isCompact ? 12 : 13,
-                      color: AppColors.grey500,
-                      decoration: TextDecoration.lineThrough,
-                      decorationColor: AppColors.grey500,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+              if (hasRating) ...[
+                const SizedBox(height: 3),
+                _buildRatingRow(product, isCompact),
+              ],
+              const SizedBox(height: 3),
+              _buildPriceRow(product, isCompact, discount),
             ],
           ),
         ),
@@ -195,64 +197,31 @@ class _ProductCardState extends State<ProductCard>
     );
   }
 
-  Widget _buildVisualCard(ProductModel product, bool isCompact) {
-    final outerRadius = isCompact ? 20.0 : 22.0;
-    final innerInset = isCompact ? 8.0 : 10.0;
-    final innerRadius = outerRadius - 6;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildVisualCard(ProductModel product, bool isCompact, int? discount) {
     final imageUrl = _resolvedImageUrl;
 
     return Expanded(
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 15,
+          Positioned.fill(
             child: Container(
-              width: double.infinity,
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF303030)
-                    : const Color(0xFFF1F1F1),
-                borderRadius: BorderRadius.circular(outerRadius),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF404040)
-                      : const Color(0xFFE9E9E9),
-                ),
+                color: const Color(0xFFF7F7F7),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned.fill(
-                    child: Padding(
-                      padding: EdgeInsets.all(innerInset),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(innerRadius),
-                        child: imageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const Center(
-                                  child: SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Icon(
-                                  Icons.image_outlined,
-                                  size: isCompact ? 26 : 30,
-                                  color: AppColors.grey400,
-                                ),
-                              )
-                            : _isResolvingImage
-                            ? const Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: imageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => const Center(
                                 child: SizedBox(
                                   width: 18,
                                   height: 18,
@@ -260,78 +229,76 @@ class _ProductCardState extends State<ProductCard>
                                     strokeWidth: 2,
                                   ),
                                 ),
-                              )
-                            : Icon(
+                              ),
+                              errorWidget: (context, url, error) => Icon(
                                 Icons.image_outlined,
                                 size: isCompact ? 26 : 30,
                                 color: AppColors.grey400,
                               ),
-                      ),
-                    ),
-                  ),
-                  Positioned(top: 8, left: 8, child: _buildHotBadge(isCompact)),
-                  if (!product.inStock)
-                    Positioned.fill(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(outerRadius),
-                        child: Container(
-                          color: Colors.white.withOpacity(0.72),
-                          alignment: Alignment.center,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.62),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              'Out of\nStock',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                fontSize: isCompact ? 11 : 12,
-                                height: 1.2,
-                                letterSpacing: 0.2,
+                            )
+                          : _isResolvingImage
+                          ? const Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               ),
+                            )
+                          : Icon(
+                              Icons.image_outlined,
+                              size: isCompact ? 26 : 30,
+                              color: AppColors.grey400,
+                            ),
+                    ),
+                    if (!product.inStock)
+                      Container(
+                        color: Colors.white.withOpacity(0.72),
+                        alignment: Alignment.center,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.62),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Out of\nStock',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: isCompact ? 11 : 12,
+                              height: 1.2,
+                              letterSpacing: 0.2,
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 0,
-                    child: Container(
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F1F1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+          // Badge only when the backend price data yields a real discount.
+          if (discount != null)
+            Positioned(top: 6, left: 6, child: _buildDiscountBadge(discount)),
+          Positioned(top: 4, right: 4, child: _buildWishlistButton(product)),
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Center(
-              child: ProductAddToCartButton(
-                productId: product.id,
-                productVariantId: product.productVariantId,
-                style: ProductAddToCartButtonStyle.outlinedGreen,
-                inStock: product.inStock,
-                isQuickDelivery: widget.showDeliveryTime,
-                variants: product.variants,
-                productName: product.name,
-                productImageUrl: imageUrl,
-              ),
+            right: 4,
+            bottom: 4,
+            child: ProductAddToCartButton(
+              productId: product.id,
+              productVariantId: product.productVariantId,
+              style: ProductAddToCartButtonStyle.outlinedGreen,
+              inStock: product.inStock,
+              isQuickDelivery: widget.showDeliveryTime,
+              variants: product.variants,
+              productName: product.name,
+              productImageUrl: imageUrl,
             ),
           ),
         ],
@@ -339,44 +306,72 @@ class _ProductCardState extends State<ProductCard>
     );
   }
 
-  Widget _buildHotBadge(bool isCompact) {
+  Widget _buildDiscountBadge(int discount) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isCompact ? 6 : 7,
-        vertical: isCompact ? 2 : 3,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFFF4A3D),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFE5242B),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        'HOT',
-        style: TextStyle(
+        '$discount% OFF',
+        style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w800,
-          fontSize: isCompact ? 10 : 11,
-          letterSpacing: 0.4,
+          fontSize: 10,
+          letterSpacing: 0.2,
           height: 1,
         ),
       ),
     );
   }
 
+  Widget _buildWishlistButton(ProductModel product) {
+    final cubit = getIt<WishlistCubit>();
+    return BlocBuilder<WishlistCubit, WishlistState>(
+      bloc: cubit,
+      builder: (context, state) {
+        final wishlisted = cubit.isWishlisted(product.id);
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            if (context.read<AuthBloc>().state is! Authenticated) {
+              context.push(
+                '${AppRoutes.login}?redirectAfter=${Uri.encodeComponent(AppRoutes.home)}',
+              );
+              return;
+            }
+            cubit.toggleWishlist(productId: product.id);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Icon(
+              wishlisted
+                  ? Icons.favorite_rounded
+                  : Icons.favorite_border_rounded,
+              size: 18,
+              color: wishlisted ? Colors.red : AppColors.grey600,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildDeliveryChip(bool isCompact) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isCompact ? 8 : 10,
         vertical: isCompact ? 1.5 : 2,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF404040) : const Color(0xFFEDEDED),
+        color: const Color(0xFFE6F6EC),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
         '30 minutes',
         style: TextStyle(
-          color: const Color(0xFFE46A61),
+          color: const Color(0xFF0B6B38),
           fontSize: isCompact ? 11 : 12,
           fontWeight: FontWeight.w700,
           height: 1.1,
@@ -391,75 +386,80 @@ class _ProductCardState extends State<ProductCard>
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
-        fontSize: isCompact ? 13 : 14,
-        fontWeight: FontWeight.w700,
-        color: Theme.of(context).textTheme.bodyLarge?.color,
-        height: 1.08,
+        fontSize: isCompact ? 12 : 13,
+        fontWeight: FontWeight.w600,
+        color: AppColors.grey900,
+        height: 1.2,
       ),
     );
   }
 
-  Widget _buildRatingStars(ProductModel product, bool isCompact) {
-    final filled = ((product.averageRating ?? 4.5).round()).clamp(1, 5);
+  /// Rating row — only rendered when the API supplied a rating.
+  Widget _buildRatingRow(ProductModel product, bool isCompact) {
+    final reviews = product.totalReviews;
     return FittedBox(
       fit: BoxFit.scaleDown,
       alignment: Alignment.centerLeft,
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(5, (index) {
-          return Icon(
-            index < filled ? Icons.star_rounded : Icons.star_border_rounded,
-            size: isCompact ? 17 : 18,
-            color: const Color(0xFFF7C71A),
-          );
-        }),
+        children: [
+          const Icon(Icons.star_rounded, size: 14, color: Color(0xFFF7B500)),
+          const SizedBox(width: 2),
+          Text(
+            product.averageRating!.toStringAsFixed(1),
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.grey700,
+            ),
+          ),
+          if (reviews != null && reviews > 0)
+            Text(
+              ' ($reviews)',
+              style: const TextStyle(fontSize: 11, color: AppColors.grey500),
+            ),
+        ],
       ),
     );
   }
 
-  Widget _buildDiscountRow(int? discount, bool isCompact) {
-    if (discount == null) return const SizedBox.shrink();
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Text(
-            '$discount% off',
+  Widget _buildPriceRow(ProductModel product, bool isCompact, int? discount) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Text(
+            '₹${_formatPrice(product.salePrice)}',
             style: TextStyle(
-              color: const Color(0xFF2E97E8),
-              fontSize: isCompact ? 15 : 16,
+              color: AppColors.grey900,
+              fontSize: isCompact ? 14 : 15,
               fontWeight: FontWeight.w800,
-              height: 1,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
-        ),
-      ],
+          if (discount != null) ...[
+            const SizedBox(width: 5),
+            Text(
+              '₹${_formatPrice(product.originalPrice)}',
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.grey500,
+                decoration: TextDecoration.lineThrough,
+                decorationColor: AppColors.grey500,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
-  Widget _buildFinalPrice(ProductModel product, bool isCompact) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Text(
-            '₹${product.salePrice.toStringAsFixed(1)}',
-            style: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-              fontSize: isCompact ? 16 : 17,
-              fontWeight: FontWeight.w900,
-              height: 1,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
+  String _formatPrice(double v) =>
+      v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
 
   int? _discountPercentage(ProductModel product) {
     if (product.originalPrice <= 0 ||
