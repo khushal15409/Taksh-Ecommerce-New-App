@@ -18,26 +18,27 @@ class CategorySidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = _accentColorForCategory(category.name);
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeInOut,
-          margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+          margin: const EdgeInsets.symmetric(vertical: 4),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primaryOrange.withOpacity(0.12)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+                ? AppColors.primaryOrange.withOpacity(0.14)
+                : accent.withOpacity(0.07),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
-                  ? AppColors.primaryOrange.withOpacity(0.35)
-                  : Theme.of(context).dividerColor,
-              width: 1,
+                  ? AppColors.primaryOrange.withOpacity(0.5)
+                  : Colors.transparent,
+              width: 1.2,
             ),
           ),
           child: Column(
@@ -51,13 +52,9 @@ class CategorySidebarItem extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w700,
-                  color: isSelected
-                      ? AppColors.primaryOrange
-                      : Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  fontSize: 10.5,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  color: isSelected ? AppColors.primaryOrange : Colors.black87,
                   height: 1.2,
                 ),
               ),

@@ -16,9 +16,9 @@ import 'package:taksh_e_commerce/features/product/domain/entities/category.dart'
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cubit.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_state.dart';
 
-/// Home page header using SliverPersistentHeader for full layout control.
-/// Collapsed: delivery tabs + categories + gradient strip (pinned).
-/// Expanded: logo row + search bar + delivery tabs + categories + gradient strip.
+/// Fixed Home header: logo/address/bell row, search bar, delivery-mode tabs and
+/// the categories strip. Lives above the scroll view so scrolling starts at the
+/// promo banner.
 class HomeHeader extends StatefulWidget {
   final DeliveryType selectedDeliveryType;
   final ValueChanged<DeliveryType> onDeliveryTypeChanged;
@@ -131,146 +131,78 @@ class _HomeHeaderState extends State<HomeHeader>
     const double searchBarHeight = 44.0;
     const double deliverySelectorHeight = 60.0;
     final double categoriesStripHeight = showCategoriesStrip ? 74.0 : 0.0;
-    const double gradientStripHeight = 0.0;
 
     // --- Spacing / padding (gaps around widgets) ---
     const double logoSearchGap = 10.0;
     const double searchDeliveryGap = 6.0;
     const double deliveryPaddingV = 6.0;
 
-    // --- Computed totals (auto-update when you tweak above) ---
-    const double deliveryTotalHeight =
-        deliverySelectorHeight + (deliveryPaddingV * 2);
-    const double collapsibleHeight =
-        logoRowHeight + searchBarHeight + logoSearchGap + searchDeliveryGap;
-    final double pinnedContentHeight =
-        deliveryTotalHeight + categoriesStripHeight + gradientStripHeight;
+    final modeTheme = HomeModeTheme.of(widget.selectedDeliveryType);
 
-    final double maxExtent =
-        topPadding + collapsibleHeight + pinnedContentHeight;
-    final double minExtent = topPadding + pinnedContentHeight;
-
-    return SliverPersistentHeader(
-      pinned: true,
-      delegate: _HomeHeaderDelegate(
-        maxExtent: maxExtent,
-        minExtent: minExtent,
-        topPadding: topPadding,
-        pinnedContentHeight: pinnedContentHeight,
-        collapsibleHeight: collapsibleHeight,
-        buildContent: (shrinkOffset) {
-          // How much of the collapsible area is hidden (0.0 = expanded, 1.0 = collapsed)
-          final collapseProgress = (shrinkOffset / collapsibleHeight).clamp(
-            0.0,
-            1.0,
-          );
-          final collapsibleOpacity = (1.0 - collapseProgress * 1.5).clamp(
-            0.0,
-            1.0,
-          );
-
-          final modeTheme = HomeModeTheme.of(widget.selectedDeliveryType);
-          // Transparent: the continuous festive scene is painted once by
-          // HomePage behind the whole scroll view.
-          return Container(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                Positioned.fill(child: _buildSparkles(modeTheme.sparkle)),
-                // Main content column
-                Positioned.fill(
-                  child: Column(
-                    children: [
-                      // Status bar space
-                      SizedBox(height: topPadding),
-
-                      // === Collapsible area (fades & shrinks on scroll) ===
-                      ClipRect(
-                        child: Opacity(
-                          opacity: collapsibleOpacity,
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            heightFactor: (1 - collapseProgress).clamp(
-                              0.0,
-                              1.0,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // Logo + Address + Notification row
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                    ),
-                                    child: SizedBox(
-                                      height: logoRowHeight,
-                                      child: Row(
-                                        children: [
-                                          _buildLogo(),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: AddressHeaderWidget(
-                                              selectedAddress:
-                                                  widget.selectedAddress,
-                                              onTap: widget.onAddressTap,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          _buildNotificationButton(),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: logoSearchGap),
-                                  // Search bar
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                    ),
-                                    child: SizedBox(
-                                      height: searchBarHeight,
-                                      child: _buildSearchBar(context),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+    // Fixed (non-collapsing) header: the festive artwork painted by HomePage
+    // shows through, only the content below it scrolls.
+    return Stack(
+      children: [
+        Positioned.fill(child: _buildSparkles(modeTheme.sparkle)),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: topPadding + 2),
+            // Logo + Address + Notification row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: SizedBox(
+                height: logoRowHeight,
+                child: Row(
+                  children: [
+                    _buildLogo(),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: AddressHeaderWidget(
+                        selectedAddress: widget.selectedAddress,
+                        onTap: widget.onAddressTap,
                       ),
-
-                      // === Pinned area (always visible) ===
-                      // Delivery Type Selector
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: deliveryPaddingV,
-                        ),
-                        child: SizedBox(
-                          height: deliverySelectorHeight,
-                          child: DeliveryTypeSelector(
-                            selectedDeliveryType: widget.selectedDeliveryType,
-                            onDeliveryTypeChanged: widget.onDeliveryTypeChanged,
-                          ),
-                        ),
-                      ),
-
-                      // Categories horizontal strip
-                      if (showCategoriesStrip)
-                        SizedBox(
-                          height: categoriesStripHeight,
-                          child: _buildCategoriesStrip(),
-                        ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildNotificationButton(),
+                  ],
                 ),
-              ],
+              ),
             ),
-          );
-        },
-      ),
+            const SizedBox(height: logoSearchGap),
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: SizedBox(
+                height: searchBarHeight,
+                child: _buildSearchBar(context),
+              ),
+            ),
+            const SizedBox(height: searchDeliveryGap),
+            // Delivery Type Selector
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: deliveryPaddingV,
+              ),
+              child: SizedBox(
+                height: deliverySelectorHeight,
+                child: DeliveryTypeSelector(
+                  selectedDeliveryType: widget.selectedDeliveryType,
+                  onDeliveryTypeChanged: widget.onDeliveryTypeChanged,
+                ),
+              ),
+            ),
+            // Categories horizontal strip
+            if (showCategoriesStrip)
+              SizedBox(
+                height: categoriesStripHeight,
+                child: _buildCategoriesStrip(),
+              ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ],
     );
   }
 
@@ -661,47 +593,6 @@ class _HomeHeaderState extends State<HomeHeader>
     if (lower.contains('grocery')) return Icons.storefront;
 
     return Icons.category_outlined;
-  }
-}
-
-/// Custom delegate that gives full control over the header layout at every
-/// scroll position — no more fighting with SliverAppBar's internal Column.
-class _HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double _maxExtent;
-  final double _minExtent;
-  final double topPadding;
-  final double pinnedContentHeight;
-  final double collapsibleHeight;
-  final Widget Function(double shrinkOffset) buildContent;
-
-  _HomeHeaderDelegate({
-    required double maxExtent,
-    required double minExtent,
-    required this.topPadding,
-    required this.pinnedContentHeight,
-    required this.collapsibleHeight,
-    required this.buildContent,
-  }) : _maxExtent = maxExtent,
-       _minExtent = minExtent;
-
-  @override
-  double get maxExtent => _maxExtent;
-
-  @override
-  double get minExtent => _minExtent;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return buildContent(shrinkOffset);
-  }
-
-  @override
-  bool shouldRebuild(covariant _HomeHeaderDelegate oldDelegate) {
-    return true;
   }
 }
 

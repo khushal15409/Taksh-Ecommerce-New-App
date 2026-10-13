@@ -270,41 +270,52 @@ class _HomePageState extends State<_HomePageContent> {
             backgroundColor: Colors.white,
             body: Stack(
               children: [
-                // One continuous festive scene (top artwork fading to white)
-                // shared by header and content — tapped through by nothing.
+                // Festive artwork, always edge-to-edge (full width) and
+                // fading into white below the header.
                 Positioned.fill(
                   child: IgnorePointer(
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 350),
-                      child: Image.asset(
-                        HomeModeTheme.of(_selectedDeliveryType).backgroundAsset,
+                      child: Align(
                         key: ValueKey(_selectedDeliveryType),
-                        fit: BoxFit.cover,
                         alignment: Alignment.topCenter,
-                        gaplessPlayback: true,
+                        child: Image.asset(
+                          HomeModeTheme.of(
+                            _selectedDeliveryType,
+                          ).backgroundAsset,
+                          width: double.infinity,
+                          fit: BoxFit.fitWidth,
+                          gaplessPlayback: true,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                RefreshIndicator(
-              onRefresh: _handleRefresh,
-              edgeOffset: 120, // Push refresh indicator below header slightly
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  // The Header is now part of the scroll view
-                  HomeHeader(
-                    selectedDeliveryType: _selectedDeliveryType,
-                    onDeliveryTypeChanged: _onDeliveryTypeChanged,
-                    selectedAddress: selectedAddress,
-                    onAddressTap: _showAddressSelectionBottomSheet,
-                  ),
-                  // The Content wrapper with rounded corners background
-                  SliverToBoxAdapter(child: _buildContent()),
-                ],
-              ),
-            ),
+                Column(
+                  children: [
+                    HomeHeader(
+                      selectedDeliveryType: _selectedDeliveryType,
+                      onDeliveryTypeChanged: _onDeliveryTypeChanged,
+                      selectedAddress: selectedAddress,
+                      onAddressTap: _showAddressSelectionBottomSheet,
+                    ),
+                    // Only this area scrolls: it starts at the promo banner.
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _handleRefresh,
+                        child: CustomScrollView(
+                          controller: _scrollController,
+                          physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                          slivers: [
+                            SliverToBoxAdapter(child: _buildContent()),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           );
@@ -313,16 +324,28 @@ class _HomePageState extends State<_HomePageContent> {
     );
   }
 
+  /// "Shop Now" on the banner artwork: bring the product sections into view.
+  void _scrollToProducts() {
+    if (!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      (MediaQuery.of(context).size.width * 0.45).clamp(
+        0.0,
+        _scrollController.position.maxScrollExtent,
+      ).toDouble(),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   Widget _buildContent() {
     switch (_selectedDeliveryType) {
       case DeliveryType.standard:
         return Column(
           children: [
-            const ModePromoBanner(
+            ModePromoBanner(
               asset: 'assets/images/diwali/banner_standard.jpg',
-              title: 'Diwali Shopping\nFestival',
-              subtitle: 'Shop your favourites, delivered to your door',
-              shadowColor: Color(0xFFF26A0E),
+              shadowColor: const Color(0xFFF26A0E),
+              onTap: _scrollToProducts,
             ),
             BlocBuilder<DashboardBloc, DashboardState>(
               builder: (context, state) {
@@ -350,11 +373,10 @@ class _HomePageState extends State<_HomePageContent> {
       case DeliveryType.quick:
         return Column(
           children: [
-            const ModePromoBanner(
+            ModePromoBanner(
               asset: 'assets/images/diwali/banner_quick.jpg',
-              title: 'Express Delivery\nin 30 Minutes!',
-              subtitle: 'Daily essentials at your doorstep',
-              shadowColor: Color(0xFF138A4A),
+              shadowColor: const Color(0xFF138A4A),
+              onTap: _scrollToProducts,
             ),
             BlocBuilder<ExpressDashboardBloc, ExpressDashboardState>(
               builder: (context, state) {

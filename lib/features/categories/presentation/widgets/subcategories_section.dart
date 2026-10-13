@@ -18,20 +18,7 @@ class SubcategoriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      margin: const EdgeInsets.fromLTRB(8, 14, 12, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -40,8 +27,8 @@ class SubcategoriesSection extends StatelessWidget {
           Text(
             category.name,
             style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
               color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
             maxLines: 1,
@@ -56,19 +43,19 @@ class SubcategoriesSection extends StatelessWidget {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide(color: Theme.of(context).dividerColor),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide(color: Theme.of(context).dividerColor),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(color: AppColors.primaryOrange),
               ),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              fillColor: Colors.white,
               isDense: true,
             ),
             hint: Text(

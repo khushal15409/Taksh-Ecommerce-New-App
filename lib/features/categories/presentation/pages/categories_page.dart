@@ -11,6 +11,7 @@ import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/address/presentation/widgets/address_selection_bottom_sheet.dart';
 import 'package:taksh_e_commerce/features/categories/presentation/widgets/widgets.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/home_mode_theme.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cubit.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_state.dart';
@@ -219,123 +220,175 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        toolbarHeight: 72,
-        titleSpacing: 16,
-        automaticallyImplyLeading: false,
-        title: Container(
-          width: double.infinity,
-          height: 52,
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Theme.of(context).dividerColor),
-          ),
-          child: SegmentedButton<DeliveryType>(
-            segments: [
-              ButtonSegment(
-                value: DeliveryType.standard,
-                label: Text(AppLocalizations.of(context)!.standard),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Festive artwork: always edge-to-edge, fading into white.
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Image.asset(
+                  'assets/images/diwali/home_categories_diwali_bg.jpg',
+                  width: double.infinity,
+                  fit: BoxFit.fitWidth,
+                  gaplessPlayback: true,
+                ),
               ),
-              ButtonSegment(
-                value: DeliveryType.quick,
-                label: Text(AppLocalizations.of(context)!.quick),
-              ),
-              ButtonSegment(
-                value: DeliveryType.services,
-                label: Text(AppLocalizations.of(context)!.services),
-              ),
-            ],
-            selected: {_homeDeliveryType},
-            onSelectionChanged: (selection) {
-              final type = selection.first;
-              _handleDeliveryTypeSelection(type);
-            },
-            style: ButtonStyle(
-              padding: const WidgetStatePropertyAll(
-                EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              ),
-              shape: WidgetStatePropertyAll(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-              ),
-              backgroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return AppColors.primaryOrange.withOpacity(0.12);
-                }
-                return Colors.transparent;
-              }),
-              foregroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return AppColors.primaryOrange;
-                }
-                return Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.color?.withOpacity(0.7);
-              }),
-              overlayColor: WidgetStatePropertyAll(
-                AppColors.primaryOrange.withOpacity(0.08),
-              ),
-              textStyle: const WidgetStatePropertyAll(
-                TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-              ),
-              side: const WidgetStatePropertyAll(BorderSide.none),
             ),
           ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: _buildSearchBar(),
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: Image.asset(
-          'assets/images/diwali/home_categories_diwali_bg.jpg',
-          fit: BoxFit.cover,
-          alignment: Alignment.topCenter,
-          gaplessPlayback: true,
-        ),
-        surfaceTintColor: Colors.transparent,
-        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-      ),
-      body: BlocConsumer<ProductCubit, ProductState>(
-        listener: _handleStateChange,
-        builder: (context, state) {
-          if (state is CategoryLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is ProductError && _categories.isEmpty) {
-            return ErrorView(
-              message: state.message,
-              onRetry: _retryFetchCategories,
-            );
-          }
-
-          if (_categories.isEmpty) {
-            return Center(
-              child: Text(AppLocalizations.of(context)!.noCategoriesAvailable),
-            );
-          }
-
-          return Row(
+          Column(
             children: [
-              CategoriesSidebar(
-                categories: _categories,
-                selectedIndex: _selectedIndex,
-                onCategorySelected: _selectCategory,
+              SizedBox(height: topPadding + 8),
+              Text(
+                AppLocalizations.of(context)!.categoriesTab,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+                ),
               ),
-              Expanded(child: _buildProductsPanel(state)),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildSearchBar(),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildModeTabs(context),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 14,
+                        offset: const Offset(0, -3),
+                      ),
+                    ],
+                  ),
+                  child: _buildBody(),
+                ),
+              ),
             ],
-          );
-        },
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildModeTabs(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tabs = [
+      (DeliveryType.standard, l10n.standard),
+      (DeliveryType.quick, l10n.quick),
+      (DeliveryType.services, l10n.services),
+    ];
+    return Row(
+      children: [
+        for (var i = 0; i < tabs.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(
+            child: Builder(
+              builder: (context) {
+                final type = tabs[i].$1;
+                final theme = HomeModeTheme.of(type);
+                final selected = _homeDeliveryType == type;
+                return GestureDetector(
+                  onTap: () => _handleDeliveryTypeSelection(type),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    height: 36,
+                    decoration: BoxDecoration(
+                      gradient: selected
+                          ? LinearGradient(
+                              colors: [theme.accent, theme.accentDark],
+                            )
+                          : null,
+                      color: selected ? null : Colors.white.withOpacity(0.94),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (selected ? theme.accent : Colors.black)
+                              .withOpacity(selected ? 0.4 : 0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          theme.tabIcon,
+                          size: 16,
+                          color: selected ? Colors.white : theme.accent,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          tabs[i].$2,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: selected ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    return BlocConsumer<ProductCubit, ProductState>(
+      listener: _handleStateChange,
+      builder: (context, state) {
+        if (state is CategoryLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is ProductError && _categories.isEmpty) {
+          return ErrorView(
+            message: state.message,
+            onRetry: _retryFetchCategories,
+          );
+        }
+
+        if (_categories.isEmpty) {
+          return Center(
+            child: Text(AppLocalizations.of(context)!.noCategoriesAvailable),
+          );
+        }
+
+        return Row(
+          children: [
+            CategoriesSidebar(
+              categories: _categories,
+              selectedIndex: _selectedIndex,
+              onCategorySelected: _selectCategory,
+            ),
+            Expanded(child: _buildProductsPanel(state)),
+          ],
+        );
+      },
     );
   }
 
@@ -404,8 +457,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),

@@ -60,36 +60,61 @@ class DeliveryTypeSelector extends StatelessWidget {
           );
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
           decoration: BoxDecoration(
-            color: isSelected ? theme.accent : Colors.white.withOpacity(0.92),
-            borderRadius: BorderRadius.circular(14),
+            gradient: isSelected
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [theme.accent, theme.accentDark],
+                  )
+                : null,
+            color: isSelected ? null : Colors.white.withOpacity(0.94),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.white.withOpacity(0.55)
+                  : theme.accent.withOpacity(0.14),
+              width: isSelected ? 1.4 : 1,
+            ),
             boxShadow: [
               BoxShadow(
                 color: (isSelected ? theme.accent : Colors.black)
-                    .withOpacity(isSelected ? 0.35 : 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
+                    .withOpacity(isSelected ? 0.45 : 0.08),
+                blurRadius: isSelected ? 12 : 8,
+                offset: Offset(0, isSelected ? 5 : 3),
               ),
             ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                theme.tabIcon,
-                size: 20,
-                color: isSelected ? Colors.white : Colors.black87,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 260),
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected
+                      ? Colors.white.withOpacity(0.22)
+                      : theme.accentSoft,
+                ),
+                child: Icon(
+                  theme.tabIcon,
+                  size: 14,
+                  color: isSelected ? Colors.white : theme.accent,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 label,
                 style: TextStyle(
                   color: isSelected ? Colors.white : Colors.black87,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 11,
-                  height: 1.15,
+                  height: 1.1,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

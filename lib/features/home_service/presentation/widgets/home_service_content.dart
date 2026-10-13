@@ -156,8 +156,6 @@ class _ServicesView extends StatelessWidget {
             children: [
               ModePromoBanner(
                 asset: 'assets/images/diwali/banner_services.jpg',
-                title: l10n.homeServices,
-                subtitle: l10n.homeServicesSubtitle,
                 shadowColor: const Color(0xFF6A1FD0),
                 margin: const EdgeInsets.only(bottom: AppSpacing.md),
               ),
