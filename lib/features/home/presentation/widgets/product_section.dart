@@ -118,14 +118,14 @@ class ProductSection extends StatelessWidget {
         final visibleColumns = gridColumns.clamp(2, 6);
 
         // Peek next column to hint horizontal scroll
-        const peekFraction = 0.3;
+        const peekFraction = 0.1;
         final itemWidth = (screenWidth - (spacing * (visibleColumns - 1))) /
             (visibleColumns + peekFraction);
 
         // Different base heights for redesigned cards
-        final itemHeight = isCompactGrid ? 232.0 : 252.0;
+        final itemHeight = isCompactGrid ? 176.0 : 184.0;
         final aspectRatio = itemHeight / itemWidth;
-        final gridHeight = (itemHeight * 2) + spacing;
+        final gridHeight = itemHeight + 10;
 
         return SizedBox(
           height: gridHeight,
@@ -134,7 +134,7 @@ class ProductSection extends StatelessWidget {
             padding: EdgeInsets.zero,
             physics: const BouncingScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 1,
               crossAxisSpacing: spacing,
               mainAxisSpacing: spacing,
               childAspectRatio: aspectRatio,
@@ -143,11 +143,26 @@ class ProductSection extends StatelessWidget {
             itemCount: section.products.length,
             itemBuilder: (context, index) {
               final product = section.products[index];
-              return ProductCard(
-                product: product,
-                variant: cardVariant,
-                showDeliveryTime: showDeliveryTime,
-                onTap: () => onProductTap?.call(product),
+              final reduceMotion = MediaQuery.of(context).disableAnimations;
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: reduceMotion ? 1 : 0, end: 1),
+                duration: Duration(
+                  milliseconds: reduceMotion ? 0 : 320 + (index % 4) * 70,
+                ),
+                curve: Curves.easeOutCubic,
+                builder: (context, t, child) => Opacity(
+                  opacity: t,
+                  child: Transform.translate(
+                    offset: Offset(0, 14 * (1 - t)),
+                    child: child,
+                  ),
+                ),
+                child: ProductCard(
+                  product: product,
+                  variant: cardVariant,
+                  showDeliveryTime: showDeliveryTime,
+                  onTap: () => onProductTap?.call(product),
+                ),
               );
             },
           ),

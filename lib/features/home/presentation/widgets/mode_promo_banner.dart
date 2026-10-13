@@ -21,6 +21,20 @@ class ModePromoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: reduceMotion ? 1 : 0, end: 1),
+      duration: Duration(milliseconds: reduceMotion ? 0 : 450),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Transform.scale(scale: 0.96 + 0.04 * t, child: child),
+      ),
+      child: _buildBanner(),
+    );
+  }
+
+  Widget _buildBanner() {
     return Container(
       margin: margin,
       decoration: BoxDecoration(

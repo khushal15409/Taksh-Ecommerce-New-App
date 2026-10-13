@@ -5,6 +5,7 @@ import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/widgets/product_add_to_cart_button.dart';
 import 'package:taksh_e_commerce/features/home/domain/entities/product_variant_info.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/wishlist_heart_button.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product.dart';
 
 /// Product card widget used in the categories page grid
@@ -77,7 +78,35 @@ class CategoryProductCard extends StatelessWidget {
                 const SizedBox(height: 6),
               ],
               _buildName(context),
-              const SizedBox(height: 8),
+              if ((product.ratingSummary?.averageRating ?? 0) > 0) ...[
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star_rounded,
+                      size: 14,
+                      color: Color(0xFFF7B500),
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      product.ratingSummary!.averageRating.toStringAsFixed(1),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (product.ratingSummary!.totalReviews > 0)
+                      Text(
+                        ' (${product.ratingSummary!.totalReviews})',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.grey500,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 6),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompactWidth = constraints.maxWidth < 180;
@@ -129,6 +158,7 @@ class CategoryProductCard extends StatelessWidget {
       variants: ProductVariantInfo.fromProductVariants(product.variants),
       productName: product.name,
       productImageUrl: product.primaryImageUrl,
+      compactCircle: true,
     );
   }
 
@@ -189,6 +219,11 @@ class CategoryProductCard extends StatelessWidget {
               ),
             ),
           ),
+        Positioned(
+          top: 2,
+          right: 2,
+          child: WishlistHeartButton(productId: product.id, size: 18),
+        ),
         if (!product.inStock)
           Positioned.fill(
             child: ClipRRect(

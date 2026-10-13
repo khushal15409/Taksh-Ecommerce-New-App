@@ -57,6 +57,10 @@ class ProductAddToCartButton extends StatefulWidget {
   /// Product image URL used in the variant selection bottom sheet header
   final String? productImageUrl;
 
+  /// Renders the initial "add" action as a small orange "+" circle
+  /// (used by the redesigned product cards). Cart logic is unchanged.
+  final bool compactCircle;
+
   const ProductAddToCartButton({
     super.key,
     required this.productId,
@@ -69,6 +73,7 @@ class ProductAddToCartButton extends StatefulWidget {
     this.variants,
     this.productName,
     this.productImageUrl,
+    this.compactCircle = false,
   });
 
   @override
@@ -638,6 +643,42 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
   }) {
     final isOutlinedGreen =
         widget.style == ProductAddToCartButtonStyle.outlinedGreen;
+
+    if (widget.compactCircle) {
+      return Material(
+        color: AppColors.primaryOrange,
+        shape: const CircleBorder(),
+        elevation: 2,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: isLoading
+              ? null
+              : () {
+                  if (_hasMultipleVariants) {
+                    _showVariantSheet();
+                  } else {
+                    _addToCart();
+                  }
+                },
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: Center(
+              child: isLoading
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.add_rounded, size: 19, color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Material(
       color: Colors.transparent,

@@ -55,12 +55,6 @@ class _HomePageContent extends StatefulWidget {
 
 class _HomePageState extends State<_HomePageContent> {
   final _log = loggerWithContext({'feature': 'home', 'page': 'HomePage'});
-  static const double _scrollShadeHeightFactor = 0.62;
-  static const double _scrollShadeBottomCurve = 44;
-  // Extra upward shift applied to the gradient on top of normal scroll speed.
-  // Total gradient speed = 1x (scroll) + 0.6x (extra) = 1.6x — feels like
-  // the green is rushing up faster than the content sitting on top of it.
-  static const double _scrollShadeParallaxFactor = 0.6;
   static const double _defaultLatitude = 23.0695;
   static const double _defaultLongitude = 72.6738;
   static const String _defaultPincode = '382330';
@@ -274,7 +268,25 @@ class _HomePageState extends State<_HomePageContent> {
 
           return Scaffold(
             backgroundColor: Colors.white,
-            body: RefreshIndicator(
+            body: Stack(
+              children: [
+                // One continuous festive scene (top artwork fading to white)
+                // shared by header and content — tapped through by nothing.
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 350),
+                      child: Image.asset(
+                        HomeModeTheme.of(_selectedDeliveryType).backgroundAsset,
+                        key: ValueKey(_selectedDeliveryType),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                        gaplessPlayback: true,
+                      ),
+                    ),
+                  ),
+                ),
+                RefreshIndicator(
               onRefresh: _handleRefresh,
               edgeOffset: 120, // Push refresh indicator below header slightly
               child: CustomScrollView(
@@ -289,84 +301,14 @@ class _HomePageState extends State<_HomePageContent> {
                     onAddressTap: _showAddressSelectionBottomSheet,
                   ),
                   // The Content wrapper with rounded corners background
-                  SliverToBoxAdapter(child: _buildScrollableBody()),
+                  SliverToBoxAdapter(child: _buildContent()),
                 ],
               ),
             ),
+              ],
+            ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildScrollableBody() {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final shadeHeight = screenHeight * _scrollShadeHeightFactor;
-    final minBodyHeight = screenHeight * 0.7;
-
-    return Stack(
-      children: [
-        // ── Gradient background (parallax layer) ──────────────────────────
-        // Moves upward faster than normal scroll speed.
-        // Since this widget is already inside the CustomScrollView it moves
-        // at 1x by default. AnimatedBuilder adds an EXTRA upward offset
-        // (_scrollShadeParallaxFactor × scrollOffset) so the total speed is
-        // (1 + _scrollShadeParallaxFactor)x — the green rushes up faster.
-        AnimatedBuilder(
-          animation: _scrollController,
-          builder: (context, child) {
-            // Guard: .offset asserts exactly 1 attached position – during
-            // BlocBuilder/tab rebuilds there can briefly be 2 or 0.
-            final scrollOffset =
-                _scrollController.hasClients &&
-                    _scrollController.positions.length == 1
-                ? _scrollController.positions.first.pixels
-                : 0.0;
-            final extraShift = (scrollOffset * _scrollShadeParallaxFactor)
-                .clamp(0.0, shadeHeight);
-            return Transform.translate(
-              offset: Offset(0, -extraShift),
-              child: child,
-            );
-          },
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(_scrollShadeBottomCurve),
-                  bottomRight: Radius.circular(_scrollShadeBottomCurve),
-                ),
-                child: _buildWhiteGreenBodyGradient(shadeHeight),
-              ),
-              Container(
-                constraints: BoxConstraints(minHeight: minBodyHeight),
-                color: Colors.white,
-              ),
-            ],
-          ),
-        ),
-
-        // ── Content (normal scroll speed) ─────────────────────────────────
-        _buildContent(),
-      ],
-    );
-  }
-
-  Widget _buildWhiteGreenBodyGradient(double height) {
-    return SizedBox(
-      height: height,
-      width: double.infinity,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 350),
-        child: Image.asset(
-          HomeModeTheme.of(_selectedDeliveryType).backgroundAsset,
-          key: ValueKey(_selectedDeliveryType),
-          width: double.infinity,
-          height: height,
-          fit: BoxFit.cover,
-          alignment: Alignment.topCenter,
-          gaplessPlayback: true,
-        ),
       ),
     );
   }

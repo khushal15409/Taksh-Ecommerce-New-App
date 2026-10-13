@@ -170,32 +170,12 @@ class _HomeHeaderState extends State<HomeHeader>
           );
 
           final modeTheme = HomeModeTheme.of(widget.selectedDeliveryType);
+          // Transparent: the continuous festive scene is painted once by
+          // HomePage behind the whole scroll view.
           return Container(
-            decoration: BoxDecoration(
-              color: modeTheme.accent,
-              boxShadow: [
-                BoxShadow(
-                  color: modeTheme.accent.withOpacity(0.16),
-                  blurRadius: 7,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+            color: Colors.transparent,
             child: Stack(
               children: [
-                // Festive artwork (static) + lightweight sparkle overlay.
-                Positioned.fill(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    child: Image.asset(
-                      modeTheme.backgroundAsset,
-                      key: ValueKey(modeTheme.backgroundAsset),
-                      fit: BoxFit.cover,
-                      alignment: Alignment.topCenter,
-                      gaplessPlayback: true,
-                    ),
-                  ),
-                ),
                 Positioned.fill(child: _buildSparkles(modeTheme.sparkle)),
                 // Main content column
                 Positioned.fill(
@@ -576,10 +556,9 @@ class _HomeHeaderState extends State<HomeHeader>
                     Text(
                       category.name,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.black,
                         fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        shadows: [Shadow(color: Colors.black54, blurRadius: 3)],
+                        fontWeight: FontWeight.w600,
                         height: 1.2,
                       ),
                       textAlign: TextAlign.center,

@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:taksh_e_commerce/core/routing/app_routes.dart';
-import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
-import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
-import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/widgets/product_add_to_cart_button.dart';
 import 'package:taksh_e_commerce/features/home/data/models/product_model.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/wishlist_heart_button.dart';
 import 'package:taksh_e_commerce/features/product/domain/usecases/get_ecommerce_product_details.dart';
 
 /// Enum to define different product card layouts
@@ -162,10 +156,10 @@ class _ProductCardState extends State<ProductCard>
         builder: (context, child) =>
             Transform.scale(scale: _scaleAnimation.value, child: child),
         child: Container(
-          padding: EdgeInsets.all(isCompact ? 6 : 8),
+          padding: EdgeInsets.all(isCompact ? 6 : 7),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.07),
@@ -178,7 +172,7 @@ class _ProductCardState extends State<ProductCard>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildVisualCard(product, isCompact, discount),
-              SizedBox(height: isCompact ? 8 : 10),
+              SizedBox(height: isCompact ? 6 : 7),
               if (widget.showDeliveryTime) ...[
                 _buildDeliveryChip(isCompact),
                 const SizedBox(height: 4),
@@ -207,8 +201,8 @@ class _ProductCardState extends State<ProductCard>
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F7F7),
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -216,7 +210,7 @@ class _ProductCardState extends State<ProductCard>
                   fit: StackFit.expand,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.fromLTRB(4, 14, 4, 12),
                       child: imageUrl != null
                           ? CachedNetworkImage(
                               imageUrl: imageUrl,
@@ -286,10 +280,14 @@ class _ProductCardState extends State<ProductCard>
           // Badge only when the backend price data yields a real discount.
           if (discount != null)
             Positioned(top: 6, left: 6, child: _buildDiscountBadge(discount)),
-          Positioned(top: 4, right: 4, child: _buildWishlistButton(product)),
           Positioned(
-            right: 4,
-            bottom: 4,
+            top: 2,
+            right: 2,
+            child: WishlistHeartButton(productId: product.id, size: 16),
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
             child: ProductAddToCartButton(
               productId: product.id,
               productVariantId: product.productVariantId,
@@ -299,6 +297,7 @@ class _ProductCardState extends State<ProductCard>
               variants: product.variants,
               productName: product.name,
               productImageUrl: imageUrl,
+              compactCircle: true,
             ),
           ),
         ],
@@ -323,38 +322,6 @@ class _ProductCardState extends State<ProductCard>
           height: 1,
         ),
       ),
-    );
-  }
-
-  Widget _buildWishlistButton(ProductModel product) {
-    final cubit = getIt<WishlistCubit>();
-    return BlocBuilder<WishlistCubit, WishlistState>(
-      bloc: cubit,
-      builder: (context, state) {
-        final wishlisted = cubit.isWishlisted(product.id);
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            if (context.read<AuthBloc>().state is! Authenticated) {
-              context.push(
-                '${AppRoutes.login}?redirectAfter=${Uri.encodeComponent(AppRoutes.home)}',
-              );
-              return;
-            }
-            cubit.toggleWishlist(productId: product.id);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Icon(
-              wishlisted
-                  ? Icons.favorite_rounded
-                  : Icons.favorite_border_rounded,
-              size: 18,
-              color: wishlisted ? Colors.red : AppColors.grey600,
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -386,7 +353,7 @@ class _ProductCardState extends State<ProductCard>
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
-        fontSize: isCompact ? 12 : 13,
+        fontSize: isCompact ? 11 : 11.5,
         fontWeight: FontWeight.w600,
         color: AppColors.grey900,
         height: 1.2,
@@ -436,7 +403,7 @@ class _ProductCardState extends State<ProductCard>
             '₹${_formatPrice(product.salePrice)}',
             style: TextStyle(
               color: AppColors.grey900,
-              fontSize: isCompact ? 14 : 15,
+              fontSize: isCompact ? 13 : 14,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -445,7 +412,7 @@ class _ProductCardState extends State<ProductCard>
             Text(
               '₹${_formatPrice(product.originalPrice)}',
               style: const TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 color: AppColors.grey500,
                 decoration: TextDecoration.lineThrough,
                 decorationColor: AppColors.grey500,
