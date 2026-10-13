@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/home_mode_theme.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
@@ -26,42 +26,30 @@ class DeliveryTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.25),
-          width: 1,
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        _buildDeliveryTab(
+          DeliveryType.standard,
+          l10n.standardDelivery.replaceAll(' ', '\n'),
         ),
-      ),
-      child: Row(
-        children: [
-          _buildDeliveryTab(
-            DeliveryType.standard,
-            AppLocalizations.of(context)!.standardDelivery.replaceAll(' ', '\n'),
-            AppColors.secondaryGreen,
-          ),
-          const SizedBox(width: 3),
-          _buildDeliveryTab(
-            DeliveryType.quick,
-            AppLocalizations.of(context)!.quickDelivery.replaceAll(' ', '\n'),
-            AppColors.primaryOrange,
-          ),
-          const SizedBox(width: 3),
-          _buildDeliveryTab(
-            DeliveryType.services,
-            AppLocalizations.of(context)!.homeService.replaceAll(' ', '\n'),
-            AppColors.primaryOrange,
-          ),
-        ],
-      ),
+        const SizedBox(width: 6),
+        _buildDeliveryTab(
+          DeliveryType.quick,
+          l10n.quickDelivery.replaceAll(' ', '\n'),
+        ),
+        const SizedBox(width: 6),
+        _buildDeliveryTab(
+          DeliveryType.services,
+          l10n.homeService.replaceAll(' ', '\n'),
+        ),
+      ],
     );
   }
 
-  Widget _buildDeliveryTab(DeliveryType type, String label, Color accentColor) {
+  Widget _buildDeliveryTab(DeliveryType type, String label) {
     final isSelected = selectedDeliveryType == type;
+    final theme = HomeModeTheme.of(type);
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -72,32 +60,42 @@ class DeliveryTypeSelector extends StatelessWidget {
           );
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+          duration: const Duration(milliseconds: 220),
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(11),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: accentColor.withOpacity(0.2),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            color: isSelected ? theme.accent : Colors.white.withOpacity(0.92),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: (isSelected ? theme.accent : Colors.black)
+                    .withOpacity(isSelected ? 0.35 : 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? accentColor : Colors.black,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              fontSize: 12,
-              height: 1.4,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                theme.tabIcon,
+                size: 20,
+                color: isSelected ? Colors.white : Colors.black87,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  fontSize: 11,
+                  height: 1.15,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ),

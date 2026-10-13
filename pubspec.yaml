@@ -98,6 +98,8 @@ flutter:
     - docs/splash_logo.jpeg
     - "docs/Image (7).jpg"
     - assets/images/
+    - assets/images/diwali/
+    - assets/images/onboarding/
     # - assets/icons/
 
   # fonts:

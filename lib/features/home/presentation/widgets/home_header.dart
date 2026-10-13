@@ -11,6 +11,7 @@ import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/address_header_widget.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/home_mode_theme.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cubit.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_state.dart';
@@ -67,8 +68,8 @@ class _HomeHeaderState extends State<HomeHeader>
     }
     _petalController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 12),
-    )..repeat();
+      duration: const Duration(seconds: 6),
+    );
     final random = Random(7);
     _petals = List.generate(26, (index) {
       final size = 6.0 + random.nextDouble() * 6.0;
@@ -82,6 +83,18 @@ class _HomeHeaderState extends State<HomeHeader>
         phase: random.nextDouble() * pi * 2,
       );
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Single controller drives the sparkle overlay; paused when the user
+    // prefers reduced motion.
+    if (MediaQuery.of(context).disableAnimations) {
+      _petalController.stop();
+    } else if (!_petalController.isAnimating) {
+      _petalController.repeat();
+    }
   }
 
   @override
@@ -116,9 +129,9 @@ class _HomeHeaderState extends State<HomeHeader>
     // --- Widget sizes (what you see) ---
     const double logoRowHeight = 48.0;
     const double searchBarHeight = 44.0;
-    const double deliverySelectorHeight = 56.0;
-    final double categoriesStripHeight = showCategoriesStrip ? 68.0 : 0.0;
-    const double gradientStripHeight = 4.0;
+    const double deliverySelectorHeight = 60.0;
+    final double categoriesStripHeight = showCategoriesStrip ? 74.0 : 0.0;
+    const double gradientStripHeight = 0.0;
 
     // --- Spacing / padding (gaps around widgets) ---
     const double logoSearchGap = 10.0;
@@ -156,16 +169,13 @@ class _HomeHeaderState extends State<HomeHeader>
             1.0,
           );
 
+          final modeTheme = HomeModeTheme.of(widget.selectedDeliveryType);
           return Container(
             decoration: BoxDecoration(
-              image: const DecorationImage(
-                image: AssetImage('assets/images/orange.jpeg'),
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
-              ),
+              color: modeTheme.accent,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryOrange.withOpacity(0.16),
+                  color: modeTheme.accent.withOpacity(0.16),
                   blurRadius: 7,
                   offset: const Offset(0, 2),
                 ),
@@ -173,6 +183,20 @@ class _HomeHeaderState extends State<HomeHeader>
             ),
             child: Stack(
               children: [
+                // Festive artwork (static) + lightweight sparkle overlay.
+                Positioned.fill(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    child: Image.asset(
+                      modeTheme.backgroundAsset,
+                      key: ValueKey(modeTheme.backgroundAsset),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                      gaplessPlayback: true,
+                    ),
+                  ),
+                ),
+                Positioned.fill(child: _buildSparkles(modeTheme.sparkle)),
                 // Main content column
                 Positioned.fill(
                   child: Column(
@@ -259,25 +283,6 @@ class _HomeHeaderState extends State<HomeHeader>
                           height: categoriesStripHeight,
                           child: _buildCategoriesStrip(),
                         ),
-
-                      // Push gradient strip to the very bottom
-                      const Spacer(),
-
-                      // Orange → White → Green gradient strip
-                      Container(
-                        height: gradientStripHeight,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              AppColors.primaryOrangeLight,
-                              Colors.white,
-                              AppColors.secondaryGreen,
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -293,9 +298,14 @@ class _HomeHeaderState extends State<HomeHeader>
     const double logoHeight = 44.0;
     const double logoWidth = 84.0;
 
-    return SizedBox(
+    return Container(
       height: logoHeight,
       width: logoWidth,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Image.asset(
         _homeLogoAssetPath,
         fit: BoxFit.contain,
@@ -326,16 +336,15 @@ class _HomeHeaderState extends State<HomeHeader>
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.18),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
             const Icon(
               Icons.notifications_none_rounded,
-              color: Colors.black,
+              color: Colors.black87,
               size: 22,
             ),
             Positioned(
@@ -361,7 +370,7 @@ class _HomeHeaderState extends State<HomeHeader>
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -384,9 +393,9 @@ class _HomeHeaderState extends State<HomeHeader>
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.search_rounded,
-                  color: AppColors.primaryOrange,
+                  color: HomeModeTheme.of(widget.selectedDeliveryType).accent,
                   size: 22,
                 ),
                 const SizedBox(width: 10),
@@ -403,18 +412,28 @@ class _HomeHeaderState extends State<HomeHeader>
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryOrange.withOpacity(0.08),
+                    color: HomeModeTheme.of(widget.selectedDeliveryType).accent.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.mic_none_rounded,
-                    color: AppColors.primaryOrange,
+                    color: HomeModeTheme.of(widget.selectedDeliveryType).accent,
                     size: 18,
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSparkles(Color color) {
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: CustomPaint(
+          painter: _SparklePainter(_petalController, _petals, color),
         ),
       ),
     );
@@ -557,9 +576,10 @@ class _HomeHeaderState extends State<HomeHeader>
                     Text(
                       category.name,
                       style: const TextStyle(
-                        color: AppColors.black,
+                        color: Colors.white,
                         fontSize: 10,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
+                        shadows: [Shadow(color: Colors.black54, blurRadius: 3)],
                         height: 1.2,
                       ),
                       textAlign: TextAlign.center,
@@ -587,30 +607,41 @@ class _HomeHeaderState extends State<HomeHeader>
   }
 
   Widget _buildCategoryIcon(Category category) {
-    const double iconSize = 38.0;
+    const double iconSize = 42.0;
     final iconUrl = category.iconUrl ?? category.imageUrl;
 
-    if (iconUrl == null || iconUrl.isEmpty) {
-      return Icon(
-        _iconForCategoryName(category.name),
-        size: 27,
-        color: Colors.white,
-      );
-    }
+    final accent = HomeModeTheme.of(widget.selectedDeliveryType).accent;
+    final fallback = Icon(
+      _iconForCategoryName(category.name),
+      size: 22,
+      color: accent,
+    );
 
-    return ClipOval(
-      child: SizedBox(
-        width: iconSize,
-        height: iconSize,
-        child: CachedNetworkImage(
-          imageUrl: iconUrl,
-          fit: BoxFit.cover,
-          errorWidget: (context, url, error) => Icon(
-            _iconForCategoryName(category.name),
-            size: 23,
-            color: Colors.white,
+    return Container(
+      width: iconSize,
+      height: iconSize,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
-        ),
+        ],
+      ),
+      child: ClipOval(
+        child: (iconUrl == null || iconUrl.isEmpty)
+            ? fallback
+            : Padding(
+                padding: const EdgeInsets.all(3),
+                child: CachedNetworkImage(
+                  imageUrl: iconUrl,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => fallback,
+                ),
+              ),
       ),
     );
   }
@@ -693,6 +724,31 @@ class _HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant _HomeHeaderDelegate oldDelegate) {
     return true;
   }
+}
+
+class _SparklePainter extends CustomPainter {
+  final Animation<double> animation;
+  final List<_PetalConfig> petals;
+  final Color color;
+
+  _SparklePainter(this.animation, this.petals, this.color)
+    : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = animation.value * pi * 2;
+    final paint = Paint();
+    for (final p in petals) {
+      final twinkle = (sin(t * p.speed.round().clamp(1, 2) + p.phase) + 1) / 2;
+      final dx = p.x * size.width;
+      final dy = (p.phase / (pi * 2)) * size.height;
+      paint.color = color.withOpacity(0.15 + 0.6 * twinkle * p.opacity);
+      canvas.drawCircle(Offset(dx, dy), 0.8 + p.size * 0.18 * twinkle, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SparklePainter old) => old.color != color;
 }
 
 class _PetalConfig {

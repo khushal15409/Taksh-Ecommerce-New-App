@@ -23,6 +23,7 @@ import 'package:taksh_e_commerce/features/home/presentation/widgets/dashboard_co
 import 'package:taksh_e_commerce/features/home/presentation/widgets/dashboard_shimmer.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/express_dashboard_content.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/home_header.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/home_mode_theme.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/widgets/home_service_content.dart';
 
@@ -354,10 +355,17 @@ class _HomePageState extends State<_HomePageContent> {
     return SizedBox(
       height: height,
       width: double.infinity,
-      child: Image.asset(
-        'assets/images/green.jpeg',
-        fit: BoxFit.cover,
-        alignment: Alignment.topCenter,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 350),
+        child: Image.asset(
+          HomeModeTheme.of(_selectedDeliveryType).backgroundAsset,
+          key: ValueKey(_selectedDeliveryType),
+          width: double.infinity,
+          height: height,
+          fit: BoxFit.cover,
+          alignment: Alignment.topCenter,
+          gaplessPlayback: true,
+        ),
       ),
     );
   }
@@ -372,11 +380,11 @@ class _HomePageState extends State<_HomePageContent> {
               margin: const EdgeInsets.fromLTRB(16, 4, 16, 2),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                gradient: IndiaGradients.greenGradient,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.secondaryGreen.withOpacity(0.42),
+                    color: HomeModeTheme.standard.accent.withOpacity(0.35),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -387,13 +395,13 @@ class _HomePageState extends State<_HomePageContent> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: HomeModeTheme.standard.accentSoft,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.local_shipping,
-                      color: AppColors.secondaryGreen,
+                      color: HomeModeTheme.standard.accent,
                       size: 14,
                     ),
                   ),
@@ -443,11 +451,11 @@ class _HomePageState extends State<_HomePageContent> {
               margin: const EdgeInsets.fromLTRB(16, 4, 16, 2),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                gradient: IndiaGradients.saffronGradient,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryOrange.withOpacity(0.3),
+                    color: HomeModeTheme.quick.accent.withOpacity(0.35),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -458,13 +466,13 @@ class _HomePageState extends State<_HomePageContent> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: HomeModeTheme.quick.accentSoft,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.bolt,
-                      color: AppColors.primaryOrange,
+                      color: HomeModeTheme.quick.accent,
                       size: 12,
                     ),
                   ),

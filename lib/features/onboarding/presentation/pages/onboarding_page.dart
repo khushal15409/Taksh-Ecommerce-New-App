@@ -24,22 +24,22 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   static const List<_OnboardingStep> _steps = [
     _OnboardingStep(
-      image: 'assets/images/01.png',
+      image: 'assets/images/onboarding/onboarding_shop_bg.jpg',
       titleKey: _TitleKey.title1,
       subtitleKey: _TitleKey.subtitle1,
-      backgroundColor: Color(0xFFFFE9D6), // Light peach
+      backgroundColor: Color(0xFFFFF5E8), // Warm cream
     ),
     _OnboardingStep(
-      image: 'assets/images/02.png',
+      image: 'assets/images/onboarding/onboarding_delivery_bg.jpg',
       titleKey: _TitleKey.title2,
       subtitleKey: _TitleKey.subtitle2,
-      backgroundColor: AppColors.backgroundLight, // White
+      backgroundColor: Color(0xFFF0FAEC), // Soft green cream
     ),
     _OnboardingStep(
-      image: 'assets/images/03.png',
+      image: 'assets/images/onboarding/onboarding_payment_bg.jpg',
       titleKey: _TitleKey.title3,
       subtitleKey: _TitleKey.subtitle3,
-      backgroundColor: Color(0xFFE0F2E1), // Light mint
+      backgroundColor: Color(0xFFF5EEFF), // Soft lavender
     ),
   ];
 
@@ -70,7 +70,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
   }
 
+  bool _isCompleting = false;
+
   Future<void> _completeOnboarding() async {
+    if (_isCompleting) return;
+    _isCompleting = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('seenOnboarding', true);
 
@@ -134,16 +138,105 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final isLastPage = _currentPage == _steps.length - 1;
     final backgroundColor = _interpolatedBackgroundColor();
 
+    final bottomReserve = 8 + 8 + 24 + 54 + 24.0;
+
     return Scaffold(
       body: Container(
         color: backgroundColor,
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Top bar — Skip button anchored to the right so it does
-              // not compete with the centered illustration.
-              Align(
-                alignment: Alignment.centerRight,
+        child: Stack(
+          children: [
+            // Swipeable content — full-bleed festive artwork fading into the
+            // page tint, with the title/subtitle as real widgets below it.
+            Positioned.fill(
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _steps.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final step = _steps[index];
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.asset(
+                              step.image,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
+                              gaplessPlayback: true,
+                            ),
+                            // Fade the artwork into the page colour.
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              height: 90,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      step.backgroundColor.withOpacity(0),
+                                      step.backgroundColor,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 480),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _titleFor(step.titleKey),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.headlineSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.grey900,
+                                    ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                _subtitleFor(step.subtitleKey),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
+                                      color: AppColors.grey600,
+                                      height: 1.45,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height:
+                            bottomReserve +
+                            MediaQuery.of(context).padding.bottom,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // Skip button anchored top-right.
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
                 child: TextButton(
                   onPressed: _completeOnboarding,
                   style: TextButton.styleFrom(
@@ -155,153 +248,62 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   child: Text(
                     l10n.skip,
                     style: const TextStyle(
-                      color: AppColors.grey600,
+                      color: AppColors.grey900,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
+            ),
 
-              // Swipeable content — illustration on top, title/subtitle
-              // below. Each page is a Column with two Expanded children
-              // (image flex 6, text flex 4) so the image dominates the
-              // page without forcing a hardcoded height.
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _steps.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    final step = _steps[index];
-                    return Column(
-                      children: [
-                        const SizedBox(height: 8),
-                        // Illustration — wrapped directly in a ClipRRect
-                        // (not a Container) so the rounding is applied
-                        // to the image itself.
-                        //
-                        // The image shares the page column with the
-                        // text via Expanded flex values (6 for the
-                        // image, 4 for the text) so it owns ~60% of the
-                        // available height — the dominant visual
-                        // element on the screen. BoxFit.contain scales
-                        // the portrait source to fit the available
-                        // space without cropping or distortion, and
-                        // width:double.infinity lets the image scale
-                        // smoothly across phone and tablet sizes.
-                        Expanded(
-                          flex: 7,
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxWidth: 480,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(40),
-                                  child: Image.asset(
-                                    step.image,
-                                    width: double.infinity,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
+            // Page indicator + primary action pinned to the bottom.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _PageIndicator(
+                      count: _steps.length,
+                      currentIndex: _currentPage,
+                      activeColor: AppColors.primaryOrange,
+                      inactiveColor: AppColors.grey300,
+                    ),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _nextPage,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryOrange,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            isLastPage ? l10n.getStarted : l10n.next,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        Expanded(
-                          flex: 3,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                              24,
-                              28,
-                              24,
-                              8,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _titleFor(step.titleKey),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.grey900,
-                                      ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  _subtitleFor(step.subtitleKey),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        color: AppColors.grey600,
-                                        height: 1.45,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-
-              // Page indicator dots.
-              _PageIndicator(
-                count: _steps.length,
-                currentIndex: _currentPage,
-                activeColor: AppColors.primaryOrange,
-                inactiveColor: AppColors.grey300,
-              ),
-
-              const SizedBox(height: 24),
-
-              // Bottom action button — Next or Get Started.
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _nextPage,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOrange,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      isLastPage ? l10n.getStarted : l10n.next,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
