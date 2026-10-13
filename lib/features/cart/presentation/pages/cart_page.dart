@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/dashed_divider.dart';
 import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_page_header.dart';
 import 'package:taksh_e_commerce/core/widgets/guest_auth_wall.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
@@ -26,6 +28,8 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+
+  static const Color _accent = Color(0xFFFF8A1F);
 
   String get _selectedDeliveryType => _tabController.index == 0
       ? CartCubit.deliveryTypeExpress
@@ -107,42 +111,15 @@ class _CartPageState extends State<CartPage>
   Widget _buildCartContent(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context)!.cart,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-            shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFF1DE), Color(0xFFF3F8E8), Color(0xFFBFE8C0)],
+            stops: [0, 0.45, 1],
           ),
         ),
-        centerTitle: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        foregroundColor: Colors.white,
-        actions: [
-          BlocBuilder<CartCubit, CartState>(
-            builder: (context, state) {
-              final activeCart = context.read<CartCubit>().cartForDeliveryType(
-                _selectedDeliveryType,
-              );
-              if (activeCart.isEmpty) {
-                return const SizedBox.shrink();
-              }
-
-              return IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () =>
-                    _showClearCartDialog(context, _selectedDeliveryType),
-                tooltip: AppLocalizations.of(context)!.clearCart,
-              );
-            },
-          ),
-        ],
-      ),
-      body: FestiveHeaderBackdrop(
         child: BlocConsumer<CartCubit, CartState>(
           listener: (context, state) {
             if (state is CartError) {
@@ -192,16 +169,21 @@ class _CartPageState extends State<CartPage>
             _syncSelectedTabWithCartAvailability(quickCart, standardCart);
 
             if (isInitialLoad) {
-              return const Center(child: CircularProgressIndicator());
+              return Column(
+                children: [
+                  _buildHeader(context, activeCart),
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ],
+              );
             }
 
             return Column(
               children: [
-                SizedBox(
-                  height: MediaQuery.of(context).padding.top + kToolbarHeight,
-                ),
+                _buildHeader(context, activeCart),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                   child: Row(
                     children: [
                       Expanded(
@@ -216,7 +198,7 @@ class _CartPageState extends State<CartPage>
                       Expanded(
                         child: _buildDeliveryChip(
                           index: 1,
-                          icon: Icons.local_shipping_outlined,
+                          icon: Icons.local_shipping_rounded,
                           label:
                               '${AppLocalizations.of(context)!.standardDelivery} (${standardCart.totalItems})',
                         ),
@@ -239,6 +221,29 @@ class _CartPageState extends State<CartPage>
     );
   }
 
+  Widget _buildHeader(BuildContext context, Cart activeCart) {
+    return FestivePageHeader(
+      title: 'My Cart',
+      subtitle: 'Review your items and proceed to checkout',
+      onBack: () {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(AppRoutes.home);
+        }
+      },
+      trailing: activeCart.isEmpty
+          ? null
+          : FestiveHeaderIconButton(
+              icon: Icons.delete_outline_rounded,
+              color: _accent,
+              tooltip: AppLocalizations.of(context)!.clearCart,
+              onPressed: () =>
+                  _showClearCartDialog(context, _selectedDeliveryType),
+            ),
+    );
+  }
+
   Widget _buildDeliveryChip({
     required int index,
     required IconData icon,
@@ -249,41 +254,57 @@ class _CartPageState extends State<CartPage>
       onTap: () => _tabController.animateTo(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 42,
+        height: 46,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          gradient: selected ? festiveOrangeGradient : null,
-          color: selected ? null : Colors.white.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(14),
+          color: selected ? Colors.white : Colors.white.withOpacity(0.55),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withOpacity(selected ? 0.1 : 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: selected ? Colors.white : AppColors.grey800,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
+                  color: selected ? _accent : AppColors.grey800,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                      color: selected ? _accent : AppColors.grey900,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? Colors.white : AppColors.grey900,
+            if (selected)
+              Positioned(
+                bottom: 0,
+                child: Container(
+                  width: 110,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: _accent,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -291,22 +312,100 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildCartBody(BuildContext context, Cart cart) {
+    final isQuick = _selectedDeliveryType == CartCubit.deliveryTypeExpress;
     return Column(
       children: [
         Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: cart.items.length + 1,
-            itemBuilder: (context, index) {
-              if (index == cart.items.length) {
-                return _buildBillDetails(context, cart);
-              }
-              return _buildCartItem(context, cart.items[index]);
-            },
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            children: [
+              for (final item in cart.items) _buildCartItem(context, item),
+              if (isQuick) _buildSavingTimeBanner(),
+              _buildBillDetails(context, cart),
+            ],
           ),
         ),
         _buildCheckoutBar(context, cart),
       ],
+    );
+  }
+
+  /// "You're saving time!" promo shown on the quick delivery cart.
+  Widget _buildSavingTimeBanner() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF3E0), Color(0xFFFFFAF2)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFFFE3BF)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.shopping_bag_rounded,
+            size: 52,
+            color: Color(0xFFB04BD6),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "You're saving time!",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.grey900,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Get your items delivered in just 25 minutes',
+                  style: TextStyle(fontSize: 14, color: AppColors.grey600),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 62,
+            height: 62,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(color: _accent, width: 3),
+            ),
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '25',
+                  style: TextStyle(
+                    color: _accent,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
+                ),
+                Text(
+                  'min',
+                  style: TextStyle(
+                    color: _accent,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -385,21 +484,22 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildCartItem(BuildContext context, CartItem item) {
+    final isQuick = item.isExpress30 == true;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: festiveCardDecoration(),
+      decoration: festiveCardDecoration(radius: 22),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(16),
               child: item.image != null
                   ? Image.network(
                       item.image!,
-                      width: 80,
-                      height: 80,
+                      width: 104,
+                      height: 104,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return _buildPlaceholderImage();
@@ -407,62 +507,131 @@ class _CartPageState extends State<CartPage>
                     )
                   : _buildPlaceholderImage(),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.productName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.productName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                            color: AppColors.grey900,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => _showRemoveItemDialog(context, item),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFEEDD),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.delete_outline_rounded,
+                            size: 20,
+                            color: _accent,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   if (item.variantName != null &&
                       item.variantName!.trim().isNotEmpty)
                     Text(
                       item.variantName!,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                        fontSize: 12,
+                      style: const TextStyle(
+                        color: AppColors.grey600,
+                        fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
                     )
                   else
                     Text(
                       AppLocalizations.of(context)!.sku(item.sku),
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                        fontSize: 12,
+                      style: const TextStyle(
+                        color: AppColors.grey600,
+                        fontSize: 13,
                       ),
                     ),
-                  const SizedBox(height: 8),
+                  if (isQuick) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE3F5E6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 16,
+                            color: AppColors.secondaryGreen,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            '25 mins',
+                            style: TextStyle(
+                              color: AppColors.secondaryGreen,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        '₹${item.price}',
-                        style: const TextStyle(
-                          color: AppColors.primaryOrange,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '₹${item.price}',
+                              style: const TextStyle(
+                                color: _accent,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 24,
+                              ),
+                            ),
+                            if (item.qty > 1)
+                              Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.total(item.total.toString()),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: AppColors.grey600,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 8),
                       _buildQuantityControls(context, item),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppLocalizations.of(context)!.total(item.total.toString()),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
                   ),
                 ],
               ),
@@ -475,11 +644,11 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildPlaceholderImage() {
     return Container(
-      width: 80,
-      height: 80,
+      width: 104,
+      height: 104,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Icon(
         Icons.image,
@@ -491,53 +660,55 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildQuantityControls(BuildContext context, CartItem item) {
     return Container(
+      height: 40,
       decoration: BoxDecoration(
-        color: AppColors.primaryOrange.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.primaryOrange, width: 1),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFFFC27A), width: 1.2),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildControlButton(
-            context,
-            icon: item.qty == 1 ? Icons.delete_outline : Icons.remove,
+          InkWell(
             onTap: () => _decrementQuantity(context, item),
-          ),
-          Container(
-            constraints: const BoxConstraints(minWidth: 32),
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              '${item.qty}',
-              style: const TextStyle(
-                color: AppColors.primaryOrange,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+            child: Container(
+              width: 36,
+              height: double.infinity,
+              color: const Color(0xFFFFEEDD),
+              child: Icon(
+                item.qty == 1 ? Icons.delete_outline : Icons.remove_rounded,
+                size: 20,
+                color: _accent,
               ),
             ),
           ),
-          _buildControlButton(
-            context,
-            icon: Icons.add,
+          Container(
+            constraints: const BoxConstraints(minWidth: 38),
+            alignment: Alignment.center,
+            child: Text(
+              '${item.qty}',
+              style: const TextStyle(
+                color: AppColors.grey900,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          InkWell(
             onTap: () => _incrementQuantity(context, item),
+            child: Container(
+              width: 36,
+              height: double.infinity,
+              color: const Color(0xFFFFEEDD),
+              child: const Icon(
+                Icons.add_circle_rounded,
+                size: 22,
+                color: _accent,
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildControlButton(
-    BuildContext context, {
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(6),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Icon(icon, size: 18, color: AppColors.primaryOrange),
       ),
     );
   }
@@ -622,12 +793,12 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildBillDetails(BuildContext context, Cart cart) {
-    final displayTotal = (cart.totalWithDelivery ?? cart.total) +
-        ExtraCharge.platformFeeAmount;
+    final displayTotal =
+        (cart.totalWithDelivery ?? cart.total) + ExtraCharge.platformFeeAmount;
 
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: festiveCardDecoration(),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      decoration: festiveCardDecoration(radius: 22),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -635,13 +806,13 @@ class _CartPageState extends State<CartPage>
             children: [
               Icon(
                 Icons.receipt_long_outlined,
-                size: 18,
-                color: AppColors.primaryOrange,
+                size: 24,
+                color: AppColors.grey900,
               ),
-              SizedBox(width: 8),
+              SizedBox(width: 12),
               Text(
                 'Bill Details',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
               ),
             ],
           ),
@@ -669,24 +840,41 @@ class _CartPageState extends State<CartPage>
             AppLocalizations.of(context)!.platformFees,
             '₹${ExtraCharge.platformFeeAmount}',
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 4),
+          const DashedDivider(),
+          const SizedBox(height: 12),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                AppLocalizations.of(context)!.totalItemsLabel(cart.totalItems),
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.totalItemsLabel(
+                      cart.totalItems,
+                    ),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: AppColors.grey600,
+                    ),
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.totalAmount,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(width: 16),
               Text(
                 '₹$displayTotal',
                 style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryOrange,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: _accent,
                 ),
               ),
             ],
@@ -698,41 +886,59 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildCheckoutBar(BuildContext context, Cart cart) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       color: Colors.transparent,
       child: SafeArea(
         top: false,
-        child: FestiveGradientButton(
-          onPressed: () {
-            if (cart.items.isEmpty) {
-              return;
-            }
-
-            context.push(
-              AppRoutes.checkout,
-              extra: SelectedCheckoutItems(
-                items: cart.items,
-                itemIds: cart.items.map((item) => item.id).toList(),
-                subtotal: cart.total,
-                totalQuantity: cart.totalItems,
-                extraCharges: cart.extraCharges,
-                deliveryType: _selectedDeliveryType,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: _accent.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            );
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.proceedToCheckout,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_rounded, size: 20),
             ],
+          ),
+          child: FestiveGradientButton(
+            onPressed: () {
+              if (cart.items.isEmpty) {
+                return;
+              }
+
+              context.push(
+                AppRoutes.checkout,
+                extra: SelectedCheckoutItems(
+                  items: cart.items,
+                  itemIds: cart.items.map((item) => item.id).toList(),
+                  subtotal: cart.total,
+                  totalQuantity: cart.totalItems,
+                  extraCharges: cart.extraCharges,
+                  deliveryType: _selectedDeliveryType,
+                ),
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.verified_user_rounded, size: 24),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context)!.proceedToCheckout,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_rounded, size: 22),
+              ],
+            ),
           ),
         ),
       ),
@@ -746,18 +952,18 @@ class _CartPageState extends State<CartPage>
     Color? valueColor,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 16, color: AppColors.grey700),
           ),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: valueColor,
             ),

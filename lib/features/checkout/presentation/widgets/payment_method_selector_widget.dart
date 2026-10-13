@@ -5,6 +5,7 @@ import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Widget for selecting payment method (COD or Online)
 class PaymentMethodSelectorWidget extends StatefulWidget {
@@ -35,32 +36,58 @@ class _PaymentMethodSelectorWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: festiveCardDecoration(),
-      child: Column(
-        children: [
-          // COD Payment Method
-          _buildPaymentMethodTile(
-            method: PaymentMethodSelection.cod,
-            icon: Icons.money_outlined,
-            title: PaymentMethodType.cod.displayName,
-            subtitle: PaymentMethodSelection.cod.description,
-            isSelected: _selectedMethod.type == PaymentMethodType.cod,
-            onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.credit_card_rounded,
+              color: AppColors.primaryOrange,
+              size: 30,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              AppLocalizations.of(context)!.paymentMethod,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: AppColors.grey900,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: festiveCardDecoration(radius: 22),
+          child: Column(
+            children: [
+              // COD Payment Method
+              _buildPaymentMethodTile(
+                method: PaymentMethodSelection.cod,
+                icon: Icons.payments_outlined,
+                title: PaymentMethodType.cod.displayName,
+                subtitle: PaymentMethodSelection.cod.description,
+                isSelected: _selectedMethod.type == PaymentMethodType.cod,
+                onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
+              ),
+              const SizedBox(height: 8),
+              // Online Payment Method
+              _buildPaymentMethodTile(
+                method: PaymentMethodSelection.online,
+                icon: Icons.credit_card_rounded,
+                title: PaymentMethodType.online.displayName,
+                subtitle: PaymentMethodSelection.online.description,
+                isSelected: _selectedMethod.type == PaymentMethodType.online,
+                onTap: () =>
+                    _selectPaymentMethod(PaymentMethodSelection.online),
+                trailing: _buildPaymentLogos(),
+              ),
+            ],
           ),
-          const Divider(height: 1),
-          // Online Payment Method
-          _buildPaymentMethodTile(
-            method: PaymentMethodSelection.online,
-            icon: Icons.payment_outlined,
-            title: PaymentMethodType.online.displayName,
-            subtitle: PaymentMethodSelection.online.description,
-            isSelected: _selectedMethod.type == PaymentMethodType.online,
-            onTap: () => _selectPaymentMethod(PaymentMethodSelection.online),
-            trailing: _buildPaymentLogos(),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -77,35 +104,41 @@ class _PaymentMethodSelectorWidgetState
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryOrange.withOpacity(0.08)
-              : Colors.transparent,
+          color: isSelected ? const Color(0xFFFFF3E6) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primaryOrange : Colors.transparent,
+            color: isSelected
+                ? AppColors.primaryOrange
+                : Colors.black.withOpacity(0.06),
+            width: isSelected ? 1.4 : 1,
           ),
         ),
         child: Row(
+          crossAxisAlignment: trailing != null
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
             // Icon
             Container(
-              padding: const EdgeInsets.all(12),
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primaryOrange.withOpacity(0.1)
-                    : Theme.of(context).disabledColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+                    ? AppColors.primaryOrange.withOpacity(0.18)
+                    : const Color(0xFFEDEDED),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 icon,
-                color:
-                    isSelected ? AppColors.primaryOrange : Theme.of(context).textTheme.bodyMedium?.color,
-                size: 28,
+                color: isSelected
+                    ? AppColors.primaryOrange
+                    : AppColors.grey900,
+                size: 34,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             // Title and subtitle
             Expanded(
               child: Column(
@@ -114,37 +147,40 @@ class _PaymentMethodSelectorWidgetState
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          isSelected ? AppColors.primaryOrange : Theme.of(context).textTheme.bodyLarge?.color,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected
+                          ? AppColors.primaryOrange
+                          : AppColors.grey900,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: AppColors.grey600,
                     ),
                   ),
                   if (trailing != null) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     trailing,
                   ],
                 ],
               ),
             ),
-            // Radio button
-            Radio<PaymentMethodType>(
-              value: method.type,
-              groupValue: _selectedMethod.type,
-              onChanged: (value) {
-                if (value != null) {
-                  _selectPaymentMethod(method);
-                }
-              },
-              activeColor: AppColors.primaryOrange,
+            // Radio indicator (the whole tile is tappable)
+            Padding(
+              padding: EdgeInsets.only(top: trailing != null ? 14 : 0),
+              child: Icon(
+                isSelected
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                size: 34,
+                color: isSelected
+                    ? AppColors.primaryOrange
+                    : AppColors.grey900,
+              ),
             ),
           ],
         ),
@@ -153,34 +189,48 @@ class _PaymentMethodSelectorWidgetState
   }
 
   Widget _buildPaymentLogos() {
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
       children: [
-        _buildPaymentLogo('Razorpay', Colors.blue.shade700),
-        const SizedBox(width: 8),
-        _buildPaymentLogo('Cards', Colors.green.shade700),
-        const SizedBox(width: 8),
-        _buildPaymentLogo('UPI', Colors.orange.shade700),
-        const SizedBox(width: 8),
-        _buildPaymentLogo('Wallets', Colors.purple.shade700),
+        _buildPaymentLogo('Razorpay', Icons.bolt_rounded, Colors.blue.shade700),
+        _buildPaymentLogo('Cards', Icons.credit_card, Colors.green.shade700),
+        _buildPaymentLogo(
+          'UPI',
+          Icons.account_balance_outlined,
+          Colors.orange.shade700,
+        ),
+        _buildPaymentLogo(
+          'Wallets',
+          Icons.account_balance_wallet_rounded,
+          Colors.purple.shade700,
+        ),
       ],
     );
   }
 
-  Widget _buildPaymentLogo(String label, Color color) {
+  Widget _buildPaymentLogo(String label, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

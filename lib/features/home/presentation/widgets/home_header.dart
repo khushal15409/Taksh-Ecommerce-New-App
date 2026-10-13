@@ -207,29 +207,37 @@ class _HomeHeaderState extends State<HomeHeader>
   }
 
   Widget _buildLogo() {
+    // The artwork ships with its own background (aspect ~3:2), so the box
+    // matches that ratio and the image fills it edge to edge: no extra white
+    // padding around the logo.
     const double logoHeight = 44.0;
-    const double logoWidth = 84.0;
+    const double logoWidth = 66.0;
+    const double logoRadius = 12.0;
 
     return Container(
       height: logoHeight,
       width: logoWidth,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(logoRadius),
       ),
-      child: Image.asset(
-        _homeLogoAssetPath,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.high,
-        errorBuilder: (context, error, stackTrace) => const Center(
-          child: Text(
-            'Taksh',
-            style: TextStyle(
-              color: AppColors.secondaryGreen,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.4,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(logoRadius),
+        child: Image.asset(
+          _homeLogoAssetPath,
+          fit: BoxFit.cover,
+          width: logoWidth,
+          height: logoHeight,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (context, error, stackTrace) => const Center(
+            child: Text(
+              'Taksh',
+              style: TextStyle(
+                color: AppColors.secondaryGreen,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
+              ),
             ),
           ),
         ),

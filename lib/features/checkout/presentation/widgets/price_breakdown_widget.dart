@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/dashed_divider.dart';
 import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/price_breakdown.dart';
 
@@ -17,9 +19,32 @@ class PriceBreakdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return festiveCard(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.receipt_long_rounded,
+              color: AppColors.grey900,
+              size: 30,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              AppLocalizations.of(context)!.priceDetails,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: AppColors.grey900,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Container(
+      decoration: festiveCardDecoration(radius: 22),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           children: [
             _buildPriceRow(
@@ -56,7 +81,9 @@ class PriceBreakdownWidget extends StatelessWidget {
                 isDiscount: true,
               ),
             ],
-            const Divider(height: 24),
+            const SizedBox(height: 14),
+            const DashedDivider(),
+            const SizedBox(height: 14),
             _buildPriceRow(
               context,
               'Grand Total',
@@ -66,6 +93,8 @@ class PriceBreakdownWidget extends StatelessWidget {
           ],
         ),
       ),
+        ),
+      ],
     );
   }
 
@@ -85,10 +114,8 @@ class PriceBreakdownWidget extends StatelessWidget {
         Text(
           label,
           style: isTotal
-              ? Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  )
-              : Theme.of(context).textTheme.bodyLarge,
+              ? const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)
+              : const TextStyle(fontSize: 16, color: AppColors.grey700),
         ),
         const SizedBox(width: 16),
         if (isFree)
@@ -96,28 +123,33 @@ class PriceBreakdownWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.secondaryGreen,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(6),
             ),
-            child: Text(
+            child: const Text(
               'FREE',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
             ),
           )
         else
           Text(
             '${isDiscount ? '-' : ''}₹${amount.abs().toStringAsFixed(2)}',
             style: isTotal
-                ? Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryOrange,
-                    )
-                : Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isDiscount ? AppColors.secondaryGreen : null,
-                      fontWeight: isDiscount ? FontWeight.bold : null,
-                    ),
+                ? const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryOrange,
+                  )
+                : TextStyle(
+                    fontSize: 16,
+                    color: isDiscount
+                        ? AppColors.secondaryGreen
+                        : AppColors.grey900,
+                    fontWeight: isDiscount ? FontWeight.bold : FontWeight.w500,
+                  ),
           ),
       ],
     );

@@ -27,6 +27,9 @@ class AddToCartButton extends StatelessWidget {
   /// Whether this button belongs to quick-delivery flow.
   final bool isQuickDelivery;
 
+  /// Large size only: render the initial "Add to Cart" as an outlined button.
+  final bool outlined;
+
   /// Optional callback when item is added
   final VoidCallback? onAdded;
 
@@ -39,6 +42,7 @@ class AddToCartButton extends StatelessWidget {
     required this.productId,
     this.size = 'small',
     this.isQuickDelivery = false,
+    this.outlined = false,
     this.onAdded,
     this.onQuantityChanged,
   });
@@ -154,6 +158,50 @@ class AddToCartButton extends StatelessWidget {
     }
 
     // Large button for product details page
+    if (outlined) {
+      const accent = Color(0xFFFF8A2B);
+      return SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: isLoading ? null : () => _addToCart(context),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: accent,
+            side: const BorderSide(color: accent, width: 1.6),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: accent,
+                  ),
+                )
+              : const FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shopping_cart_outlined, size: 20),
+                      SizedBox(width: 6),
+                      Text(
+                        'Add to Cart',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      );
+    }
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
