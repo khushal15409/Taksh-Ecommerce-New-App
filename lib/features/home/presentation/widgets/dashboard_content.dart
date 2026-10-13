@@ -52,6 +52,8 @@ class _DashboardContentState extends State<DashboardContent> {
       if (section.key == 'Logo') continue;
 
       if (section.key == 'Banners') {
+        // Hide the whole banner section when admin has no banners for this type.
+        if (section.banners.isEmpty) continue;
         bannerWidgets.add(
           Padding(
             padding: const EdgeInsets.only(top: 6, bottom: 10),

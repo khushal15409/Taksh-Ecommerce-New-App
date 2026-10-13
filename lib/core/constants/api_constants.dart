@@ -28,6 +28,7 @@ class ApiConstants {
 
   /// Dashboard endpoint
   static const String dashboard = '/dashboard';
+  static const String ecommerceBanners = '/ecommerce/banners';
   static const String expressDashboard = '/express-30/dashboard';
 
   /// User endpoints

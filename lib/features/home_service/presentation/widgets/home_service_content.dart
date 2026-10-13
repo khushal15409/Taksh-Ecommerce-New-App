@@ -9,7 +9,7 @@ import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_s
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/courier_booking_page.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/general_service_page.dart';
-import 'package:taksh_e_commerce/features/home/presentation/widgets/mode_promo_banner.dart';
+import 'package:taksh_e_commerce/features/home_service/presentation/widgets/service_banners_section.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Content widget shown in the home tab when home services are selected.
@@ -154,11 +154,7 @@ class _ServicesView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ModePromoBanner(
-                asset: 'assets/images/diwali/banner_services.jpg',
-                shadowColor: const Color(0xFF6A1FD0),
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-              ),
+              const ServiceBannersSection(),
               if (services.isEmpty)
                 _EmptyView(subtitle: l10n.homeServicesSubtitle)
               else

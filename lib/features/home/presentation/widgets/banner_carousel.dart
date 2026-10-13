@@ -1,16 +1,23 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
 
-/// Banner carousel widget for displaying promotional banners
+/// Banner widget for displaying promotional banners.
+///
+/// A single banner is shown as a static card; multiple banners are shown as an
+/// auto-playing slider with page indicators. Renders nothing when empty.
 class BannerCarousel extends StatefulWidget {
   final List<BannerModel> banners;
   final Function(BannerModel)? onBannerTap;
+  final double horizontalPadding;
 
   const BannerCarousel({
     super.key,
     required this.banners,
     this.onBannerTap,
+    this.horizontalPadding = 16,
   });
 
   @override
@@ -20,9 +27,41 @@ class BannerCarousel extends StatefulWidget {
 class _BannerCarouselState extends State<BannerCarousel> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  Timer? _autoPlay;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoPlay();
+  }
+
+  @override
+  void didUpdateWidget(covariant BannerCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.banners.length != widget.banners.length) {
+      _currentPage = 0;
+      if (_pageController.hasClients) _pageController.jumpToPage(0);
+      _startAutoPlay();
+    }
+  }
+
+  void _startAutoPlay() {
+    _autoPlay?.cancel();
+    if (widget.banners.length < 2) return;
+    _autoPlay = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+      final next = (_currentPage + 1) % widget.banners.length;
+      _pageController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
 
   @override
   void dispose() {
+    _autoPlay?.cancel();
     _pageController.dispose();
     super.dispose();
   }
@@ -31,6 +70,19 @@ class _BannerCarouselState extends State<BannerCarousel> {
   Widget build(BuildContext context) {
     if (widget.banners.isEmpty) {
       return const SizedBox.shrink();
+    }
+
+    // Standard single banner: static card, no slider/indicator.
+    if (widget.banners.length == 1) {
+      final banner = widget.banners.first;
+      return SizedBox(
+        height: 180,
+        child: _BannerItem(
+          banner: banner,
+          horizontalPadding: widget.horizontalPadding,
+          onTap: () => widget.onBannerTap?.call(banner),
+        ),
+      );
     }
 
     return Column(
@@ -49,6 +101,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
               final banner = widget.banners[index];
               return _BannerItem(
                 banner: banner,
+                horizontalPadding: widget.horizontalPadding,
                 onTap: () => widget.onBannerTap?.call(banner),
               );
             },
@@ -69,17 +122,19 @@ class _BannerCarouselState extends State<BannerCarousel> {
 /// Individual banner item
 class _BannerItem extends StatelessWidget {
   final BannerModel banner;
+  final double horizontalPadding;
   final VoidCallback? onTap;
 
   const _BannerItem({
     required this.banner,
+    required this.horizontalPadding,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: GestureDetector(
         onTap: onTap,
         child: Container(

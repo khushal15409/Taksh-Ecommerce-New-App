@@ -6,6 +6,9 @@ class BannerEntity extends Equatable {
   final String title;
   final String imageUrl;
   final String position;
+
+  /// standard | quick | service
+  final String type;
   final String redirectType;
   final int? redirectId;
 
@@ -14,10 +17,11 @@ class BannerEntity extends Equatable {
     required this.title,
     required this.imageUrl,
     required this.position,
+    this.type = 'standard',
     required this.redirectType,
     this.redirectId,
   });
 
   @override
-  List<Object?> get props => [id, title, imageUrl, position, redirectType, redirectId];
+  List<Object?> get props => [id, title, imageUrl, position, type, redirectType, redirectId];
 }

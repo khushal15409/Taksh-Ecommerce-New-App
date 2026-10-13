@@ -12,11 +12,14 @@ class BannerModel extends BannerEntity {
     required super.title,
     required super.imageUrl,
     required super.position,
+    super.type,
     required super.redirectType,
     super.redirectId,
   });
 
-  factory BannerModel.fromJson(DataMap json) => _$BannerModelFromJson(json);
+  // Older API responses have no `type`; default it so parsing never fails.
+  factory BannerModel.fromJson(DataMap json) =>
+      _$BannerModelFromJson({...json, 'type': json['type'] ?? 'standard'});
 
   DataMap toJson() => _$BannerModelToJson(this);
 
@@ -27,6 +30,7 @@ class BannerModel extends BannerEntity {
       title: entity.title,
       imageUrl: entity.imageUrl,
       position: entity.position,
+      type: entity.type,
       redirectType: entity.redirectType,
       redirectId: entity.redirectId,
     );
