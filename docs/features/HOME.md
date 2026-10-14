@@ -101,3 +101,15 @@ dashboard (type `quick`), Service tab → `GET /api/ecommerce/banners?type=servi
 product sections (service tab: after the first half of the services);
 `home_bottom` → below all sections. Order inside a slot follows admin `sort_order`.
 Empty slots render nothing. Admin form labels were updated to match.
+
+### Update: static promo banners removed, "after section" for middle banners
+- The static Diwali promo images (`ModePromoBanner`) on the Standard / Quick tabs were removed; every banner now comes from the admin panel.
+- A **Middle** banner can choose the dashboard section it is shown below (admin: Banner → "Show after which section?"). The API sends `after_section_name`; the app matches it to the rendered section `key` and inserts the banner right after it. No section chosen, or that section is not shown → fallback to the middle of the sections. Service tab has no sections (middle = after the first half of the services).
+
+## Dashboard sections: type + design (admin-configured)
+Admin (App Home Sections) now sets, per section:
+- **Show on dashboard** — `standard`, `quick` or `both` (old sections stay `both`). `/api/dashboard` returns standard+both, `/express-30/dashboard` quick+both.
+- **Design** — none (normal horizontal row) or one of 5 templates: `premium`, `hot_deals`, `fresh_picks`, `spotlight`, `minimal`.
+- **Rows × products per row** (rows 1–10, per row 1–4; default 2×2) — only for a design.
+
+The API adds `id`, `design`, `rows`, `items_per_row` to each section. In the app `DashboardSectionModel` parses them and `DashboardContent` / `ExpressDashboardContent` render a section with `DesignedProductSection` when `design` is a known template, otherwise with the unchanged `ProductSection`. Unknown design keys fall back to the normal row. Banners/Logo/Categories are not affected.

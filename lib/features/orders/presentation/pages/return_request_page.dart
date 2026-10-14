@@ -93,7 +93,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
 
         if (state is OrdersError) {
           setState(() => _isSubmitting = false);
-          AppErrorToast.show(context);
+          AppErrorToast.show(context, message: state.message);
         }
       },
       child: Scaffold(
@@ -517,13 +517,18 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
       return;
     }
 
+    // The API's `resolution` only accepts refund / replacement / wallet, so the
+    // free-text note goes along with the reason instead (reason allows 1000
+    // characters). Sending the note as `resolution` made the request fail
+    // validation.
+    final note = _resolutionController.text.trim();
+    final selectedReason = _selectedReason!;
+    final reason = note.isEmpty ? selectedReason : '$selectedReason - $note';
+
     context.read<OrdersCubit>().completeReturnRequest(
       orderId: widget.orderId,
       orderItemId: _selectedItem!.id,
-      reason: _selectedReason!,
-      resolution: _resolutionController.text.trim().isEmpty
-          ? null
-          : _resolutionController.text.trim(),
+      reason: reason.length > 1000 ? reason.substring(0, 1000) : reason,
       imagePaths: _selectedImages.map((image) => image.path).toList(),
     );
   }

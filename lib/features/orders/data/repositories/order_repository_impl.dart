@@ -256,6 +256,10 @@ class OrderRepositoryImpl implements OrderRepository {
         stackTrace,
       );
       return Left(NetworkFailure(e.message));
+    } on AppException catch (e) {
+      // Other typed errors (400 validation, 404 ...) already carry the
+      // server's message; show it instead of a wrapped "Failed to ...: $e".
+      return Left(ServerFailure(e.message));
     } catch (e, stackTrace) {
       log.errorWithContext(
         'Unexpected error requesting return',
@@ -322,6 +326,10 @@ class OrderRepositoryImpl implements OrderRepository {
         stackTrace,
       );
       return Left(NetworkFailure(e.message));
+    } on AppException catch (e) {
+      // Other typed errors (400 validation, 404 ...) already carry the
+      // server's message; show it instead of a wrapped "Failed to ...: $e".
+      return Left(ServerFailure(e.message));
     } catch (e, stackTrace) {
       log.errorWithContext(
         'Unexpected error uploading return media',

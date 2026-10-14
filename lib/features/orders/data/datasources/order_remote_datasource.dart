@@ -314,6 +314,9 @@ class OrderRemoteDatasourceImpl implements OrderRemoteDatasource {
         'Failed to request return: ${e.message}',
         e.response?.statusCode,
       );
+    } on AppException {
+      // Already a typed error from ApiClient (message from the server): keep it.
+      rethrow;
     } catch (e, stackTrace) {
       log.errorWithContext(
         'Unexpected error requesting return',
@@ -401,6 +404,8 @@ class OrderRemoteDatasourceImpl implements OrderRemoteDatasource {
         'Failed to upload return media: ${e.message}',
         e.response?.statusCode,
       );
+    } on AppException {
+      rethrow;
     } catch (e, stackTrace) {
       log.errorWithContext(
         'Unexpected error uploading return media',

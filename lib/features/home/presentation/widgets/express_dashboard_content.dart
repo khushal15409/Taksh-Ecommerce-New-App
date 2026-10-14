@@ -7,6 +7,7 @@ import 'package:taksh_e_commerce/features/home/domain/entities/express_dashboard
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/category_catalog_section.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/designed_product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/product_section.dart';
 import 'package:taksh_e_commerce/features/home/data/models/product_model.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +39,7 @@ class ExpressDashboardContent extends StatelessWidget {
     final sections = dashboard.sections as List<dynamic>;
     Map<BannerSlot, List<BannerModel>> bannerSlots = groupBannersBySlot(const []);
     final productWidgets = <Widget>[];
+    final productKeys = <String>[];
     List<Category>? categoryData;
 
     for (final item in sections) {
@@ -58,42 +60,77 @@ class ExpressDashboardContent extends StatelessWidget {
       }
 
       if (section.hasData && section.products.isNotEmpty) {
+        productKeys.add(section.key);
+
+        void onTap(ProductModel product) {
+          _log.infoWithContext('Express product tapped', {
+            'product_id': product.id,
+            'name': product.name,
+          });
+          onProductTap?.call(product);
+        }
+
+        void onViewAllTap() {
+          _log.infoWithContext('Express view all tapped', {
+            'section': section.key,
+          });
+          context.push(
+            AppRoutes.viewAllProducts,
+            extra: ViewAllProductsArgs(
+              title: section.key,
+              products: section.products,
+            ),
+          );
+        }
+
         productWidgets.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: ProductSection(
-              section: section,
-              gridColumns: 3,
-              showDeliveryTime: true,
-              onProductTap: (product) {
-                _log.infoWithContext('Express product tapped', {
-                  'product_id': product.id,
-                  'name': product.name,
-                });
-                onProductTap?.call(product);
-              },
-              onViewAllTap: () {
-                _log.infoWithContext('Express view all tapped', {
-                  'section': section.key,
-                });
-                context.push(
-                  AppRoutes.viewAllProducts,
-                  extra: ViewAllProductsArgs(
-                    title: section.key,
-                    products: section.products,
+            child: SectionDesign.isKnown(section.design)
+                ? DesignedProductSection(
+                    section: section,
+                    showDeliveryTime: true,
+                    onProductTap: onTap,
+                    onViewAllTap: onViewAllTap,
+                  )
+                : ProductSection(
+                    section: section,
+                    gridColumns: 3,
+                    showDeliveryTime: true,
+                    onProductTap: onTap,
+                    onViewAllTap: onViewAllTap,
                   ),
-                );
-              },
-            ),
           ),
         );
       }
     }
 
-    // Middle banners sit between the product sections (after the first half).
-    final middleBanners = _bannerBlock(bannerSlots[BannerSlot.middle]!);
-    if (middleBanners != null) {
-      productWidgets.insert(productWidgets.length ~/ 2, middleBanners);
+    // Middle banners: each goes right below the section chosen in the admin
+    // panel. A banner with no (or an unavailable) section falls back to the
+    // middle of the product sections.
+    final middleByKey = <String, List<BannerModel>>{};
+    final middleDefault = <BannerModel>[];
+    for (final banner in bannerSlots[BannerSlot.middle]!) {
+      final target = banner.afterSectionName;
+      if (target != null && productKeys.contains(target)) {
+        middleByKey.putIfAbsent(target, () => []).add(banner);
+      } else {
+        middleDefault.add(banner);
+      }
+    }
+    final defaultBlock = _bannerBlock(middleDefault);
+    final half = productWidgets.length ~/ 2;
+    final orderedProducts = <Widget>[
+      // No product sections to split: keep the banner at the top of the list.
+      if (defaultBlock != null && half == 0) defaultBlock,
+    ];
+    for (var i = 0; i < productWidgets.length; i++) {
+      orderedProducts.add(productWidgets[i]);
+      final block = _bannerBlock(middleByKey[productKeys[i]] ?? const []);
+      if (block != null) orderedProducts.add(block);
+      if (defaultBlock != null && half > 0 && i == half - 1) {
+        orderedProducts.add(defaultBlock);
+      }
     }
     final topBanners = _bannerBlock(bannerSlots[BannerSlot.top]!);
     final bottomBanners = _bannerBlock(bannerSlots[BannerSlot.bottom]!);
@@ -102,7 +139,7 @@ class ExpressDashboardContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (topBanners != null) topBanners,
-        ...productWidgets,
+        ...orderedProducts,
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: CategoryCatalogSection(

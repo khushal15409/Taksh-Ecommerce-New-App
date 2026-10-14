@@ -167,11 +167,11 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Widget _buildLogoCard() {
+    // The logo artwork already has its own white background, so it fills the
+    // whole card (no inner padding) instead of floating inside it.
     return Container(
       width: 286,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.92),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -182,11 +182,11 @@ class _SplashPageState extends State<SplashPage> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(28),
         child: Image.asset(
           'docs/splash_logo.jpeg',
-          height: 132,
-          fit: BoxFit.contain,
+          width: double.infinity,
+          fit: BoxFit.fitWidth,
         ),
       ),
     );

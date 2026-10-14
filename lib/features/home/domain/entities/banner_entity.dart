@@ -12,6 +12,10 @@ class BannerEntity extends Equatable {
   final String redirectType;
   final int? redirectId;
 
+  /// For `home_middle` banners: name of the dashboard section the banner is
+  /// shown below (null = default place).
+  final String? afterSectionName;
+
   const BannerEntity({
     required this.id,
     required this.title,
@@ -20,8 +24,9 @@ class BannerEntity extends Equatable {
     this.type = 'standard',
     required this.redirectType,
     this.redirectId,
+    this.afterSectionName,
   });
 
   @override
-  List<Object?> get props => [id, title, imageUrl, position, type, redirectType, redirectId];
+  List<Object?> get props => [id, title, imageUrl, position, type, redirectType, redirectId, afterSectionName];
 }

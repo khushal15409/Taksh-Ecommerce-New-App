@@ -7,10 +7,22 @@ class DashboardSectionEntity extends Equatable {
   final List<dynamic> data;
   final String? message;
 
+  /// Admin-configured layout. [design] is a template key (premium, hot_deals,
+  /// fresh_picks, spotlight, minimal); null = the normal product row.
+  /// [rows] x [itemsPerRow] is the size of the templated block.
+  final int? id;
+  final String? design;
+  final int? rows;
+  final int? itemsPerRow;
+
   const DashboardSectionEntity({
     required this.key,
     required this.data,
     this.message,
+    this.id,
+    this.design,
+    this.rows,
+    this.itemsPerRow,
   });
 
   /// Check if section has data
@@ -20,5 +32,5 @@ class DashboardSectionEntity extends Equatable {
   bool get isEmpty => data.isEmpty && message != null;
 
   @override
-  List<Object?> get props => [key, data, message];
+  List<Object?> get props => [key, data, message, id, design, rows, itemsPerRow];
 }

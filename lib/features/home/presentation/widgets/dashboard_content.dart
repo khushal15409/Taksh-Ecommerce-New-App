@@ -5,11 +5,13 @@ import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
 import 'package:taksh_e_commerce/features/home/data/models/dashboard_section_model.dart';
+import 'package:taksh_e_commerce/features/home/data/models/product_model.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/recent_views_cubit.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/recent_views_state.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/category_catalog_section.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/designed_product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/pages/view_all_products_page.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/recent_views_section.dart';
@@ -46,6 +48,7 @@ class _DashboardContentState extends State<DashboardContent> {
     final sections = widget.dashboard.sections as List<dynamic>;
     Map<BannerSlot, List<BannerModel>> bannerSlots = groupBannersBySlot(const []);
     final productWidgets = <Widget>[];
+    final productKeys = <String>[];
     List<Category>? categoryData;
 
     for (final item in sections) {
@@ -66,48 +69,85 @@ class _DashboardContentState extends State<DashboardContent> {
       }
 
       if (section.hasData) {
+        productKeys.add(section.key);
+
+        void onProductTap(ProductModel product) {
+          _log.infoWithContext(
+            'Product tapped',
+            {'product_id': product.id, 'name': product.name},
+          );
+          context.push(
+            AppRoutes.productDetails(product.id),
+            extra: {
+              'inStock': product.inStock,
+              'outOfStockMessage': product.outOfStockMessage,
+            },
+          );
+        }
+
+        void onViewAllTap() {
+          _log.infoWithContext(
+            'View all tapped',
+            {'section': section.key},
+          );
+          context.push(
+            AppRoutes.viewAllProducts,
+            extra: ViewAllProductsArgs(
+              title: section.key,
+              products: section.products,
+            ),
+          );
+        }
+
         productWidgets.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: ProductSection(
-              section: section,
-              showDeliveryTime: false,
-              onProductTap: (product) {
-                _log.infoWithContext(
-                  'Product tapped',
-                  {'product_id': product.id, 'name': product.name},
-                );
-                context.push(
-                  AppRoutes.productDetails(product.id),
-                  extra: {
-                    'inStock': product.inStock,
-                    'outOfStockMessage': product.outOfStockMessage,
-                  },
-                );
-              },
-              onViewAllTap: () {
-                _log.infoWithContext(
-                  'View all tapped',
-                  {'section': section.key},
-                );
-                context.push(
-                  AppRoutes.viewAllProducts,
-                  extra: ViewAllProductsArgs(
-                    title: section.key,
-                    products: section.products,
+            // A section with an admin-picked design uses that template;
+            // no design = the normal product row.
+            child: SectionDesign.isKnown(section.design)
+                ? DesignedProductSection(
+                    section: section,
+                    showDeliveryTime: false,
+                    onProductTap: onProductTap,
+                    onViewAllTap: onViewAllTap,
+                  )
+                : ProductSection(
+                    section: section,
+                    showDeliveryTime: false,
+                    onProductTap: onProductTap,
+                    onViewAllTap: onViewAllTap,
                   ),
-                );
-              },
-            ),
           ),
         );
       }
     }
 
-    // Middle banners sit between the product sections (after the first half).
-    final middleBanners = _bannerBlock(bannerSlots[BannerSlot.middle]!);
-    if (middleBanners != null) {
-      productWidgets.insert(productWidgets.length ~/ 2, middleBanners);
+    // Middle banners: each goes right below the section chosen in the admin
+    // panel. A banner with no (or an unavailable) section falls back to the
+    // middle of the product sections.
+    final middleByKey = <String, List<BannerModel>>{};
+    final middleDefault = <BannerModel>[];
+    for (final banner in bannerSlots[BannerSlot.middle]!) {
+      final target = banner.afterSectionName;
+      if (target != null && productKeys.contains(target)) {
+        middleByKey.putIfAbsent(target, () => []).add(banner);
+      } else {
+        middleDefault.add(banner);
+      }
+    }
+    final defaultBlock = _bannerBlock(middleDefault);
+    final half = productWidgets.length ~/ 2;
+    final orderedProducts = <Widget>[
+      // No product sections to split: keep the banner at the top of the list.
+      if (defaultBlock != null && half == 0) defaultBlock,
+    ];
+    for (var i = 0; i < productWidgets.length; i++) {
+      orderedProducts.add(productWidgets[i]);
+      final block = _bannerBlock(middleByKey[productKeys[i]] ?? const []);
+      if (block != null) orderedProducts.add(block);
+      if (defaultBlock != null && half > 0 && i == half - 1) {
+        orderedProducts.add(defaultBlock);
+      }
     }
     final topBanners = _bannerBlock(bannerSlots[BannerSlot.top]!);
     final bottomBanners = _bannerBlock(bannerSlots[BannerSlot.bottom]!);
@@ -137,7 +177,7 @@ class _DashboardContentState extends State<DashboardContent> {
             return const SizedBox.shrink();
           },
         ),
-        ...productWidgets,
+        ...orderedProducts,
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: CategoryCatalogSection(

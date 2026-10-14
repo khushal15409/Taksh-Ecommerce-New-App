@@ -24,7 +24,6 @@ import 'package:taksh_e_commerce/features/home/presentation/widgets/dashboard_sh
 import 'package:taksh_e_commerce/features/home/presentation/widgets/express_dashboard_content.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/home_header.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/home_mode_theme.dart';
-import 'package:taksh_e_commerce/features/home/presentation/widgets/mode_promo_banner.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/widgets/home_service_content.dart';
 
@@ -324,29 +323,11 @@ class _HomePageState extends State<_HomePageContent> {
     );
   }
 
-  /// "Shop Now" on the banner artwork: bring the product sections into view.
-  void _scrollToProducts() {
-    if (!_scrollController.hasClients) return;
-    _scrollController.animateTo(
-      (MediaQuery.of(context).size.width * 0.45).clamp(
-        0.0,
-        _scrollController.position.maxScrollExtent,
-      ).toDouble(),
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
   Widget _buildContent() {
     switch (_selectedDeliveryType) {
       case DeliveryType.standard:
         return Column(
           children: [
-            ModePromoBanner(
-              asset: 'assets/images/diwali/banner_standard.jpg',
-              shadowColor: const Color(0xFFF26A0E),
-              onTap: _scrollToProducts,
-            ),
             BlocBuilder<DashboardBloc, DashboardState>(
               builder: (context, state) {
                 if (state is DashboardLoading) {
@@ -373,11 +354,6 @@ class _HomePageState extends State<_HomePageContent> {
       case DeliveryType.quick:
         return Column(
           children: [
-            ModePromoBanner(
-              asset: 'assets/images/diwali/banner_quick.jpg',
-              shadowColor: const Color(0xFF138A4A),
-              onTap: _scrollToProducts,
-            ),
             BlocBuilder<ExpressDashboardBloc, ExpressDashboardState>(
               builder: (context, state) {
                 if (state is ExpressDashboardLoading) {

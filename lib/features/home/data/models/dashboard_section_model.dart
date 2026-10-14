@@ -14,6 +14,10 @@ class DashboardSectionModel extends DashboardSectionEntity {
     required super.key,
     required super.data,
     super.message,
+    super.id,
+    super.design,
+    super.rows,
+    super.itemsPerRow,
   });
 
   factory DashboardSectionModel.fromJson(DataMap json) {
@@ -45,10 +49,17 @@ class DashboardSectionModel extends DashboardSectionEntity {
           .toList();
     }
 
+    int? asInt(dynamic v) => v is num ? v.toInt() : int.tryParse('$v');
+    final design = json['design'];
+
     return DashboardSectionModel(
       key: key,
       data: parsedData,
       message: message,
+      id: asInt(json['id']),
+      design: design is String && design.isNotEmpty ? design : null,
+      rows: asInt(json['rows']),
+      itemsPerRow: asInt(json['items_per_row']),
     );
   }
 

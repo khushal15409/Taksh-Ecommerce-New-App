@@ -15,6 +15,7 @@ class BannerModel extends BannerEntity {
     super.type,
     required super.redirectType,
     super.redirectId,
+    super.afterSectionName,
   });
 
   // Older API responses have no `type`; default it so parsing never fails.
@@ -33,6 +34,7 @@ class BannerModel extends BannerEntity {
       type: entity.type,
       redirectType: entity.redirectType,
       redirectId: entity.redirectId,
+      afterSectionName: entity.afterSectionName,
     );
   }
 }
