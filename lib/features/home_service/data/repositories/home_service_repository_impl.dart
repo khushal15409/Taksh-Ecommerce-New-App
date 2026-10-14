@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:taksh_e_commerce/core/error/exceptions.dart';
 import 'package:taksh_e_commerce/core/error/failures.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/home_service/data/datasources/home_service_remote_datasource.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking_history.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_delivery_partner.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_quote.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/home_service.dart';
@@ -107,39 +111,18 @@ class HomeServiceRepositoryImpl implements HomeServiceRepository {
     }
   }
 
-  @override
-  ResultFuture<CourierQuote> getCourierQuote({
-    required double weightGrams,
-    required double dimensionLength,
-    required double dimensionHeight,
-    required double dimensionWidth,
-    required String dimensionUnit,
-  }) async {
+  /// Runs [call] and maps data-layer exceptions to [Failure]s.
+  ResultFuture<T> _run<T>(String action, Future<T> Function() call) async {
     final log = loggerWithContext({
       'feature': 'home_service',
       'class': 'HomeServiceRepositoryImpl',
-      'method': 'getCourierQuote',
+      'method': action,
     });
-
     try {
-      log.infoWithContext('Getting courier quote', {
-        'weight_grams': weightGrams,
-        'dimension_unit': dimensionUnit,
-      });
-      final quote = await _remoteDataSource.getCourierQuote(
-        weightGrams: weightGrams,
-        dimensionLength: dimensionLength,
-        dimensionHeight: dimensionHeight,
-        dimensionWidth: dimensionWidth,
-        dimensionUnit: dimensionUnit,
-      );
-      log.infoWithContext('Courier quote retrieved successfully', {
-        'quotes_count': quote.quotes.length,
-      });
-      return Right(quote);
+      return Right(await call());
     } on ServerException catch (e, stackTrace) {
       log.errorWithContext(
-        'Server exception getting courier quote',
+        'Server exception',
         {'message': e.message},
         e,
         stackTrace,
@@ -147,7 +130,7 @@ class HomeServiceRepositoryImpl implements HomeServiceRepository {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e, stackTrace) {
       log.errorWithContext(
-        'Network exception getting courier quote',
+        'Network exception',
         {'message': e.message},
         e,
         stackTrace,
@@ -155,13 +138,37 @@ class HomeServiceRepositoryImpl implements HomeServiceRepository {
       return Left(NetworkFailure(e.message));
     } catch (e, stackTrace) {
       log.errorWithContext(
-        'Unexpected error getting courier quote',
+        'Unexpected error',
         {'error_type': e.runtimeType.toString()},
         e,
         stackTrace,
       );
-      return Left(ServerFailure('Failed to get courier quote: $e'));
+      return const Left(ServerFailure('Something went wrong. Please try again.'));
     }
+  }
+
+  @override
+  ResultFuture<CourierQuote> getCourierQuote({
+    required String pickupPincode,
+    required String deliveryPincode,
+    required double weightGrams,
+    required double dimensionLength,
+    required double dimensionHeight,
+    required double dimensionWidth,
+    required String dimensionUnit,
+  }) {
+    return _run(
+      'getCourierQuote',
+      () => _remoteDataSource.getCourierQuote(
+        pickupPincode: pickupPincode,
+        deliveryPincode: deliveryPincode,
+        weightGrams: weightGrams,
+        dimensionLength: dimensionLength,
+        dimensionHeight: dimensionHeight,
+        dimensionWidth: dimensionWidth,
+        dimensionUnit: dimensionUnit,
+      ),
+    );
   }
 
   @override
@@ -181,24 +188,14 @@ class HomeServiceRepositoryImpl implements HomeServiceRepository {
     required double dimensionHeight,
     required double dimensionWidth,
     required String dimensionUnit,
-    required int courierDeliveryPartnerId,
+    required String courierCompanyId,
+    double? quotedRate,
     String? customerNotes,
     String? itemPhotoPath,
-  }) async {
-    final log = loggerWithContext({
-      'feature': 'home_service',
-      'class': 'HomeServiceRepositoryImpl',
-      'method': 'createCourierBooking',
-    });
-
-    try {
-      log.infoWithContext('Creating courier booking', {
-        'pickup_pincode': pickupPincode,
-        'delivery_pincode': deliveryPincode,
-        'courier_delivery_partner_id': courierDeliveryPartnerId,
-      });
-
-      final booking = await _remoteDataSource.createCourierBooking(
+  }) {
+    return _run(
+      'createCourierBooking',
+      () => _remoteDataSource.createCourierBooking(
         customerName: customerName,
         customerMobile: customerMobile,
         pickupAddress: pickupAddress,
@@ -214,42 +211,93 @@ class HomeServiceRepositoryImpl implements HomeServiceRepository {
         dimensionHeight: dimensionHeight,
         dimensionWidth: dimensionWidth,
         dimensionUnit: dimensionUnit,
-        courierDeliveryPartnerId: courierDeliveryPartnerId,
+        courierCompanyId: courierCompanyId,
+        quotedRate: quotedRate,
         customerNotes: customerNotes,
         itemPhotoPath: itemPhotoPath,
-      );
+      ),
+    );
+  }
 
-      log.infoWithContext('Courier booking created successfully', {
-        'booking_id': booking.bookingId,
-        'booking_number': booking.bookingNumber,
-      });
+  @override
+  ResultFuture<CourierPaymentOrder> createCourierPayment({
+    required int bookingId,
+  }) {
+    return _run(
+      'createCourierPayment',
+      () => _remoteDataSource.createCourierPayment(bookingId: bookingId),
+    );
+  }
 
-      return Right(booking);
-    } on ServerException catch (e, stackTrace) {
-      log.errorWithContext(
-        'Server exception creating courier booking',
-        {'message': e.message},
-        e,
-        stackTrace,
+  @override
+  ResultFuture<CourierPaymentResult> verifyCourierPayment({
+    required int bookingId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  }) {
+    return _run(
+      'verifyCourierPayment',
+      () => _remoteDataSource.verifyCourierPayment(
+        bookingId: bookingId,
+        razorpayOrderId: razorpayOrderId,
+        razorpayPaymentId: razorpayPaymentId,
+        razorpaySignature: razorpaySignature,
+      ),
+    );
+  }
+
+  @override
+  ResultFuture<CourierBookingsPage> getCourierBookings({
+    int page = 1,
+    int perPage = 15,
+  }) {
+    return _run(
+      'getCourierBookings',
+      () => _remoteDataSource.getCourierBookings(page: page, perPage: perPage),
+    );
+  }
+
+  @override
+  ResultFuture<CourierBookingDetail> getCourierBookingDetail({
+    required int bookingId,
+  }) {
+    return _run(
+      'getCourierBookingDetail',
+      () => _remoteDataSource.getCourierBookingDetail(bookingId: bookingId),
+    );
+  }
+
+  @override
+  ResultFuture<CourierCancelResult> cancelCourierBooking({
+    required int bookingId,
+    String? reason,
+  }) {
+    return _run(
+      'cancelCourierBooking',
+      () => _remoteDataSource.cancelCourierBooking(
+        bookingId: bookingId,
+        reason: reason,
+      ),
+    );
+  }
+
+  @override
+  ResultFuture<String> downloadInvoice({
+    required String path,
+    required String fileName,
+    void Function(double progress)? onProgress,
+  }) {
+    return _run('downloadInvoice', () async {
+      final directory = await getApplicationDocumentsDirectory();
+      final dir = Directory('${directory.path}/invoices');
+      if (!await dir.exists()) await dir.create(recursive: true);
+      return _remoteDataSource.downloadInvoice(
+        path: path,
+        savePath: '${dir.path}/$fileName',
+        onProgress: onProgress,
       );
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e, stackTrace) {
-      log.errorWithContext(
-        'Network exception creating courier booking',
-        {'message': e.message},
-        e,
-        stackTrace,
-      );
-      return Left(NetworkFailure(e.message));
-    } catch (e, stackTrace) {
-      log.errorWithContext(
-        'Unexpected error creating courier booking',
-        {'error_type': e.runtimeType.toString()},
-        e,
-        stackTrace,
-      );
-      return Left(ServerFailure('Failed to create courier booking: $e'));
-    }
+    });
   }
 
   @override

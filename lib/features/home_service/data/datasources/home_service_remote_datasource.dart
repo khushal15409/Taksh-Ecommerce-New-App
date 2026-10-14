@@ -1,9 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/error/exceptions.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
+import 'package:taksh_e_commerce/features/home_service/data/models/courier_booking_history_model.dart';
 import 'package:taksh_e_commerce/features/home_service/data/models/courier_booking_model.dart';
+import 'package:taksh_e_commerce/features/home_service/data/models/courier_json.dart';
 import 'package:taksh_e_commerce/features/home_service/data/models/courier_delivery_partner_model.dart';
 import 'package:taksh_e_commerce/features/home_service/data/models/courier_quote_model.dart';
 import 'package:taksh_e_commerce/features/home_service/data/models/home_service_model.dart';
@@ -13,6 +18,7 @@ import 'package:taksh_e_commerce/features/home_service/data/models/service_booki
 import 'package:taksh_e_commerce/features/home_service/data/models/service_bookings_page_model.dart';
 import 'package:taksh_e_commerce/features/home_service/data/models/service_inquiry_model.dart';
 import 'package:taksh_e_commerce/features/home_service/data/models/verify_service_booking_result_model.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking_history.dart';
 
 /// Remote data source contract for home service feature.
 abstract class HomeServiceRemoteDataSource {
@@ -22,8 +28,10 @@ abstract class HomeServiceRemoteDataSource {
   /// Fetch courier delivery partners.
   Future<List<CourierDeliveryPartnerModel>> getCourierDeliveryPartners();
 
-  /// Compute courier quotes without creating a booking.
+  /// Live courier options and rates between two pincodes (creates nothing).
   Future<CourierQuoteModel> getCourierQuote({
+    required String pickupPincode,
+    required String deliveryPincode,
     required double weightGrams,
     required double dimensionLength,
     required double dimensionHeight,
@@ -31,7 +39,7 @@ abstract class HomeServiceRemoteDataSource {
     required String dimensionUnit,
   });
 
-  /// Create a courier booking.
+  /// Create a courier booking (and its Razorpay order).
   Future<CourierBookingModel> createCourierBooking({
     required String customerName,
     required String customerMobile,
@@ -48,9 +56,48 @@ abstract class HomeServiceRemoteDataSource {
     required double dimensionHeight,
     required double dimensionWidth,
     required String dimensionUnit,
-    required int courierDeliveryPartnerId,
+    required String courierCompanyId,
+    double? quotedRate,
     String? customerNotes,
     String? itemPhotoPath,
+  });
+
+  /// Create (or reuse) the Razorpay order of an unpaid courier booking.
+  Future<CourierPaymentOrderModel> createCourierPayment({
+    required int bookingId,
+  });
+
+  /// Verify the Razorpay signature of a courier booking payment.
+  Future<CourierPaymentResultModel> verifyCourierPayment({
+    required int bookingId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  });
+
+  /// Paginated courier booking history.
+  Future<CourierBookingsPage> getCourierBookings({
+    int page = 1,
+    int perPage = 15,
+  });
+
+  /// Single courier booking with tracking timeline.
+  Future<CourierBookingDetail> getCourierBookingDetail({
+    required int bookingId,
+  });
+
+  /// Cancel a courier booking.
+  Future<CourierCancelResult> cancelCourierBooking({
+    required int bookingId,
+    String? reason,
+  });
+
+  /// Downloads the invoice PDF of a paid booking to [savePath].
+  /// [path] is the API path, e.g. `/service/book/12/invoice`.
+  Future<String> downloadInvoice({
+    required String path,
+    required String savePath,
+    void Function(double progress)? onProgress,
   });
 
   /// Books a marketplace service and creates the Razorpay payment order.
@@ -228,82 +275,65 @@ class HomeServiceRemoteDataSourceImpl implements HomeServiceRemoteDataSource {
     }
   }
 
+  /// Runs [fn] and maps every failure to a [ServerException] / [NetworkException]
+  /// carrying a customer-readable message.
+  Future<T> _guard<T>(String fallback, Future<T> Function() fn) async {
+    try {
+      return await fn();
+    } on NetworkException {
+      rethrow;
+    } on ServerException {
+      rethrow;
+    } on AppException catch (e) {
+      throw ServerException(e.message, e.statusCode);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data?['message']?.toString() ?? fallback,
+        e.response?.statusCode,
+      );
+    } catch (e, stackTrace) {
+      loggerWithContext({
+        'feature': 'home_service',
+        'class': 'HomeServiceRemoteDataSourceImpl',
+      }).errorWithContext(fallback, {'error': e.toString()}, e, stackTrace);
+      throw ServerException(fallback);
+    }
+  }
+
+  Map<String, dynamic> _unwrap(dynamic body, String fallback) {
+    final data = body as Map<String, dynamic>;
+    if (!(data['success'] as bool? ?? false)) {
+      throw ServerException(data['message'] as String? ?? fallback);
+    }
+    return cMap(data['data']);
+  }
+
   @override
   Future<CourierQuoteModel> getCourierQuote({
+    required String pickupPincode,
+    required String deliveryPincode,
     required double weightGrams,
     required double dimensionLength,
     required double dimensionHeight,
     required double dimensionWidth,
     required String dimensionUnit,
-  }) async {
-    final log = loggerWithContext({
-      'feature': 'home_service',
-      'class': 'HomeServiceRemoteDataSourceImpl',
-      'method': 'getCourierQuote',
-    });
-    final startTime = DateTime.now();
-
-    try {
-      log.infoWithContext('Fetching courier quote', {
-        'weight_grams': weightGrams,
-        'dimension_unit': dimensionUnit,
-      });
-
-      final formData = FormData.fromMap({
-        'weight_grams': weightGrams.round().toString(),
-        'dimension_unit': dimensionUnit,
-        'length': dimensionLength.toString(),
-        'width': dimensionWidth.toString(),
-        'height': dimensionHeight.toString(),
-      });
-
+  }) {
+    const fallback = 'Failed to fetch courier rates';
+    return _guard(fallback, () async {
       final response = await _apiClient.post(
         ApiConstants.courierQuote,
-        data: formData,
+        data: FormData.fromMap({
+          'pickup_pincode': pickupPincode,
+          'delivery_pincode': deliveryPincode,
+          'weight_grams': weightGrams.round().toString(),
+          'dimension_unit': dimensionUnit,
+          'length': dimensionLength.toString(),
+          'width': dimensionWidth.toString(),
+          'height': dimensionHeight.toString(),
+        }),
       );
-
-      final data = response.data as Map<String, dynamic>;
-      final success = data['success'] as bool? ?? false;
-
-      if (!success) {
-        throw ServerException(
-          data['message'] as String? ?? 'Failed to compute courier quote',
-        );
-      }
-
-      final quote = CourierQuoteModel.fromJson(
-        Map<String, dynamic>.from(data['data'] as Map),
-      );
-
-      log.infoWithContext('Courier quote fetched successfully', {
-        'quotes_count': quote.quotes.length,
-        'chargeable_weight_grams': quote.chargeableWeightGrams,
-        'duration_ms': DateTime.now().difference(startTime).inMilliseconds,
-      });
-
-      return quote;
-    } on DioException catch (e, stackTrace) {
-      log.errorWithContext(
-        'DioException fetching courier quote',
-        {'message': e.message},
-        e,
-        stackTrace,
-      );
-      throw ServerException(
-        e.response?.data?['message']?.toString() ??
-            'Failed to compute courier quote',
-        e.response?.statusCode,
-      );
-    } catch (e, stackTrace) {
-      if (e is ServerException) rethrow;
-      log.errorWithContext(
-        'Unexpected error fetching courier quote',
-        {'error_type': e.runtimeType.toString()},
-        e,
-        stackTrace,
-      );
-      throw ServerException('Failed to compute courier quote: $e');
-    }
+      return CourierQuoteModel.fromJson(_unwrap(response.data, fallback));
+    });
   }
 
   @override
@@ -323,24 +353,13 @@ class HomeServiceRemoteDataSourceImpl implements HomeServiceRemoteDataSource {
     required double dimensionHeight,
     required double dimensionWidth,
     required String dimensionUnit,
-    required int courierDeliveryPartnerId,
+    required String courierCompanyId,
+    double? quotedRate,
     String? customerNotes,
     String? itemPhotoPath,
-  }) async {
-    final log = loggerWithContext({
-      'feature': 'home_service',
-      'class': 'HomeServiceRemoteDataSourceImpl',
-      'method': 'createCourierBooking',
-    });
-    final startTime = DateTime.now();
-
-    try {
-      log.infoWithContext('Creating courier booking', {
-        'pickup_pincode': pickupPincode,
-        'delivery_pincode': deliveryPincode,
-        'courier_delivery_partner_id': courierDeliveryPartnerId,
-      });
-
+  }) {
+    const fallback = 'Failed to create courier booking';
+    return _guard(fallback, () async {
       final formMap = <String, dynamic>{
         'customer_name': customerName,
         'customer_mobile': customerMobile,
@@ -357,13 +376,12 @@ class HomeServiceRemoteDataSourceImpl implements HomeServiceRemoteDataSource {
         'length': dimensionLength.toString(),
         'width': dimensionWidth.toString(),
         'height': dimensionHeight.toString(),
-        'courier_delivery_partner_id': courierDeliveryPartnerId.toString(),
+        'shiprocket_courier_company_id': courierCompanyId,
       };
-
+      if (quotedRate != null) formMap['quoted_rate'] = quotedRate.toString();
       if (customerNotes != null && customerNotes.isNotEmpty) {
         formMap['customer_notes'] = customerNotes;
       }
-
       if (itemPhotoPath != null && itemPhotoPath.isNotEmpty) {
         formMap['item_photo'] = await MultipartFile.fromFile(
           itemPhotoPath,
@@ -371,55 +389,154 @@ class HomeServiceRemoteDataSourceImpl implements HomeServiceRemoteDataSource {
         );
       }
 
-      final formData = FormData.fromMap(formMap);
-
       final response = await _apiClient.post(
         ApiConstants.courierBookings,
-        data: formData,
+        data: FormData.fromMap(formMap),
       );
+      return CourierBookingModel.fromJson(_unwrap(response.data, fallback));
+    });
+  }
 
-      final data = response.data as Map<String, dynamic>;
-      final success = data['success'] as bool? ?? false;
+  @override
+  Future<CourierPaymentOrderModel> createCourierPayment({
+    required int bookingId,
+  }) {
+    const fallback = 'Failed to start payment';
+    return _guard(fallback, () async {
+      final response = await _apiClient.post(
+        ApiConstants.courierPaymentCreate,
+        data: {'courier_booking_id': bookingId},
+      );
+      return CourierPaymentOrderModel.fromPaymentCreate(
+        _unwrap(response.data, fallback),
+      );
+    });
+  }
 
-      if (!success) {
-        throw ServerException(
-          data['message'] as String? ?? 'Failed to create courier booking',
-        );
+  @override
+  Future<CourierPaymentResultModel> verifyCourierPayment({
+    required int bookingId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  }) {
+    const fallback = 'Failed to verify payment';
+    return _guard(fallback, () async {
+      final response = await _apiClient.post(
+        ApiConstants.courierPaymentVerify,
+        data: {
+          'courier_booking_id': bookingId,
+          'razorpay_order_id': razorpayOrderId,
+          'razorpay_payment_id': razorpayPaymentId,
+          'razorpay_signature': razorpaySignature,
+        },
+      );
+      return CourierPaymentResultModel.fromJson(
+        _unwrap(response.data, fallback),
+      );
+    });
+  }
+
+  @override
+  Future<CourierBookingsPage> getCourierBookings({
+    int page = 1,
+    int perPage = 15,
+  }) {
+    const fallback = 'Failed to fetch courier bookings';
+    return _guard(fallback, () async {
+      final response = await _apiClient.get(
+        ApiConstants.courierBookings,
+        queryParameters: {
+          'page': page.toString(),
+          'per_page': perPage.toString(),
+        },
+      );
+      return courierPageFromJson(_unwrap(response.data, fallback));
+    });
+  }
+
+  @override
+  Future<CourierBookingDetail> getCourierBookingDetail({
+    required int bookingId,
+  }) {
+    const fallback = 'Failed to fetch booking details';
+    return _guard(fallback, () async {
+      final response = await _apiClient.get(
+        ApiConstants.courierBookingDetail(bookingId),
+      );
+      return courierDetailFromJson(_unwrap(response.data, fallback));
+    });
+  }
+
+  @override
+  Future<CourierCancelResult> cancelCourierBooking({
+    required int bookingId,
+    String? reason,
+  }) {
+    const fallback = 'Failed to cancel booking';
+    return _guard(fallback, () async {
+      final trimmed = reason?.trim();
+      final response = await _apiClient.post(
+        ApiConstants.courierBookingCancel(bookingId),
+        data: {if (trimmed != null && trimmed.isNotEmpty) 'reason': trimmed},
+      );
+      return courierCancelFromJson(_unwrap(response.data, fallback));
+    });
+  }
+
+  @override
+  Future<String> downloadInvoice({
+    required String path,
+    required String savePath,
+    void Function(double progress)? onProgress,
+  }) {
+    const fallback = 'Failed to download invoice';
+    return _guard(fallback, () async {
+      final base = _apiClient.baseUrl.endsWith('/')
+          ? _apiClient.baseUrl.substring(0, _apiClient.baseUrl.length - 1)
+          : _apiClient.baseUrl;
+      // Dedicated Dio: binary response, no JSON Accept header.
+      final dio = Dio(
+        BaseOptions(
+          connectTimeout: ApiConstants.connectTimeout,
+          receiveTimeout: const Duration(seconds: 120),
+          responseType: ResponseType.bytes,
+          validateStatus: (_) => true,
+          headers: {'Accept': 'application/pdf, application/json'},
+        ),
+      );
+      final token = await _apiClient.authToken;
+      if (token != null && token.isNotEmpty) {
+        dio.options.headers['Authorization'] = 'Bearer $token';
       }
 
-      final booking = CourierBookingModel.fromJson(
-        Map<String, dynamic>.from(data['data'] as Map),
+      final response = await dio.get<List<int>>(
+        '$base$path',
+        onReceiveProgress: (received, total) {
+          if (total > 0) onProgress?.call((received / total).clamp(0.0, 1.0));
+        },
       );
-
-      log.infoWithContext('Courier booking created successfully', {
-        'booking_id': booking.bookingId,
-        'booking_number': booking.bookingNumber,
-        'duration_ms': DateTime.now().difference(startTime).inMilliseconds,
-      });
-
-      return booking;
-    } on DioException catch (e, stackTrace) {
-      log.errorWithContext(
-        'DioException creating courier booking',
-        {'message': e.message},
-        e,
-        stackTrace,
-      );
-      throw ServerException(
-        e.response?.data?['message']?.toString() ??
-            'Failed to create courier booking',
-        e.response?.statusCode,
-      );
-    } catch (e, stackTrace) {
-      if (e is ServerException) rethrow;
-      log.errorWithContext(
-        'Unexpected error creating courier booking',
-        {'error_type': e.runtimeType.toString()},
-        e,
-        stackTrace,
-      );
-      throw ServerException('Failed to create courier booking: $e');
-    }
+      final bytes = response.data ?? const <int>[];
+      final isPdf =
+          bytes.length > 5 &&
+          bytes[0] == 0x25 &&
+          bytes[1] == 0x50 &&
+          bytes[2] == 0x44 &&
+          bytes[3] == 0x46;
+      if (response.statusCode != 200 || !isPdf) {
+        var message = fallback;
+        try {
+          final decoded = jsonDecode(utf8.decode(bytes));
+          if (decoded is Map && decoded['message'] is String) {
+            message = decoded['message'] as String;
+          }
+        } catch (_) {}
+        throw ServerException(message, response.statusCode);
+      }
+      await File(savePath).writeAsBytes(bytes, flush: true);
+      onProgress?.call(1);
+      return savePath;
+    });
   }
 
   @override

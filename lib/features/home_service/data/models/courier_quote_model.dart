@@ -1,107 +1,57 @@
+import 'package:taksh_e_commerce/features/home_service/data/models/courier_json.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_quote.dart';
-
-int _quoteAsInt(dynamic value) {
-  if (value is int) {
-    return value;
-  }
-  if (value is num) {
-    return value.toInt();
-  }
-
-  return int.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-double _quoteAsDouble(dynamic value) {
-  if (value is num) {
-    return value.toDouble();
-  }
-
-  return double.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-String _quoteAsString(dynamic value) {
-  if (value == null) {
-    return '';
-  }
-
-  return value.toString().trim();
-}
 
 class CourierQuoteOptionModel extends CourierQuoteOption {
   const CourierQuoteOptionModel({
-    required super.courierDeliveryPartnerId,
+    required super.courierCompanyId,
     required super.name,
-    required super.slug,
+    required super.rate,
+    required super.serviceCharge,
     required super.totalAmount,
+    super.estimatedDeliveryDays,
+    super.estimatedDeliveryDate,
+    super.serviceType,
   });
 
   factory CourierQuoteOptionModel.fromJson(Map<String, dynamic> json) {
+    final rate = cDouble(json['rate']);
+    final charge = cDouble(json['service_charge'] ?? json['platform_charge']);
     return CourierQuoteOptionModel(
-      courierDeliveryPartnerId: _quoteAsInt(
-        json['courier_delivery_partner_id'],
-      ),
-      name: _quoteAsString(json['name']),
-      slug: _quoteAsString(json['slug']),
-      totalAmount: _quoteAsDouble(json['total_amount']),
+      courierCompanyId: cStr(json['courier_company_id']),
+      name: cStr(json['courier_name']).isEmpty
+          ? 'Courier'
+          : cStr(json['courier_name']),
+      rate: rate,
+      serviceCharge: charge,
+      totalAmount: json['total_amount'] != null
+          ? cDouble(json['total_amount'])
+          : rate + charge,
+      estimatedDeliveryDays: cNullInt(json['estimated_delivery_days']),
+      estimatedDeliveryDate: cNullStr(json['estimated_delivery_date']),
+      serviceType: cNullStr(json['service_type']),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'courier_delivery_partner_id': courierDeliveryPartnerId,
-      'name': name,
-      'slug': slug,
-      'total_amount': totalAmount,
-    };
   }
 }
 
 class CourierQuoteModel extends CourierQuote {
   const CourierQuoteModel({
     required super.actualWeightGrams,
-    required super.volumetricWeightGrams,
-    required super.chargeableWeightGrams,
-    required super.chargeableWeightSource,
-    required super.quotes,
+    required super.weightKg,
+    required super.couriers,
   });
 
   factory CourierQuoteModel.fromJson(Map<String, dynamic> json) {
-    final quotesList = (json['quotes'] as List<dynamic>? ?? const [])
-        .map(
-          (quote) => CourierQuoteOptionModel.fromJson(
-            Map<String, dynamic>.from(quote as Map),
-          ),
-        )
-        .toList(growable: false);
-
+    final list = json['couriers'] is List ? json['couriers'] as List : const [];
     return CourierQuoteModel(
-      actualWeightGrams: _quoteAsInt(json['actual_weight_grams']),
-      volumetricWeightGrams: _quoteAsInt(json['volumetric_weight_grams']),
-      chargeableWeightGrams: _quoteAsInt(json['chargeable_weight_grams']),
-      chargeableWeightSource: _quoteAsString(json['chargeable_weight_source']),
-      quotes: quotesList,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'actual_weight_grams': actualWeightGrams,
-      'volumetric_weight_grams': volumetricWeightGrams,
-      'chargeable_weight_grams': chargeableWeightGrams,
-      'chargeable_weight_source': chargeableWeightSource,
-      'quotes': quotes
+      actualWeightGrams: cDouble(json['actual_weight_grams']),
+      weightKg: cDouble(json['weight_kg']),
+      couriers: list
+          .whereType<Map>()
           .map(
-            (quote) => quote is CourierQuoteOptionModel
-                ? quote.toJson()
-                : {
-                    'courier_delivery_partner_id':
-                        quote.courierDeliveryPartnerId,
-                    'name': quote.name,
-                    'slug': quote.slug,
-                    'total_amount': quote.totalAmount,
-                  },
+            (e) =>
+                CourierQuoteOptionModel.fromJson(Map<String, dynamic>.from(e)),
           )
           .toList(growable: false),
-    };
+    );
   }
 }

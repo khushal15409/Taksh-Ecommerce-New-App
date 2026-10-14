@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking_history.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_delivery_partner.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_quote.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/home_service.dart';
@@ -268,6 +269,118 @@ class ServiceBookingCancelError extends HomeServiceState {
   final String message;
 
   const ServiceBookingCancelError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Could not create the Razorpay order of a courier booking.
+class HomeServiceCourierPaymentError extends HomeServiceState {
+  final String message;
+
+  const HomeServiceCourierPaymentError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Razorpay order of an existing courier booking is ready for checkout.
+class HomeServiceCourierPaymentOrderReady extends HomeServiceState {
+  final int bookingId;
+  final CourierPaymentOrder order;
+
+  const HomeServiceCourierPaymentOrderReady(this.bookingId, this.order);
+
+  @override
+  List<Object?> get props => [bookingId, order];
+}
+
+/// Verifying a courier booking payment.
+class HomeServiceCourierPaymentVerifying extends HomeServiceState {
+  const HomeServiceCourierPaymentVerifying();
+}
+
+/// Courier booking payment verified.
+class HomeServiceCourierPaymentVerified extends HomeServiceState {
+  final CourierPaymentResult result;
+
+  const HomeServiceCourierPaymentVerified(this.result);
+
+  @override
+  List<Object?> get props => [result];
+}
+
+/// Courier booking payment could not be verified.
+class HomeServiceCourierPaymentVerificationError extends HomeServiceState {
+  final String message;
+
+  const HomeServiceCourierPaymentVerificationError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class CourierBookingsLoading extends HomeServiceState {
+  const CourierBookingsLoading();
+}
+
+class CourierBookingsLoaded extends HomeServiceState {
+  final CourierBookingsPage page;
+
+  const CourierBookingsLoaded(this.page);
+
+  @override
+  List<Object?> get props => [page];
+}
+
+class CourierBookingsError extends HomeServiceState {
+  final String message;
+
+  const CourierBookingsError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class CourierBookingDetailLoading extends HomeServiceState {
+  const CourierBookingDetailLoading();
+}
+
+class CourierBookingDetailLoaded extends HomeServiceState {
+  final CourierBookingDetail booking;
+
+  const CourierBookingDetailLoaded(this.booking);
+
+  @override
+  List<Object?> get props => [booking];
+}
+
+class CourierBookingDetailError extends HomeServiceState {
+  final String message;
+
+  const CourierBookingDetailError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class CourierBookingCancelling extends HomeServiceState {
+  const CourierBookingCancelling();
+}
+
+class CourierBookingCancelled extends HomeServiceState {
+  final CourierCancelResult result;
+
+  const CourierBookingCancelled(this.result);
+
+  @override
+  List<Object?> get props => [result];
+}
+
+class CourierBookingCancelError extends HomeServiceState {
+  final String message;
+
+  const CourierBookingCancelError(this.message);
 
   @override
   List<Object?> get props => [message];

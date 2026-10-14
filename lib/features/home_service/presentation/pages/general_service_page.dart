@@ -14,6 +14,7 @@ import 'package:taksh_e_commerce/features/home_service/domain/usecases/verify_se
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_cubit.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/service_history_page.dart';
+import 'package:taksh_e_commerce/features/home_service/presentation/utils/service_form_validators.dart';
 import 'package:uuid/uuid.dart';
 
 /// Booking form for general home services (Electrician, Plumber, Salon)
@@ -90,6 +91,17 @@ class _GeneralServiceForm extends StatefulWidget {
 
 class _GeneralServiceFormState extends State<_GeneralServiceForm> {
   final _formKey = GlobalKey<FormState>();
+  final _nameKey = GlobalKey<FormFieldState<String>>();
+  final _mobileKey = GlobalKey<FormFieldState<String>>();
+  final _addressKey = GlobalKey<FormFieldState<String>>();
+  final _cityKey = GlobalKey<FormFieldState<String>>();
+  final _stateKey = GlobalKey<FormFieldState<String>>();
+  final _pincodeKey = GlobalKey<FormFieldState<String>>();
+  final _descriptionKey = GlobalKey<FormFieldState<String>>();
+
+  /// Messages re-validate live (and clear while typing) only after the first
+  /// failed submit.
+  AutovalidateMode _autoMode = AutovalidateMode.disabled;
 
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();
@@ -135,7 +147,19 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    final valid = validateFields([
+      _nameKey,
+      _mobileKey,
+      _addressKey,
+      _cityKey,
+      _stateKey,
+      _pincodeKey,
+      _descriptionKey,
+    ]);
+    if (!valid) {
+      setState(() => _autoMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
 
     _idempotencyKey ??= const Uuid().v4();
 
@@ -248,6 +272,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
       filled: true,
       fillColor: Colors.grey[50],
       counterText: '',
+      errorMaxLines: 2,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: Colors.grey[300]!),
@@ -307,6 +332,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
         },
         child: Form(
           key: _formKey,
+          autovalidateMode: _autoMode,
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.screenPaddingHorizontal),
             children: [
@@ -317,6 +343,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                 gradient: _theme.gradient,
                 children: [
                   TextFormField(
+                    key: _nameKey,
                     controller: _nameController,
                     decoration: _inputDecoration(
                       label: 'Customer Name',
@@ -325,10 +352,11 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     ),
                     textCapitalization: TextCapitalization.words,
                     validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        ServiceFormValidators.name(v, label: 'customer name'),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
                   TextFormField(
+                    key: _mobileKey,
                     controller: _mobileController,
                     decoration: _inputDecoration(
                       label: 'Mobile Number',
@@ -338,13 +366,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (v.trim().length != 10) {
-                        return 'Enter a valid 10-digit mobile number';
-                      }
-                      return null;
-                    },
+                    validator: ServiceFormValidators.mobile,
                   ),
                 ],
               ),
@@ -358,6 +380,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                 gradient: _theme.gradient,
                 children: [
                   TextFormField(
+                    key: _addressKey,
                     controller: _addressController,
                     decoration: _inputDecoration(
                       label: 'Full Address',
@@ -367,7 +390,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     ),
                     maxLines: 3,
                     validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        ServiceFormValidators.address(v, label: 'address'),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
                   TextFormField(
@@ -385,35 +408,40 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     children: [
                       Expanded(
                         child: TextFormField(
+                          key: _cityKey,
                           controller: _cityController,
                           decoration: _inputDecoration(
                             label: 'City',
                             hint: 'City',
                           ),
                           textCapitalization: TextCapitalization.words,
-                          validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Required'
-                              : null,
+                          validator: (v) => ServiceFormValidators.requiredText(
+                            v,
+                            'Please enter city',
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: TextFormField(
+                          key: _stateKey,
                           controller: _stateController,
                           decoration: _inputDecoration(
                             label: 'State',
                             hint: 'State',
                           ),
                           textCapitalization: TextCapitalization.words,
-                          validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Required'
-                              : null,
+                          validator: (v) => ServiceFormValidators.requiredText(
+                            v,
+                            'Please enter state',
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
                   TextFormField(
+                    key: _pincodeKey,
                     controller: _pincodeController,
                     decoration: _inputDecoration(
                       label: 'Pincode',
@@ -423,13 +451,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     keyboardType: TextInputType.number,
                     maxLength: 6,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (v.trim().length != 6) {
-                        return 'Enter a valid 6-digit pincode';
-                      }
-                      return null;
-                    },
+                    validator: ServiceFormValidators.pincode,
                   ),
                 ],
               ),
@@ -443,6 +465,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                 gradient: _theme.gradient,
                 children: [
                   TextFormField(
+                    key: _descriptionKey,
                     controller: _descriptionController,
                     decoration: _inputDecoration(
                       label: 'Describe the service you need',
@@ -451,8 +474,10 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                       alignLabelWithHint: true,
                     ),
                     maxLines: 4,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    validator: (v) => ServiceFormValidators.requiredText(
+                      v,
+                      'Please describe the service you need',
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
                   TextFormField(

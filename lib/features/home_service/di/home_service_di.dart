@@ -5,9 +5,8 @@ import 'package:taksh_e_commerce/features/home_service/data/repositories/home_se
 import 'package:taksh_e_commerce/features/home_service/domain/repositories/home_service_repository.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/book_service.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/cancel_service_booking.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/usecases/create_courier_booking.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/usecases/courier_usecases.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_courier_delivery_partners.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_courier_quote.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_service_booking_detail.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_service_bookings.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_service_inquiry_history.dart';
@@ -39,6 +38,12 @@ void registerHomeServiceDependencies(GetIt getIt) {
   getIt.registerLazySingleton(() => GetCourierDeliveryPartners(getIt()));
   getIt.registerLazySingleton(() => GetCourierQuote(getIt()));
   getIt.registerLazySingleton(() => CreateCourierBooking(getIt()));
+  getIt.registerLazySingleton(() => CreateCourierPayment(getIt()));
+  getIt.registerLazySingleton(() => VerifyCourierPayment(getIt()));
+  getIt.registerLazySingleton(() => GetCourierBookings(getIt()));
+  getIt.registerLazySingleton(() => GetCourierBookingDetail(getIt()));
+  getIt.registerLazySingleton(() => CancelCourierBooking(getIt()));
+  getIt.registerLazySingleton(() => DownloadServiceInvoice(getIt()));
   getIt.registerLazySingleton(() => BookService(getIt()));
   getIt.registerLazySingleton(() => VerifyServiceBooking(getIt()));
   getIt.registerLazySingleton(() => GetServiceBookings(getIt()));
@@ -53,6 +58,11 @@ void registerHomeServiceDependencies(GetIt getIt) {
       getCourierDeliveryPartners: getIt(),
       getCourierQuote: getIt(),
       createCourierBooking: getIt(),
+      createCourierPayment: getIt(),
+      verifyCourierPayment: getIt(),
+      getCourierBookings: getIt(),
+      getCourierBookingDetail: getIt(),
+      cancelCourierBooking: getIt(),
       bookService: getIt(),
       verifyServiceBooking: getIt(),
       getServiceBookings: getIt(),

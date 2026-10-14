@@ -1,23 +1,29 @@
-import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
+import 'package:taksh_e_commerce/core/services/razorpay_service.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/theme/app_spacing.dart';
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_quote.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/home_service.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/usecases/create_courier_booking.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_courier_quote.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/usecases/courier_usecases.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_cubit.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/courier_history_page.dart';
+import 'package:taksh_e_commerce/features/home_service/presentation/utils/service_form_validators.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Courier booking form page with vibrant, responsive UI.
+///
+/// Flow (same as the other services): live courier rates for the two pincodes
+/// → create the booking + Razorpay order → Razorpay checkout → verify payment.
 class CourierBookingPage extends StatelessWidget {
   final HomeService service;
 
@@ -45,6 +51,22 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
   final _formKey = GlobalKey<FormState>();
   final _picker = ImagePicker();
 
+  // Field keys: used to validate single fields and scroll to the first error.
+  final _nameKey = GlobalKey<FormFieldState<String>>();
+  final _mobileKey = GlobalKey<FormFieldState<String>>();
+  final _pickupAddressKey = GlobalKey<FormFieldState<String>>();
+  final _pickupPincodeKey = GlobalKey<FormFieldState<String>>();
+  final _deliveryNameKey = GlobalKey<FormFieldState<String>>();
+  final _deliveryMobileKey = GlobalKey<FormFieldState<String>>();
+  final _deliveryAddressKey = GlobalKey<FormFieldState<String>>();
+  final _deliveryPincodeKey = GlobalKey<FormFieldState<String>>();
+  final _productDetailsKey = GlobalKey<FormFieldState<String>>();
+  final _packagingDetailsKey = GlobalKey<FormFieldState<String>>();
+  final _weightKey = GlobalKey<FormFieldState<String>>();
+  final _lengthKey = GlobalKey<FormFieldState<String>>();
+  final _heightKey = GlobalKey<FormFieldState<String>>();
+  final _widthKey = GlobalKey<FormFieldState<String>>();
+
   // Customer details
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();
@@ -66,159 +88,338 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
   final _widthController = TextEditingController();
   final _notesController = TextEditingController();
 
+  late final List<TextEditingController> _allControllers;
+
   String _dimensionUnit = 'cm';
   XFile? _productImage;
 
-  // Delivery partner selection
-  bool _showDeliveryPartners = false;
-  int? _selectedPartnerId;
-  double _comparedPrice = 0;
+  /// Errors only start re-validating live after the first failed attempt, so
+  /// a field's message disappears as soon as the user fixes it.
+  AutovalidateMode _autoMode = AutovalidateMode.disabled;
+
+  // Courier selection
+  bool _showCouriers = false;
+  String? _selectedCourierId;
   CourierQuote? _quote;
   bool _loadingQuote = false;
   String? _quoteError;
+  String? _quoteSignature;
 
-  CourierQuoteOption? get _selectedPartner {
+  // Payment
+  late final RazorpayService _razorpayService;
+  CourierBooking? _pendingBooking;
+  String? _pendingSignature;
+  PaymentSuccessResponse? _lastPayment;
+
+  CourierQuoteOption? get _selectedCourier {
     final quote = _quote;
-    if (quote == null) {
-      return null;
+    if (quote == null) return null;
+    for (final courier in quote.couriers) {
+      if (courier.courierCompanyId == _selectedCourierId) return courier;
     }
-
-    for (final partner in quote.quotes) {
-      if (partner.courierDeliveryPartnerId == _selectedPartnerId) {
-        return partner;
-      }
-    }
-
     return null;
   }
 
   @override
+  void initState() {
+    super.initState();
+    _allControllers = [
+      _nameController,
+      _mobileController,
+      _pickupAddressController,
+      _pickupPincodeController,
+      _deliveryNameController,
+      _deliveryMobileController,
+      _deliveryAddressController,
+      _deliveryPincodeController,
+      _productDetailsController,
+      _packagingDetailsController,
+      _weightController,
+      _lengthController,
+      _heightController,
+      _widthController,
+      _notesController,
+    ];
+    for (final c in _allControllers) {
+      c.addListener(_onFormChanged);
+    }
+    _razorpayService = RazorpayService();
+    _razorpayService.initialize(
+      onSuccess: _handleRazorpaySuccess,
+      onFailure: _handleRazorpayFailure,
+    );
+  }
+
+  @override
   void dispose() {
-    _nameController.dispose();
-    _mobileController.dispose();
-    _pickupAddressController.dispose();
-    _pickupPincodeController.dispose();
-    _deliveryNameController.dispose();
-    _deliveryMobileController.dispose();
-    _deliveryAddressController.dispose();
-    _deliveryPincodeController.dispose();
-    _productDetailsController.dispose();
-    _packagingDetailsController.dispose();
-    _weightController.dispose();
-    _lengthController.dispose();
-    _heightController.dispose();
-    _widthController.dispose();
-    _notesController.dispose();
+    _razorpayService.dispose();
+    for (final c in _allControllers) {
+      c.removeListener(_onFormChanged);
+      c.dispose();
+    }
     super.dispose();
   }
 
-  void _checkAndComparePrice() {
-    if (!_validateQuoteInputs()) return;
+  // ── Change tracking ──
 
-    final actualWeightGrams = double.parse(_weightController.text.trim());
-    final dimensionLength = double.parse(_lengthController.text.trim());
-    final dimensionHeight = double.parse(_heightController.text.trim());
-    final dimensionWidth = double.parse(_widthController.text.trim());
+  String _quoteSig() => [
+    _pickupPincodeController.text.trim(),
+    _deliveryPincodeController.text.trim(),
+    _weightController.text.trim(),
+    _lengthController.text.trim(),
+    _heightController.text.trim(),
+    _widthController.text.trim(),
+    _dimensionUnit,
+  ].join('|');
+
+  String _fullSig() => [
+    ..._allControllers.map((c) => c.text.trim()),
+    _dimensionUnit,
+    _selectedCourierId ?? '',
+    _productImage?.path ?? '',
+  ].join('|');
+
+  /// Rates depend on pincodes / weight / size, and an unpaid booking must
+  /// match what is on screen, so changing either drops the stale state.
+  void _onFormChanged() {
+    if (_quoteSignature != null && _quoteSig() != _quoteSignature) {
+      setState(() {
+        _quote = null;
+        _selectedCourierId = null;
+        _quoteSignature = null;
+        _quoteError = null;
+        _showCouriers = false;
+        _pendingBooking = null;
+        _pendingSignature = null;
+        _lastPayment = null;
+      });
+      return;
+    }
+    if (_pendingBooking != null && _fullSig() != _pendingSignature) {
+      _pendingBooking = null;
+      _pendingSignature = null;
+      _lastPayment = null;
+    }
+  }
+
+  // ── Quote ──
+
+  void _checkAndComparePrice() {
+    final valid = validateFields([
+      _pickupPincodeKey,
+      _deliveryPincodeKey,
+      _weightKey,
+      _lengthKey,
+      _heightKey,
+      _widthKey,
+    ]);
+    if (!valid) {
+      setState(() => _autoMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
+    FocusScope.of(context).unfocus();
 
     setState(() {
-      _showDeliveryPartners = true;
-      _selectedPartnerId = null;
-      _comparedPrice = 0;
+      _showCouriers = true;
+      _selectedCourierId = null;
       _quote = null;
       _quoteError = null;
+      _quoteSignature = _quoteSig();
+      _pendingBooking = null;
+      _pendingSignature = null;
+      _lastPayment = null;
     });
 
     context.read<HomeServiceCubit>().fetchCourierQuote(
       GetCourierQuoteParams(
-        weightGrams: actualWeightGrams,
-        dimensionLength: dimensionLength,
-        dimensionHeight: dimensionHeight,
-        dimensionWidth: dimensionWidth,
+        pickupPincode: _pickupPincodeController.text.trim(),
+        deliveryPincode: _deliveryPincodeController.text.trim(),
+        weightGrams: double.parse(_weightController.text.trim()),
+        dimensionLength: double.parse(_lengthController.text.trim()),
+        dimensionHeight: double.parse(_heightController.text.trim()),
+        dimensionWidth: double.parse(_widthController.text.trim()),
         dimensionUnit: _dimensionUnit,
       ),
     );
   }
 
-  bool _validateQuoteInputs() {
-    final errors = <String?>[
-      _validateRequiredNumber(label: 'Weight', value: _weightController.text),
-      _validateRequiredNumber(label: 'Length', value: _lengthController.text),
-      _validateRequiredNumber(label: 'Height', value: _heightController.text),
-      _validateRequiredNumber(label: 'Width', value: _widthController.text),
-    ];
-
-    final errorMessage = errors.whereType<String>().cast<String?>().firstWhere(
-      (message) => message != null,
-      orElse: () => null,
-    );
-
-    if (errorMessage == null) {
-      return true;
-    }
-
-    AppToastMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    return false;
+  void _selectCourier(CourierQuoteOption courier) {
+    setState(() => _selectedCourierId = courier.courierCompanyId);
   }
 
-  String? _validateRequiredNumber({
-    required String label,
-    required String value,
-  }) {
-    final normalizedValue = value.trim();
-    if (normalizedValue.isEmpty) {
-      return '$label is required to calculate a quote';
-    }
-    if (double.tryParse(normalizedValue) == null) {
-      return 'Enter a valid number for $label';
-    }
-
-    return null;
-  }
-
-  void _selectPartner(CourierQuoteOption partner) {
-    setState(() {
-      _selectedPartnerId = partner.courierDeliveryPartnerId;
-      _comparedPrice = partner.totalAmount;
-    });
-  }
+  // ── Booking + payment ──
 
   void _submit() {
-    final selectedPartner = _selectedPartner;
-    if (selectedPartner == null) return;
-    if (!_formKey.currentState!.validate()) return;
+    final courier = _selectedCourier;
+    if (courier == null) return;
 
-    final actualWeightGrams = double.parse(_weightController.text.trim());
+    final valid = validateFields([
+      _nameKey,
+      _mobileKey,
+      _pickupAddressKey,
+      _pickupPincodeKey,
+      _deliveryNameKey,
+      _deliveryMobileKey,
+      _deliveryAddressKey,
+      _deliveryPincodeKey,
+      _productDetailsKey,
+      _packagingDetailsKey,
+      _weightKey,
+      _lengthKey,
+      _heightKey,
+      _widthKey,
+    ]);
+    if (!valid) {
+      setState(() => _autoMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
+    FocusScope.of(context).unfocus();
 
-    final params = CreateCourierBookingParams(
-      customerName: _nameController.text.trim(),
-      customerMobile: _mobileController.text.trim(),
-      pickupAddress: _pickupAddressController.text.trim(),
-      pickupPincode: _pickupPincodeController.text.trim(),
-      deliveryName: _deliveryNameController.text.trim(),
-      deliveryMobile: _deliveryMobileController.text.trim(),
-      deliveryAddress: _deliveryAddressController.text.trim(),
-      deliveryPincode: _deliveryPincodeController.text.trim(),
-      productDetails: _productDetailsController.text.trim(),
-      packagingDetails: _packagingDetailsController.text.trim(),
-      weightGrams: actualWeightGrams,
-      dimensionLength: double.parse(_lengthController.text.trim()),
-      dimensionHeight: double.parse(_heightController.text.trim()),
-      dimensionWidth: double.parse(_widthController.text.trim()),
-      dimensionUnit: _dimensionUnit,
-      courierDeliveryPartnerId: selectedPartner.courierDeliveryPartnerId,
-      customerNotes: _notesController.text.trim().isNotEmpty
-          ? _notesController.text.trim()
-          : null,
-      itemPhotoPath: _productImage?.path,
+    final cubit = context.read<HomeServiceCubit>();
+
+    // A booking was already created for exactly this form (e.g. the payment
+    // was cancelled): pay for it instead of creating a duplicate.
+    final pending = _pendingBooking;
+    if (pending != null) {
+      final payment = _lastPayment;
+      if (payment != null) {
+        _handleRazorpaySuccess(payment);
+      } else if (pending.payment != null) {
+        _openCheckout(pending, pending.payment!);
+      } else {
+        cubit.createCourierPayment(pending.bookingId);
+      }
+      return;
+    }
+
+    final notes = _notesController.text.trim();
+    cubit.submitCourierBooking(
+      CreateCourierBookingParams(
+        customerName: _nameController.text.trim(),
+        customerMobile: _mobileController.text.trim(),
+        pickupAddress: _pickupAddressController.text.trim(),
+        pickupPincode: _pickupPincodeController.text.trim(),
+        deliveryName: _deliveryNameController.text.trim(),
+        deliveryMobile: _deliveryMobileController.text.trim(),
+        deliveryAddress: _deliveryAddressController.text.trim(),
+        deliveryPincode: _deliveryPincodeController.text.trim(),
+        productDetails: _productDetailsController.text.trim(),
+        packagingDetails: _packagingDetailsController.text.trim(),
+        weightGrams: double.parse(_weightController.text.trim()),
+        dimensionLength: double.parse(_lengthController.text.trim()),
+        dimensionHeight: double.parse(_heightController.text.trim()),
+        dimensionWidth: double.parse(_widthController.text.trim()),
+        dimensionUnit: _dimensionUnit,
+        courierCompanyId: courier.courierCompanyId,
+        quotedRate: courier.rate,
+        customerNotes: notes.isNotEmpty ? notes : null,
+        itemPhotoPath: _productImage?.path,
+      ),
     );
+  }
 
-    context.read<HomeServiceCubit>().submitCourierBooking(params);
+  void _openCheckout(CourierBooking booking, CourierPaymentOrder order) {
+    _razorpayService.openCheckout(
+      razorpayOrderId: order.razorpayOrderId,
+      amountInPaise: order.amountInPaise,
+      razorpayKey: order.razorpayKey,
+      orderNumber: booking.bookingNumber,
+      userName: _nameController.text.trim(),
+      userPhone: _mobileController.text.trim(),
+    );
+  }
+
+  void _handleBookingCreated(CourierBooking booking) {
+    _pendingBooking = booking;
+    _pendingSignature = _fullSig();
+    _lastPayment = null;
+
+    final order = booking.payment;
+    if (order != null) {
+      _openCheckout(booking, order);
+    } else {
+      // The gateway order was not created together with the booking.
+      context.read<HomeServiceCubit>().createCourierPayment(booking.bookingId);
+    }
+  }
+
+  void _handleRazorpaySuccess(PaymentSuccessResponse response) {
+    if (!mounted) return;
+    final booking = _pendingBooking;
+    if (booking == null) return;
+
+    _lastPayment = response;
+    context.read<HomeServiceCubit>().verifyCourierPayment(
+      VerifyCourierPaymentParams(
+        bookingId: booking.bookingId,
+        razorpayOrderId: response.orderId ?? '',
+        razorpayPaymentId: response.paymentId ?? '',
+        razorpaySignature: response.signature ?? '',
+      ),
+    );
+  }
+
+  void _handleRazorpayFailure(PaymentFailureResponse response) {
+    if (!mounted) return;
+    _showError(
+      response.message ?? 'Payment could not be completed. Please try again.',
+    );
+  }
+
+  void _showError(String message) {
+    AppToastMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _onBookingError(String message) {
+    _showError(message);
+    // A changed price / unavailable courier needs fresh rates.
+    if (message.toLowerCase().contains('quote')) {
+      _checkAndComparePrice();
+    }
+  }
+
+  void _onPaymentVerified(CourierPaymentResult result) {
+    final booking = _pendingBooking;
+    _pendingBooking = null;
+    _pendingSignature = null;
+    _lastPayment = null;
+    _showSuccessDialog(
+      bookingNumber: booking?.bookingNumber ?? '',
+      courierName: result.courierName.isNotEmpty
+          ? result.courierName
+          : (booking?.courierName ?? ''),
+      amount: result.amount > 0 ? result.amount : (booking?.totalAmount ?? 0),
+      status: result.status,
+      paymentStatus: result.paymentStatus,
+      awbCode: result.awbCode,
+    );
+    _resetForm();
+  }
+
+  void _resetForm() {
+    for (final c in _allControllers) {
+      c.removeListener(_onFormChanged);
+      c.clear();
+      c.addListener(_onFormChanged);
+    }
+    setState(() {
+      _dimensionUnit = 'cm';
+      _productImage = null;
+      _autoMode = AutovalidateMode.disabled;
+      _showCouriers = false;
+      _selectedCourierId = null;
+      _quote = null;
+      _quoteError = null;
+      _quoteSignature = null;
+    });
+    _formKey.currentState?.reset();
   }
 
   String _formatAmount(double amount) {
@@ -230,7 +431,18 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
     return amount.toStringAsFixed(2);
   }
 
-  Widget _buildDeliveryPartnerSelector() {
+  String _deliveryEstimate(CourierQuoteOption courier) {
+    final days = courier.estimatedDeliveryDays;
+    final parts = <String>[
+      if (days != null) 'Delivery in $days ${days == 1 ? 'day' : 'days'}',
+      if (courier.serviceType != null)
+        courier.serviceType![0].toUpperCase() +
+            courier.serviceType!.substring(1),
+    ];
+    return parts.isEmpty ? 'Standard delivery' : parts.join(' • ');
+  }
+
+  Widget _buildCourierSelector() {
     final quote = _quote;
 
     if (_loadingQuote) {
@@ -251,7 +463,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
-                'Calculating quotes...',
+                'Fetching courier rates...',
                 style: TextStyle(
                   color: Colors.grey[700],
                   fontWeight: FontWeight.w500,
@@ -275,7 +487,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Could not calculate quote',
+              'Could not fetch courier rates',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.error,
@@ -297,7 +509,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
       );
     }
 
-    if (quote == null || quote.quotes.isEmpty) {
+    if (quote == null || quote.couriers.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
@@ -306,121 +518,110 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
           border: Border.all(color: Colors.grey[300]!),
         ),
         child: Text(
-          'No quotes are available right now.',
+          'No courier is available for these pincodes right now.',
           style: TextStyle(color: Colors.grey[700]),
         ),
       );
     }
 
-    final partners = [...quote.quotes]
-      ..sort(
-        (firstPartner, secondPartner) =>
-            firstPartner.totalAmount.compareTo(secondPartner.totalAmount),
-      );
+    final couriers = [...quote.couriers]
+      ..sort((a, b) => a.totalAmount.compareTo(b.totalAmount));
 
     return Column(
       children: [
-        for (final partner in partners)
+        for (final courier in couriers)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Material(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
               child: InkWell(
-                onTap: () => _selectPartner(partner),
+                onTap: () => _selectCourier(courier),
                 borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color:
-                          _selectedPartnerId == partner.courierDeliveryPartnerId
-                          ? const Color(0xFF2E7D32)
-                          : Colors.grey[300]!,
-                      width:
-                          _selectedPartnerId == partner.courierDeliveryPartnerId
-                          ? 1.5
-                          : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:
-                                _selectedPartnerId ==
-                                    partner.courierDeliveryPartnerId
-                                ? const Color(0xFF2E7D32)
-                                : Colors.grey[400]!,
-                            width: 2,
-                          ),
-                          color:
-                              _selectedPartnerId ==
-                                  partner.courierDeliveryPartnerId
-                              ? const Color(0xFF2E7D32)
-                              : Colors.transparent,
-                        ),
-                        child:
-                            _selectedPartnerId ==
-                                partner.courierDeliveryPartnerId
-                            ? const Icon(
-                                Icons.check,
-                                size: 14,
-                                color: Colors.white,
-                              )
-                            : null,
+                child: Builder(
+                  builder: (context) {
+                    final selected =
+                        _selectedCourierId == courier.courierCompanyId;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              partner.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15,
-                                color:
-                                    _selectedPartnerId ==
-                                        partner.courierDeliveryPartnerId
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: selected
+                              ? const Color(0xFF2E7D32)
+                              : Colors.grey[300]!,
+                          width: selected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: selected
                                     ? const Color(0xFF2E7D32)
-                                    : Colors.grey[800],
+                                    : Colors.grey[400]!,
+                                width: 2,
                               ),
+                              color: selected
+                                  ? const Color(0xFF2E7D32)
+                                  : Colors.transparent,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              partner.slug,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
+                            child: selected
+                                ? const Icon(
+                                    Icons.check,
+                                    size: 14,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  courier.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                    color: selected
+                                        ? const Color(0xFF2E7D32)
+                                        : Colors.grey[800],
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _deliveryEstimate(courier),
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            '₹${_formatAmount(courier.totalAmount)}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                              color: selected
+                                  ? const Color(0xFF2E7D32)
+                                  : AppColors.primaryOrange,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        '₹${_formatAmount(partner.totalAmount)}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                          color:
-                              _selectedPartnerId ==
-                                  partner.courierDeliveryPartnerId
-                              ? const Color(0xFF2E7D32)
-                              : AppColors.primaryOrange,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -485,6 +686,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
     final image = await _picker.pickImage(source: source, imageQuality: 80);
     if (image != null) {
       setState(() => _productImage = image);
+      _onFormChanged();
     }
   }
 
@@ -499,6 +701,8 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
       prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
       filled: true,
       fillColor: Colors.grey[50],
+      counterText: '',
+      errorMaxLines: 2,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: Colors.grey[300]!),
@@ -515,6 +719,38 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
         ),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
+  Widget _textField({
+    required Key fieldKey,
+    required TextEditingController controller,
+    required String label,
+    required String? Function(String?) validator,
+    String? hint,
+    IconData? icon,
+    TextInputType? keyboardType,
+    int? maxLength,
+    int maxLines = 1,
+    bool digitsOnly = false,
+    bool decimal = false,
+    TextCapitalization capitalization = TextCapitalization.none,
+  }) {
+    return TextFormField(
+      key: fieldKey,
+      controller: controller,
+      decoration: _inputDecoration(label: label, hint: hint, prefixIcon: icon),
+      keyboardType: decimal
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : keyboardType,
+      textCapitalization: capitalization,
+      maxLength: maxLength,
+      maxLines: maxLines,
+      inputFormatters: [
+        if (digitsOnly) FilteringTextInputFormatter.digitsOnly,
+        if (decimal) FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+      ],
+      validator: validator,
     );
   }
 
@@ -551,34 +787,37 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
               _loadingQuote = false;
               _quoteError = null;
               _quote = state.quote;
-              _selectedPartnerId = null;
-              _comparedPrice = 0;
+              _selectedCourierId = null;
             });
           } else if (state is HomeServiceCourierQuoteError) {
             setState(() {
               _loadingQuote = false;
               _quoteError = state.message;
               _quote = null;
-              _selectedPartnerId = null;
-              _comparedPrice = 0;
+              _selectedCourierId = null;
             });
           } else if (state is HomeServiceCourierBookingSuccess) {
-            _showSuccessDialog(context, state);
+            _handleBookingCreated(state.booking);
           } else if (state is HomeServiceCourierBookingError) {
-            AppToastMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
+            _onBookingError(state.message);
+          } else if (state is HomeServiceCourierPaymentOrderReady) {
+            final booking = _pendingBooking;
+            if (booking != null && booking.bookingId == state.bookingId) {
+              _openCheckout(booking, state.order);
+            }
+          } else if (state is HomeServiceCourierPaymentError) {
+            _showError(state.message);
+          } else if (state is HomeServiceCourierPaymentVerified) {
+            _onPaymentVerified(state.result);
+          } else if (state is HomeServiceCourierPaymentVerificationError) {
+            // The payment may already be captured: keep the response so the
+            // button retries verification instead of charging again.
+            _showError(state.message);
           }
         },
         child: Form(
           key: _formKey,
+          autovalidateMode: _autoMode,
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.screenPaddingHorizontal),
             children: [
@@ -588,66 +827,52 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                 icon: Icons.assignment_ind_rounded,
                 gradient: const [Color(0xFF5E35B1), Color(0xFFFF8F5E)],
                 children: [
-                  TextFormField(
+                  _textField(
+                    fieldKey: _nameKey,
                     controller: _nameController,
-                    decoration: _inputDecoration(
-                      label: 'Customer Name',
-                      hint: 'Enter full name',
-                      prefixIcon: Icons.person_outline,
-                    ),
-                    textCapitalization: TextCapitalization.words,
+                    label: 'Customer Name',
+                    hint: 'Enter full name',
+                    icon: Icons.person_outline,
+                    capitalization: TextCapitalization.words,
                     validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        ServiceFormValidators.name(v, label: 'customer name'),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _mobileKey,
                     controller: _mobileController,
-                    decoration: _inputDecoration(
-                      label: 'Mobile Number',
-                      hint: '10-digit mobile number',
-                      prefixIcon: Icons.phone_outlined,
-                    ),
+                    label: 'Mobile Number',
+                    hint: '10-digit mobile number',
+                    icon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (v.trim().length != 10) {
-                        return 'Enter valid 10-digit number';
-                      }
-                      return null;
-                    },
+                    digitsOnly: true,
+                    validator: ServiceFormValidators.mobile,
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _pickupAddressKey,
                     controller: _pickupAddressController,
-                    decoration: _inputDecoration(
-                      label: l10n.pickupAddress,
-                      hint: l10n.enterPickupAddress,
-                      prefixIcon: Icons.home_outlined,
-                    ),
+                    label: l10n.pickupAddress,
+                    hint: l10n.enterPickupAddress,
+                    icon: Icons.home_outlined,
                     maxLines: 2,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    validator: (v) => ServiceFormValidators.address(
+                      v,
+                      label: 'pickup address',
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _pickupPincodeKey,
                     controller: _pickupPincodeController,
-                    decoration: _inputDecoration(
-                      label: l10n.pickupPincode,
-                      hint: '6-digit pincode',
-                      prefixIcon: Icons.pin_drop_outlined,
-                    ),
+                    label: l10n.pickupPincode,
+                    hint: '6-digit pincode',
+                    icon: Icons.pin_drop_outlined,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (v.trim().length != 6) {
-                        return 'Enter a valid 6-digit pincode';
-                      }
-                      return null;
-                    },
+                    digitsOnly: true,
+                    validator: ServiceFormValidators.pincode,
                   ),
                 ],
               ),
@@ -660,66 +885,52 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                 icon: Icons.local_shipping_rounded,
                 gradient: const [Color(0xFF2E7D32), Color(0xFF66BB6A)],
                 children: [
-                  TextFormField(
+                  _textField(
+                    fieldKey: _deliveryNameKey,
                     controller: _deliveryNameController,
-                    decoration: _inputDecoration(
-                      label: 'Delivery Contact Name',
-                      hint: 'Enter receiver name',
-                      prefixIcon: Icons.person_outline,
-                    ),
-                    textCapitalization: TextCapitalization.words,
+                    label: 'Delivery Contact Name',
+                    hint: 'Enter receiver name',
+                    icon: Icons.person_outline,
+                    capitalization: TextCapitalization.words,
                     validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        ServiceFormValidators.name(v, label: 'receiver name'),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _deliveryMobileKey,
                     controller: _deliveryMobileController,
-                    decoration: _inputDecoration(
-                      label: 'Delivery Mobile Number',
-                      hint: '10-digit mobile number',
-                      prefixIcon: Icons.phone_outlined,
-                    ),
+                    label: 'Delivery Mobile Number',
+                    hint: '10-digit mobile number',
+                    icon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (v.trim().length != 10) {
-                        return 'Enter valid 10-digit number';
-                      }
-                      return null;
-                    },
+                    digitsOnly: true,
+                    validator: ServiceFormValidators.mobile,
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _deliveryAddressKey,
                     controller: _deliveryAddressController,
-                    decoration: _inputDecoration(
-                      label: 'Delivery Address',
-                      hint: 'Enter full delivery address',
-                      prefixIcon: Icons.flag_outlined,
-                    ),
+                    label: 'Delivery Address',
+                    hint: 'Enter full delivery address',
+                    icon: Icons.flag_outlined,
                     maxLines: 2,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    validator: (v) => ServiceFormValidators.address(
+                      v,
+                      label: 'delivery address',
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _deliveryPincodeKey,
                     controller: _deliveryPincodeController,
-                    decoration: _inputDecoration(
-                      label: 'Delivery Pincode',
-                      hint: '6-digit pincode',
-                      prefixIcon: Icons.pin_drop_outlined,
-                    ),
+                    label: 'Delivery Pincode',
+                    hint: '6-digit pincode',
+                    icon: Icons.pin_drop_outlined,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (v.trim().length != 6) {
-                        return 'Enter a valid 6-digit pincode';
-                      }
-                      return null;
-                    },
+                    digitsOnly: true,
+                    validator: ServiceFormValidators.pincode,
                   ),
                 ],
               ),
@@ -732,29 +943,31 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                 icon: Icons.inventory_rounded,
                 gradient: const [Color(0xFF00897B), Color(0xFF26A69A)],
                 children: [
-                  TextFormField(
+                  _textField(
+                    fieldKey: _productDetailsKey,
                     controller: _productDetailsController,
-                    decoration: _inputDecoration(
-                      label: l10n.productDetails,
-                      hint: l10n.enterProductDetails,
-                      prefixIcon: Icons.description_outlined,
-                    ),
+                    label: l10n.productDetails,
+                    hint: l10n.enterProductDetails,
+                    icon: Icons.description_outlined,
                     maxLines: 2,
-                    textCapitalization: TextCapitalization.sentences,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    capitalization: TextCapitalization.sentences,
+                    validator: (v) => ServiceFormValidators.requiredText(
+                      v,
+                      'Please enter product details',
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
-                  TextFormField(
+                  _textField(
+                    fieldKey: _packagingDetailsKey,
                     controller: _packagingDetailsController,
-                    decoration: _inputDecoration(
-                      label: l10n.packagingDetails,
-                      hint: l10n.enterPackagingDetails,
-                      prefixIcon: Icons.inventory_2_outlined,
+                    label: l10n.packagingDetails,
+                    hint: l10n.enterPackagingDetails,
+                    icon: Icons.inventory_2_outlined,
+                    capitalization: TextCapitalization.sentences,
+                    validator: (v) => ServiceFormValidators.requiredText(
+                      v,
+                      'Please enter packaging details',
                     ),
-                    textCapitalization: TextCapitalization.sentences,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
                   ),
                 ],
               ),
@@ -767,23 +980,15 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                 icon: Icons.inventory_2_rounded,
                 gradient: const [Color(0xFF1976D2), Color(0xFF42A5F5)],
                 children: [
-                  TextFormField(
+                  _textField(
+                    fieldKey: _weightKey,
                     controller: _weightController,
-                    decoration: _inputDecoration(
-                      label: 'Weight (grams)',
-                      hint: 'e.g. 500',
-                      prefixIcon: Icons.scale_outlined,
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Required';
-                      if (double.tryParse(v.trim()) == null) {
-                        return 'Enter a valid number';
-                      }
-                      return null;
-                    },
+                    label: 'Weight (grams)',
+                    hint: 'e.g. 500',
+                    icon: Icons.scale_outlined,
+                    decimal: true,
+                    validator: (v) =>
+                        ServiceFormValidators.positiveNumber(v, 'weight'),
                   ),
                   const SizedBox(height: AppSpacing.formFieldGap),
 
@@ -815,15 +1020,19 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                               _UnitChip(
                                 label: 'cm',
                                 selected: _dimensionUnit == 'cm',
-                                onTap: () =>
-                                    setState(() => _dimensionUnit = 'cm'),
+                                onTap: () {
+                                  setState(() => _dimensionUnit = 'cm');
+                                  _onFormChanged();
+                                },
                               ),
                               const SizedBox(width: AppSpacing.xs),
                               _UnitChip(
                                 label: 'inch',
                                 selected: _dimensionUnit == 'inch',
-                                onTap: () =>
-                                    setState(() => _dimensionUnit = 'inch'),
+                                onTap: () {
+                                  setState(() => _dimensionUnit = 'inch');
+                                  _onFormChanged();
+                                },
                               ),
                             ],
                           ),
@@ -835,22 +1044,21 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
 
                   // L × H × W
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: TextFormField(
+                        child: _textField(
+                          fieldKey: _lengthKey,
                           controller: _lengthController,
-                          decoration: _inputDecoration(
-                            label: 'L ($_dimensionUnit)',
-                            hint: 'Length',
-                          ),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: _numberValidator,
+                          label: 'L ($_dimensionUnit)',
+                          hint: 'Length',
+                          decimal: true,
+                          validator: (v) =>
+                              ServiceFormValidators.positiveNumber(v, 'length'),
                         ),
                       ),
                       const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.only(left: 4, right: 4, top: 12),
                         child: Text(
                           '×',
                           style: TextStyle(
@@ -860,20 +1068,18 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                         ),
                       ),
                       Expanded(
-                        child: TextFormField(
+                        child: _textField(
+                          fieldKey: _heightKey,
                           controller: _heightController,
-                          decoration: _inputDecoration(
-                            label: 'H ($_dimensionUnit)',
-                            hint: 'Height',
-                          ),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: _numberValidator,
+                          label: 'H ($_dimensionUnit)',
+                          hint: 'Height',
+                          decimal: true,
+                          validator: (v) =>
+                              ServiceFormValidators.positiveNumber(v, 'height'),
                         ),
                       ),
                       const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.only(left: 4, right: 4, top: 12),
                         child: Text(
                           '×',
                           style: TextStyle(
@@ -883,16 +1089,14 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                         ),
                       ),
                       Expanded(
-                        child: TextFormField(
+                        child: _textField(
+                          fieldKey: _widthKey,
                           controller: _widthController,
-                          decoration: _inputDecoration(
-                            label: 'W ($_dimensionUnit)',
-                            hint: 'Width',
-                          ),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: _numberValidator,
+                          label: 'W ($_dimensionUnit)',
+                          hint: 'Width',
+                          decimal: true,
+                          validator: (v) =>
+                              ServiceFormValidators.positiveNumber(v, 'width'),
                         ),
                       ),
                     ],
@@ -952,7 +1156,10 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                   _ImagePickerCard(
                     image: _productImage,
                     onTap: _pickImage,
-                    onRemove: () => setState(() => _productImage = null),
+                    onRemove: () {
+                      setState(() => _productImage = null);
+                      _onFormChanged();
+                    },
                   ),
                 ],
               ),
@@ -977,7 +1184,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                   ],
                 ),
                 child: ElevatedButton.icon(
-                  onPressed: _checkAndComparePrice,
+                  onPressed: _loadingQuote ? null : _checkAndComparePrice,
                   icon: const Icon(Icons.compare_arrows_rounded, size: 22),
                   label: const Text(
                     'Compare Delivery Partners',
@@ -995,27 +1202,35 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
               ),
 
               // ── Weight Comparison (shown after check) ──
-              if (_showDeliveryPartners) ...[
+              if (_showCouriers) ...[
                 const SizedBox(height: AppSpacing.md),
                 _buildWeightComparison(),
-                const SizedBox(height: AppSpacing.md),
+                if (_quote != null) const SizedBox(height: AppSpacing.md),
 
                 // ── Delivery Partners ──
                 _FormSection(
                   title: 'Select Delivery Partner',
                   icon: Icons.local_shipping_rounded,
                   gradient: const [Color(0xFF00695C), Color(0xFF26A69A)],
-                  children: [_buildDeliveryPartnerSelector()],
+                  children: [_buildCourierSelector()],
                 ),
 
                 const SizedBox(height: AppSpacing.md),
 
-                // ── Pay Button ──
-                if (_selectedPartner != null)
+                // ── Price + Pay Button ──
+                if (_selectedCourier != null) ...[
+                  _buildPriceSummary(_selectedCourier!),
+                  const SizedBox(height: AppSpacing.md),
                   BlocBuilder<HomeServiceCubit, HomeServiceState>(
                     builder: (context, state) {
                       final loading =
-                          state is HomeServiceCourierBookingSubmitting;
+                          state is HomeServiceCourierBookingSubmitting ||
+                          state is HomeServiceCourierPaymentVerifying;
+                      final retry = _pendingBooking != null;
+                      final amount = _formatAmount(
+                        _pendingBooking?.totalAmount ??
+                            _selectedCourier!.totalAmount,
+                      );
                       return Container(
                         width: double.infinity,
                         height: 56,
@@ -1045,11 +1260,13 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Icon(Icons.inventory_rounded, size: 22),
+                              : const Icon(Icons.payment_rounded, size: 22),
                           label: Text(
                             loading
                                 ? 'Processing...'
-                                : 'Create Booking • ₹${_formatAmount(_comparedPrice)}',
+                                : (retry
+                                      ? 'Retry Payment • ₹$amount'
+                                      : 'Book & Pay • ₹$amount'),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -1067,12 +1284,45 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                       );
                     },
                   ),
+                ],
               ],
 
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPriceSummary(CourierQuoteOption courier) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD7EBD8)),
+      ),
+      child: Column(
+        children: [
+          _BookingInfoRow(label: 'Courier', value: courier.name),
+          const SizedBox(height: AppSpacing.xs),
+          _BookingInfoRow(
+            label: 'Courier charge',
+            value: '₹${_formatAmount(courier.rate)}',
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          _BookingInfoRow(
+            label: 'Service charge',
+            value: '₹${_formatAmount(courier.serviceCharge)}',
+          ),
+          const Divider(height: 18),
+          _BookingInfoRow(
+            label: 'Total payable',
+            value: '₹${_formatAmount(courier.totalAmount)}',
+            highlightValue: true,
+          ),
+        ],
       ),
     );
   }
@@ -1109,7 +1359,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Weight Comparison',
+                'Weight Details',
                 style: Theme.of(
                   context,
                 ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
@@ -1119,58 +1369,28 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
           const SizedBox(height: AppSpacing.sm),
           _WeightRow(
             label: 'Actual Weight',
-            value: '${quote.actualWeightGrams} g',
-            isHigher: !quote.isVolumetricChargeableWeight,
+            value: '${_formatAmount(quote.actualWeightGrams)} g',
+            isHigher: false,
           ),
           const SizedBox(height: 6),
           _WeightRow(
-            label: 'Volumetric Weight',
-            value: '${quote.volumetricWeightGrams} g',
-            isHigher: quote.isVolumetricChargeableWeight,
-          ),
-          const Divider(height: 16),
-          Row(
-            children: [
-              const Icon(
-                Icons.check_circle_rounded,
-                size: 16,
-                color: Color(0xFF2E7D32),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Chargeable: ${quote.chargeableWeightGrams} g',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  color: Color(0xFF2E7D32),
-                ),
-              ),
-              const Spacer(),
-              Text(
-                quote.isVolumetricChargeableWeight
-                    ? '(Volumetric)'
-                    : '(Actual)',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-              ),
-            ],
+            label: 'Chargeable Weight',
+            value: '${_formatAmount(quote.weightKg)} kg',
+            isHigher: true,
           ),
         ],
       ),
     );
   }
 
-  String? _numberValidator(String? v) {
-    if (v == null || v.trim().isEmpty) return 'Required';
-    if (double.tryParse(v.trim()) == null) return 'Invalid';
-    return null;
-  }
-
-  void _showSuccessDialog(
-    BuildContext context,
-    HomeServiceCourierBookingSuccess state,
-  ) {
-    final booking = state.booking;
-
+  void _showSuccessDialog({
+    required String bookingNumber,
+    required String courierName,
+    required double amount,
+    required String status,
+    required String paymentStatus,
+    String? awbCode,
+  }) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1206,14 +1426,15 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Courier Booking Created',
+                'Courier Booking Confirmed',
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Booking ${booking.bookingNumber} has been created successfully.',
+                'Booking $bookingNumber is paid and confirmed.',
                 style: TextStyle(color: Colors.grey[600], height: 1.4),
                 textAlign: TextAlign.center,
               ),
@@ -1239,23 +1460,23 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                   children: [
                     _BookingInfoRow(
                       label: 'Booking Number',
-                      value: booking.bookingNumber,
+                      value: bookingNumber,
                     ),
+                    if (courierName.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      _BookingInfoRow(
+                        label: 'Delivery Partner',
+                        value: courierName,
+                      ),
+                    ],
+                    if (awbCode != null) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      _BookingInfoRow(label: 'AWB', value: awbCode),
+                    ],
                     const SizedBox(height: AppSpacing.xs),
                     _BookingInfoRow(
-                      label: 'Delivery Partner',
-                      value: booking.partnerName,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    _BookingInfoRow(
-                      label: 'Chargeable Weight',
-                      value:
-                          '${booking.chargeableWeightGrams} g (${booking.isVolumetricChargeableWeight ? 'Volumetric' : 'Actual'})',
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    _BookingInfoRow(
-                      label: 'Amount',
-                      value: '₹${_formatAmount(booking.totalAmount)}',
+                      label: 'Amount Paid',
+                      value: '₹${_formatAmount(amount)}',
                       highlightValue: true,
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -1264,13 +1485,12 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                       runSpacing: AppSpacing.xs,
                       children: [
                         _StatusChip(
-                          label: booking.status.toUpperCase(),
+                          label: status.toUpperCase(),
                           backgroundColor: const Color(0xFFFFF8E1),
                           textColor: const Color(0xFFF57F17),
                         ),
                         _StatusChip(
-                          label:
-                              'PAYMENT ${booking.paymentStatus.toUpperCase()}',
+                          label: 'PAYMENT ${paymentStatus.toUpperCase()}',
                           backgroundColor: const Color(0xFFE8F5E9),
                           textColor: const Color(0xFF2E7D32),
                         ),

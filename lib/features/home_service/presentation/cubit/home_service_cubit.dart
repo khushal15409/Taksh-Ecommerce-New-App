@@ -2,9 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/book_service.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/cancel_service_booking.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/usecases/create_courier_booking.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_courier_delivery_partners.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_courier_quote.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/usecases/courier_usecases.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_service_booking_detail.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_service_bookings.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/usecases/get_service_inquiry_history.dart';
@@ -18,6 +17,11 @@ class HomeServiceCubit extends Cubit<HomeServiceState> {
   final GetCourierDeliveryPartners _getCourierDeliveryPartners;
   final GetCourierQuote _getCourierQuote;
   final CreateCourierBooking _createCourierBooking;
+  final CreateCourierPayment _createCourierPayment;
+  final VerifyCourierPayment _verifyCourierPayment;
+  final GetCourierBookings _getCourierBookings;
+  final GetCourierBookingDetail _getCourierBookingDetail;
+  final CancelCourierBooking _cancelCourierBooking;
   final BookService _bookService;
   final VerifyServiceBooking _verifyServiceBooking;
   final GetServiceBookings _getServiceBookings;
@@ -35,6 +39,11 @@ class HomeServiceCubit extends Cubit<HomeServiceState> {
     required GetCourierDeliveryPartners getCourierDeliveryPartners,
     required GetCourierQuote getCourierQuote,
     required CreateCourierBooking createCourierBooking,
+    required CreateCourierPayment createCourierPayment,
+    required VerifyCourierPayment verifyCourierPayment,
+    required GetCourierBookings getCourierBookings,
+    required GetCourierBookingDetail getCourierBookingDetail,
+    required CancelCourierBooking cancelCourierBooking,
     required BookService bookService,
     required VerifyServiceBooking verifyServiceBooking,
     required GetServiceBookings getServiceBookings,
@@ -45,6 +54,11 @@ class HomeServiceCubit extends Cubit<HomeServiceState> {
        _getCourierDeliveryPartners = getCourierDeliveryPartners,
        _getCourierQuote = getCourierQuote,
        _createCourierBooking = createCourierBooking,
+       _createCourierPayment = createCourierPayment,
+       _verifyCourierPayment = verifyCourierPayment,
+       _getCourierBookings = getCourierBookings,
+       _getCourierBookingDetail = getCourierBookingDetail,
+       _cancelCourierBooking = cancelCourierBooking,
        _bookService = bookService,
        _verifyServiceBooking = verifyServiceBooking,
        _getServiceBookings = getServiceBookings,
@@ -125,8 +139,7 @@ class HomeServiceCubit extends Cubit<HomeServiceState> {
       },
       (quote) {
         _log.infoWithContext('Courier quote fetched', {
-          'quotes_count': quote.quotes.length,
-          'chargeable_weight_grams': quote.chargeableWeightGrams,
+          'couriers_count': quote.couriers.length,
         });
         emit(HomeServiceCourierQuoteLoaded(quote));
       },
@@ -137,7 +150,7 @@ class HomeServiceCubit extends Cubit<HomeServiceState> {
   Future<void> submitCourierBooking(CreateCourierBookingParams params) async {
     _log.infoWithContext('Submitting courier booking', {
       'action': 'submitCourierBooking',
-      'courier_delivery_partner_id': params.courierDeliveryPartnerId,
+      'courier_company_id': params.courierCompanyId,
     });
     emit(const HomeServiceCourierBookingSubmitting());
 
@@ -159,6 +172,85 @@ class HomeServiceCubit extends Cubit<HomeServiceState> {
         });
         emit(HomeServiceCourierBookingSuccess(booking));
       },
+    );
+  }
+
+  /// Create (or reuse) the Razorpay order of an unpaid courier booking.
+  Future<void> createCourierPayment(int bookingId) async {
+    emit(const HomeServiceCourierBookingSubmitting());
+
+    final result = await _createCourierPayment(bookingId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (failure) => emit(HomeServiceCourierPaymentError(failure.message)),
+      (order) => emit(HomeServiceCourierPaymentOrderReady(bookingId, order)),
+    );
+  }
+
+  /// Verify the Razorpay payment of a courier booking.
+  Future<void> verifyCourierPayment(VerifyCourierPaymentParams params) async {
+    emit(const HomeServiceCourierPaymentVerifying());
+
+    final result = await _verifyCourierPayment(params);
+
+    if (isClosed) return;
+
+    result.fold((failure) {
+      _log.warnWithContext('Failed to verify courier payment', {
+        'message': failure.message,
+      });
+      emit(HomeServiceCourierPaymentVerificationError(failure.message));
+    }, (payment) => emit(HomeServiceCourierPaymentVerified(payment)));
+  }
+
+  /// Fetch the courier booking history.
+  Future<void> fetchCourierBookings({int page = 1, int perPage = 15}) async {
+    emit(const CourierBookingsLoading());
+
+    final result = await _getCourierBookings(
+      GetCourierBookingsParams(page: page, perPage: perPage),
+    );
+
+    if (isClosed) return;
+
+    result.fold(
+      (failure) => emit(CourierBookingsError(failure.message)),
+      (bookings) => emit(CourierBookingsLoaded(bookings)),
+    );
+  }
+
+  /// Fetch a single courier booking with its tracking timeline.
+  Future<void> fetchCourierBookingDetail(int bookingId) async {
+    emit(const CourierBookingDetailLoading());
+
+    final result = await _getCourierBookingDetail(bookingId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (failure) => emit(CourierBookingDetailError(failure.message)),
+      (booking) => emit(CourierBookingDetailLoaded(booking)),
+    );
+  }
+
+  /// Cancel a courier booking.
+  Future<void> cancelCourierBooking({
+    required int bookingId,
+    String? reason,
+  }) async {
+    emit(const CourierBookingCancelling());
+
+    final result = await _cancelCourierBooking(
+      CancelCourierBookingParams(bookingId: bookingId, reason: reason),
+    );
+
+    if (isClosed) return;
+
+    result.fold(
+      (failure) => emit(CourierBookingCancelError(failure.message)),
+      (cancelResult) => emit(CourierBookingCancelled(cancelResult)),
     );
   }
 

@@ -1,54 +1,52 @@
 import 'package:equatable/equatable.dart';
 
-/// One courier partner quote returned from the quote API.
+/// One live courier option returned by `POST /service/courier/quote`.
 class CourierQuoteOption extends Equatable {
-  final int courierDeliveryPartnerId;
+  final String courierCompanyId;
   final String name;
-  final String slug;
+  final double rate;
+  final double serviceCharge;
   final double totalAmount;
+  final int? estimatedDeliveryDays;
+  final String? estimatedDeliveryDate;
+  final String? serviceType;
 
   const CourierQuoteOption({
-    required this.courierDeliveryPartnerId,
+    required this.courierCompanyId,
     required this.name,
-    required this.slug,
+    required this.rate,
+    required this.serviceCharge,
     required this.totalAmount,
+    this.estimatedDeliveryDays,
+    this.estimatedDeliveryDate,
+    this.serviceType,
   });
 
   @override
   List<Object?> get props => [
-    courierDeliveryPartnerId,
+    courierCompanyId,
     name,
-    slug,
+    rate,
+    serviceCharge,
     totalAmount,
+    estimatedDeliveryDays,
+    estimatedDeliveryDate,
+    serviceType,
   ];
 }
 
-/// Quote summary returned before a courier booking is created.
+/// Courier options for a parcel, sorted cheapest first by the server.
 class CourierQuote extends Equatable {
-  final int actualWeightGrams;
-  final int volumetricWeightGrams;
-  final int chargeableWeightGrams;
-  final String chargeableWeightSource;
-  final List<CourierQuoteOption> quotes;
+  final double actualWeightGrams;
+  final double weightKg;
+  final List<CourierQuoteOption> couriers;
 
   const CourierQuote({
     required this.actualWeightGrams,
-    required this.volumetricWeightGrams,
-    required this.chargeableWeightGrams,
-    required this.chargeableWeightSource,
-    required this.quotes,
+    required this.weightKg,
+    required this.couriers,
   });
 
-  bool get isVolumetricChargeableWeight {
-    return chargeableWeightSource.toLowerCase() == 'volumetric';
-  }
-
   @override
-  List<Object?> get props => [
-    actualWeightGrams,
-    volumetricWeightGrams,
-    chargeableWeightGrams,
-    chargeableWeightSource,
-    quotes,
-  ];
+  List<Object?> get props => [actualWeightGrams, weightKg, couriers];
 }

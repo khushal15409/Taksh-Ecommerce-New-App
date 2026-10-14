@@ -1,5 +1,6 @@
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking_history.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_delivery_partner.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_quote.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/home_service.dart';
@@ -18,8 +19,10 @@ abstract class HomeServiceRepository {
   /// Fetches the delivery partners available for courier bookings.
   ResultFuture<List<CourierDeliveryPartner>> getCourierDeliveryPartners();
 
-  /// Computes courier quotes for the current parcel dimensions and weight.
+  /// Live courier options and rates between two pincodes.
   ResultFuture<CourierQuote> getCourierQuote({
+    required String pickupPincode,
+    required String deliveryPincode,
     required double weightGrams,
     required double dimensionLength,
     required double dimensionHeight,
@@ -27,7 +30,7 @@ abstract class HomeServiceRepository {
     required String dimensionUnit,
   });
 
-  /// Creates a courier booking.
+  /// Creates a courier booking and its Razorpay order.
   ResultFuture<CourierBooking> createCourierBooking({
     required String customerName,
     required String customerMobile,
@@ -44,9 +47,48 @@ abstract class HomeServiceRepository {
     required double dimensionHeight,
     required double dimensionWidth,
     required String dimensionUnit,
-    required int courierDeliveryPartnerId,
+    required String courierCompanyId,
+    double? quotedRate,
     String? customerNotes,
     String? itemPhotoPath,
+  });
+
+  /// Creates (or reuses) the Razorpay order of an unpaid courier booking.
+  ResultFuture<CourierPaymentOrder> createCourierPayment({
+    required int bookingId,
+  });
+
+  /// Verifies a courier booking payment signature.
+  ResultFuture<CourierPaymentResult> verifyCourierPayment({
+    required int bookingId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  });
+
+  /// Paginated courier booking history.
+  ResultFuture<CourierBookingsPage> getCourierBookings({
+    int page = 1,
+    int perPage = 15,
+  });
+
+  /// Courier booking detail with tracking timeline.
+  ResultFuture<CourierBookingDetail> getCourierBookingDetail({
+    required int bookingId,
+  });
+
+  /// Cancels a courier booking.
+  ResultFuture<CourierCancelResult> cancelCourierBooking({
+    required int bookingId,
+    String? reason,
+  });
+
+  /// Downloads an invoice PDF (`path` is the API path) and returns the
+  /// saved file path.
+  ResultFuture<String> downloadInvoice({
+    required String path,
+    required String fileName,
+    void Function(double progress)? onProgress,
   });
 
   /// Books a marketplace service (electrician, plumber, salon) and creates

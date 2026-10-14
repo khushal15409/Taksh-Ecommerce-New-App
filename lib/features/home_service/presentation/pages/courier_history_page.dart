@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/theme/app_spacing.dart';
-import 'package:taksh_e_commerce/features/home_service/domain/entities/service_inquiry.dart';
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
+import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking_history.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_cubit.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
+import 'package:taksh_e_commerce/features/home_service/presentation/utils/service_invoice_downloader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// History page for courier bookings with tracking stepper and detail view.
+/// Courier booking history (same look as the service booking history).
+///
+/// Backed by `GET /service/courier/bookings` (list) and
+/// `GET /service/courier/bookings/{id}` (detail).
 class CourierHistoryPage extends StatelessWidget {
   final int? serviceId;
 
@@ -19,171 +25,185 @@ class CourierHistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          getIt<HomeServiceCubit>()..fetchHistory(serviceId: serviceId),
-      child: _CourierHistoryBody(serviceId: serviceId),
+          getIt<HomeServiceCubit>()..fetchCourierBookings(perPage: 30),
+      child: const _CourierHistoryBody(),
     );
   }
 }
 
-// ─── Constants ─────────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────
 
+const _gradient = [Color(0xFFFF6B35), Color(0xFFFF8F5E)];
 final _dateFormat = DateFormat('dd MMM yyyy, hh:mm a');
 
 String _formatDate(DateTime? date) =>
     date != null ? _dateFormat.format(date) : '—';
 
-const _gradientOrange = [Color(0xFFFF6B35), Color(0xFFFFA726)];
+String _formatAmount(double amount) {
+  if (amount == amount.roundToDouble()) return amount.toStringAsFixed(0);
+  return amount.toStringAsFixed(2);
+}
 
 Color _statusColor(String status) {
-  switch (status.toLowerCase()) {
+  switch (status.toLowerCase().replaceAll(' ', '_')) {
     case 'delivered':
-    case 'completed':
+    case 'paid':
       return const Color(0xFF2E7D32);
     case 'pending':
+    case 'payment_pending':
       return const Color(0xFFF57F17);
+    case 'order_created':
+    case 'courier_assigned':
+    case 'pickup_scheduled':
     case 'confirmed':
-    case 'shipped':
       return const Color(0xFF1565C0);
     case 'cancelled':
+    case 'delivery_exception':
+    case 'failed':
       return const Color(0xFFC62828);
-    case 'rto':
-    case 'return':
-      return const Color(0xFF6A1B9A);
-    case 'in_progress':
-    case 'in-progress':
+    case 'picked_up':
+    case 'in_transit':
     case 'out_for_delivery':
-      return const Color(0xFF00695C);
+      return const Color(0xFF6A1B9A);
     default:
       return const Color(0xFF616161);
   }
 }
 
-// ─── Tracking Step Data ────────────────────────────────────────────────────
-
-class _TrackingStep {
-  final String title;
-  final bool isCompleted;
-  final bool isCurrent;
-  final bool isCancelled;
-
-  const _TrackingStep({
-    required this.title,
-    this.isCompleted = false,
-    this.isCurrent = false,
-    this.isCancelled = false,
-  });
+/// What the customer sees as the booking state.
+String _displayStatus({
+  required bool cancelled,
+  required bool paid,
+  String? shipmentLabel,
+}) {
+  if (cancelled) return 'Cancelled';
+  if (!paid) return 'Payment Pending';
+  return shipmentLabel ?? 'Confirmed';
 }
 
-/// Build tracking steps based on order flow.
-/// Three flows: Delivered, Pending, RTO (Return to Origin).
-List<_TrackingStep> _buildTrackingSteps(String status) {
-  final s = status.toLowerCase();
-
-  // ── Delivered flow ──
-  if (s == 'delivered' || s == 'completed') {
-    return const [
-      _TrackingStep(title: 'Order Booked', isCompleted: true),
-      _TrackingStep(title: 'Out for Pickup', isCompleted: true),
-      _TrackingStep(title: 'Order Picked Up', isCompleted: true),
-      _TrackingStep(title: 'Shipped', isCompleted: true),
-      _TrackingStep(title: 'Out for Delivery', isCompleted: true),
-      _TrackingStep(
-        title: 'Order Delivered',
-        isCompleted: true,
-        isCurrent: true,
-      ),
-    ];
-  }
-
-  // ── RTO / Cancelled flow ──
-  if (s == 'cancelled' || s == 'rto' || s == 'return') {
-    return const [
-      _TrackingStep(title: 'Order Booked', isCompleted: true),
-      _TrackingStep(title: 'Out for Pickup', isCompleted: true),
-      _TrackingStep(title: 'Order Picked Up', isCompleted: true),
-      _TrackingStep(title: 'Shipped', isCompleted: true),
-      _TrackingStep(title: 'Out for Delivery', isCompleted: true),
-      _TrackingStep(
-        title: 'Order Cancelled',
-        isCompleted: true,
-        isCancelled: true,
-      ),
-      _TrackingStep(title: 'Return to Seller', isCompleted: true),
-      _TrackingStep(title: 'RTO Shipped', isCompleted: true),
-      _TrackingStep(title: 'Out for Delivery to Seller', isCompleted: true),
-      _TrackingStep(
-        title: 'Delivered to Seller',
-        isCompleted: true,
-        isCurrent: true,
-      ),
-    ];
-  }
-
-  // ── Pending / In-progress flow (default) ──
-  // Determine how far along the order is
-  final pendingSteps = [
-    'Order Booked',
-    'Out for Pickup',
-    'Order Picked Up',
-    'Shipped',
-    'Out for Delivery',
-    'Order Delivered',
+bool _canCancel({required bool cancelled, required String? shipmentStatus}) {
+  if (cancelled) return false;
+  const cancellable = [
+    null,
+    'pending',
+    'order_created',
+    'awb_assigned',
+    'pickup_requested',
   ];
+  return cancellable.contains(shipmentStatus);
+}
 
-  int currentIndex;
-  switch (s) {
-    case 'booked':
-    case 'order_booked':
-      currentIndex = 0;
-      break;
-    case 'out_for_pickup':
-      currentIndex = 1;
-      break;
-    case 'picked_up':
-    case 'order_picked_up':
-      currentIndex = 2;
-      break;
-    case 'shipped':
-      currentIndex = 3;
-      break;
-    case 'out_for_delivery':
-      currentIndex = 4;
-      break;
-    default:
-      // pending or other → show at "Shipped" stage with pending marker
-      currentIndex = 3;
-      break;
+Future<void> _confirmCancel(
+  BuildContext context,
+  HomeServiceCubit cubit,
+  int bookingId,
+) async {
+  final reasonController = TextEditingController();
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      title: const Text('Cancel Booking?'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'This will cancel your courier booking. Paid bookings are refunded '
+            'as per the cancellation policy.',
+            style: TextStyle(color: Colors.grey[700], height: 1.4),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: reasonController,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelText: 'Reason (optional)',
+              hintText: 'Tell us why you are cancelling',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Keep Booking'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.error,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: const Text('Cancel Booking'),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed == true) {
+    final reason = reasonController.text.trim();
+    cubit.cancelCourierBooking(
+      bookingId: bookingId,
+      reason: reason.isEmpty ? null : reason,
+    );
   }
 
-  return List.generate(pendingSteps.length, (i) {
-    return _TrackingStep(
-      title: pendingSteps[i],
-      isCompleted: i <= currentIndex,
-      isCurrent: i == currentIndex,
-    );
-  });
+  reasonController.dispose();
+}
+
+void _downloadInvoice(BuildContext context, int id, String bookingNumber) {
+  downloadServiceInvoice(
+    context,
+    path: ApiConstants.courierBookingInvoice(id),
+    bookingNumber: bookingNumber,
+  );
+}
+
+PreferredSizeWidget _gradientAppBar(String title, {List<Widget>? actions}) {
+  return AppBar(
+    title: Text(title),
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+        ),
+      ),
+    ),
+    foregroundColor: Colors.white,
+    elevation: 0,
+    actions: actions,
+  );
+}
+
+void _toast(BuildContext context, String message, {bool error = false}) {
+  AppToastMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: error ? AppColors.error : const Color(0xFF2E7D32),
+      behavior: SnackBarBehavior.floating,
+    ),
+  );
 }
 
 // ─── Main Body ─────────────────────────────────────────────────────────────
 
 class _CourierHistoryBody extends StatelessWidget {
-  final int? serviceId;
-
-  const _CourierHistoryBody({this.serviceId});
+  const _CourierHistoryBody();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Courier History'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: _gradientOrange),
-          ),
-        ),
-        foregroundColor: Colors.white,
-        elevation: 0,
+      appBar: _gradientAppBar(
+        'Courier History',
         actions: [
           TextButton.icon(
             onPressed: () => Navigator.pop(context),
@@ -202,63 +222,89 @@ class _CourierHistoryBody extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<HomeServiceCubit, HomeServiceState>(
-        builder: (context, state) {
-          if (state is HomeServiceHistoryLoading) {
-            return _buildLoadingView();
-          }
-          if (state is HomeServiceHistoryError) {
-            return _ErrorView(
-              message: state.message,
-              onRetry: () => context.read<HomeServiceCubit>().fetchHistory(
-                serviceId: serviceId,
-              ),
+      body: BlocListener<HomeServiceCubit, HomeServiceState>(
+        listener: (context, state) {
+          if (state is CourierBookingCancelled) {
+            _toast(
+              context,
+              state.result.message.isNotEmpty
+                  ? state.result.message
+                  : 'Booking cancelled successfully',
             );
+            context.read<HomeServiceCubit>().fetchCourierBookings(perPage: 30);
+          } else if (state is CourierBookingCancelError) {
+            _toast(context, state.message, error: true);
+            context.read<HomeServiceCubit>().fetchCourierBookings(perPage: 30);
           }
-          if (state is HomeServiceHistoryLoaded) {
-            // Filter courier orders only
-            final orders = state.orders
-                .where((o) => o.service.slug == 'courier-booking')
-                .toList();
-            if (orders.isEmpty) {
-              return const _EmptyView();
-            }
-            return RefreshIndicator(
-              onRefresh: () => context.read<HomeServiceCubit>().fetchHistory(
-                serviceId: serviceId,
-              ),
-              color: AppColors.primaryOrange,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(
-                  AppSpacing.screenPaddingHorizontal,
-                ),
-                itemCount: orders.length + 1, // +1 for header
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildHeader(context, orders.length);
-                  }
-                  final order = orders[index - 1];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: _CourierOrderCard(
-                      order: order,
-                      onTap: () => _openDetail(context, order),
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-          return const SizedBox.shrink();
         },
+        child: BlocBuilder<HomeServiceCubit, HomeServiceState>(
+          builder: (context, state) {
+            if (state is CourierBookingsLoading ||
+                state is CourierBookingCancelling) {
+              return const _LoadingView();
+            }
+            if (state is CourierBookingsError) {
+              return _ErrorView(
+                message: state.message,
+                onRetry: () => context
+                    .read<HomeServiceCubit>()
+                    .fetchCourierBookings(perPage: 30),
+              );
+            }
+            if (state is CourierBookingsLoaded) {
+              final bookings = state.page.bookings;
+              if (bookings.isEmpty) return const _EmptyView();
+              return RefreshIndicator(
+                onRefresh: () => context
+                    .read<HomeServiceCubit>()
+                    .fetchCourierBookings(perPage: 30),
+                color: AppColors.primaryOrange,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(
+                    AppSpacing.screenPaddingHorizontal,
+                  ),
+                  itemCount: bookings.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return _buildHeader(context, state.page.total);
+                    }
+                    final booking = bookings[index - 1];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: _BookingCard(
+                        booking: booking,
+                        onTap: () => _openDetails(context, booking),
+                        onCancel: () => _confirmCancel(
+                          context,
+                          context.read<HomeServiceCubit>(),
+                          booking.id,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
 
-  void _openDetail(BuildContext context, ServiceInquiry order) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => _CourierOrderDetailPage(order: order)),
-    );
+  void _openDetails(BuildContext context, CourierBookingSummary booking) {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (_) => _BookingDetailPage(bookingId: booking.id),
+          ),
+        )
+        .then((_) {
+          if (context.mounted) {
+            context.read<HomeServiceCubit>().fetchCourierBookings(perPage: 30);
+          }
+        });
   }
 
   Widget _buildHeader(BuildContext context, int count) {
@@ -269,7 +315,9 @@ class _CourierHistoryBody extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: _gradientOrange),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+              ),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
@@ -283,7 +331,7 @@ class _CourierHistoryBody extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           Text(
-            count == 1 ? 'Order' : 'Orders',
+            count == 1 ? 'Booking' : 'Bookings',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: Colors.grey[700],
@@ -293,47 +341,33 @@ class _CourierHistoryBody extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildLoadingView() {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.screenPaddingHorizontal),
-      child: Column(
-        children: List.generate(
-          3,
-          (_) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Container(
-              height: 160,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-// ─── Courier Order Card ────────────────────────────────────────────────────
+// ─── Booking Card ──────────────────────────────────────────────────────────
 
-class _CourierOrderCard extends StatelessWidget {
-  final ServiceInquiry order;
+class _BookingCard extends StatelessWidget {
+  final CourierBookingSummary booking;
   final VoidCallback onTap;
+  final VoidCallback onCancel;
 
-  const _CourierOrderCard({required this.order, required this.onTap});
+  const _BookingCard({
+    required this.booking,
+    required this.onTap,
+    required this.onCancel,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final sColor = _statusColor(order.status);
+    final label = _displayStatus(
+      cancelled: booking.isCancelled,
+      paid: booking.isPaid,
+      shipmentLabel: booking.shipmentStatusLabel,
+    );
+    final sColor = _statusColor(label);
+    final showCancel = _canCancel(
+      cancelled: booking.isCancelled,
+      shipmentStatus: booking.shipmentStatus,
+    );
 
     return Material(
       color: Colors.white,
@@ -350,20 +384,19 @@ class _CourierOrderCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Top row: icon + IDs + status ──
               Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 42,
+                    height: 42,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: _gradientOrange),
+                      gradient: const LinearGradient(colors: _gradient),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.local_shipping_rounded,
                       color: Colors.white,
-                      size: 22,
+                      size: 20,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -372,72 +405,27 @@ class _CourierOrderCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Order #${order.serviceInquiryId}',
+                          booking.courierName.isNotEmpty
+                              ? booking.courierName
+                              : 'Courier Booking',
                           style: Theme.of(context).textTheme.titleSmall
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
-                        if (order.trackingId != null)
-                          Text(
-                            'Tracking: ${order.trackingId}',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 12,
-                            ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Booking #${booking.bookingNumber}',
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 12,
                           ),
+                        ),
                       ],
                     ),
                   ),
-                  // Product image thumbnail (if exists)
-                  if (order.productImage != null) ...[
-                    const SizedBox(width: 8),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        order.productImage!,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.image,
-                            size: 18,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: sColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: sColor.withValues(alpha: 0.3)),
-                    ),
-                    child: Text(
-                      order.status.toUpperCase().replaceAll('_', ' '),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: sColor,
-                      ),
-                    ),
-                  ),
+                  _StatusPill(label: label, color: sColor, small: true),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
-
-              // ── Dates ──
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -450,122 +438,120 @@ class _CourierOrderCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: _DateChip(
-                        label: 'Placed on',
-                        value: _formatDate(order.bookingDate),
+                      child: _DateInfo(
+                        label: 'Booked on',
+                        value: _formatDate(booking.createdAt),
                         icon: Icons.calendar_today_rounded,
                       ),
                     ),
                     Container(width: 1, height: 28, color: Colors.grey[300]),
                     Expanded(
-                      child: _DateChip(
-                        label:
-                            order.status.toLowerCase() == 'delivered' ||
-                                order.status.toLowerCase() == 'completed'
-                            ? 'Delivered on'
-                            : 'Status',
+                      child: _DateInfo(
+                        label: booking.awbCode != null ? 'AWB' : 'Route',
                         value:
-                            order.status.toLowerCase() == 'delivered' ||
-                                order.status.toLowerCase() == 'completed'
-                            ? _formatDate(order.completedDate)
-                            : order.status.toUpperCase().replaceAll('_', ' '),
-                        icon:
-                            order.status.toLowerCase() == 'delivered' ||
-                                order.status.toLowerCase() == 'completed'
-                            ? Icons.check_circle_outline
-                            : Icons.hourglass_top_rounded,
+                            booking.awbCode ??
+                            '${booking.pickupPincode} → ${booking.deliveryPincode}',
+                        icon: booking.awbCode != null
+                            ? Icons.qr_code_2_rounded
+                            : Icons.route_rounded,
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // ── Seller / Customer label ──
-              if (order.customerName != null) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 14,
-                      color: Colors.grey[500],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Cust: ${order.customerName}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              ],
               const SizedBox(height: AppSpacing.sm),
-
-              // ── Cancel + Invoice ──
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 36,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement cancel
-                        },
-                        icon: Icon(
-                          Icons.cancel_outlined,
-                          size: 16,
-                          color: Colors.red[400],
-                        ),
-                        label: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: Colors.red[400],
-                            fontSize: 12,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.red[200]!),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                      ),
-                    ),
+                  Text(
+                    'Total Amount',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: SizedBox(
-                      height: 36,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement invoice download
-                        },
-                        icon: Icon(
-                          Icons.download_rounded,
-                          size: 16,
-                          color: _gradientOrange.first,
-                        ),
-                        label: Text(
-                          'Invoice',
-                          style: TextStyle(
-                            color: _gradientOrange.first,
-                            fontSize: 12,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: _gradientOrange.first.withValues(alpha: 0.4),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                      ),
+                  Text(
+                    '₹${_formatAmount(booking.totalAmount)}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: _gradient.first,
                     ),
                   ),
                 ],
               ),
+              if (showCancel || booking.isPaid) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    if (showCancel) ...[
+                      Expanded(
+                        child: SizedBox(
+                          height: 36,
+                          child: OutlinedButton.icon(
+                            onPressed: onCancel,
+                            icon: Icon(
+                              Icons.cancel_outlined,
+                              size: 16,
+                              color: Colors.red[400],
+                            ),
+                            label: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Colors.red[400],
+                                fontSize: 12,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.red[200]!),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (booking.isPaid) const SizedBox(width: 8),
+                    ],
+                    if (booking.isPaid)
+                      Expanded(
+                        child: SizedBox(
+                          height: 36,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _downloadInvoice(
+                              context,
+                              booking.id,
+                              booking.bookingNumber,
+                            ),
+                            icon: Icon(
+                              Icons.download_rounded,
+                              size: 16,
+                              color: _gradient.first,
+                            ),
+                            label: Text(
+                              'Invoice',
+                              style: TextStyle(
+                                color: _gradient.first,
+                                fontSize: 12,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: _gradient.first.withValues(alpha: 0.4),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -574,12 +560,47 @@ class _CourierOrderCard extends StatelessWidget {
   }
 }
 
-class _DateChip extends StatelessWidget {
+class _StatusPill extends StatelessWidget {
+  final String label;
+  final Color color;
+  final bool small;
+
+  const _StatusPill({
+    required this.label,
+    required this.color,
+    this.small = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: small ? 10 : 12,
+        vertical: small ? 4 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(small ? 8 : 10),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: small ? 10 : 12,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+class _DateInfo extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
 
-  const _DateChip({
+  const _DateInfo({
     required this.label,
     required this.value,
     required this.icon,
@@ -619,44 +640,101 @@ class _DateChip extends StatelessWidget {
   }
 }
 
-// ─── Order Detail Page ─────────────────────────────────────────────────────
+// ─── Booking Detail Page ───────────────────────────────────────────────────
 
-class _CourierOrderDetailPage extends StatelessWidget {
-  final ServiceInquiry order;
+class _BookingDetailPage extends StatelessWidget {
+  final int bookingId;
 
-  const _CourierOrderDetailPage({required this.order});
+  const _BookingDetailPage({required this.bookingId});
 
   @override
   Widget build(BuildContext context) {
-    final sColor = _statusColor(order.status);
-    final steps = _buildTrackingSteps(order.status);
+    return BlocProvider(
+      create: (_) =>
+          getIt<HomeServiceCubit>()..fetchCourierBookingDetail(bookingId),
+      child: _BookingDetailBody(bookingId: bookingId),
+    );
+  }
+}
+
+class _BookingDetailBody extends StatelessWidget {
+  final int bookingId;
+
+  const _BookingDetailBody({required this.bookingId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<HomeServiceCubit, HomeServiceState>(
+      listener: (context, state) {
+        if (state is CourierBookingCancelled) {
+          _toast(
+            context,
+            state.result.message.isNotEmpty
+                ? state.result.message
+                : 'Booking cancelled successfully',
+          );
+          context.read<HomeServiceCubit>().fetchCourierBookingDetail(bookingId);
+        } else if (state is CourierBookingCancelError) {
+          _toast(context, state.message, error: true);
+          context.read<HomeServiceCubit>().fetchCourierBookingDetail(bookingId);
+        }
+      },
+      child: BlocBuilder<HomeServiceCubit, HomeServiceState>(
+        builder: (context, state) {
+          if (state is CourierBookingDetailLoaded) {
+            return _buildDetail(context, state.booking);
+          }
+          return Scaffold(
+            backgroundColor: Colors.grey[50],
+            appBar: _gradientAppBar('Booking Details'),
+            body: state is CourierBookingDetailError
+                ? _ErrorView(
+                    message: state.message,
+                    onRetry: () => context
+                        .read<HomeServiceCubit>()
+                        .fetchCourierBookingDetail(bookingId),
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryOrange,
+                    ),
+                  ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDetail(BuildContext context, CourierBookingDetail booking) {
+    final label = _displayStatus(
+      cancelled: booking.isCancelled,
+      paid: booking.isPaid,
+      shipmentLabel: booking.shipmentStatusLabel,
+    );
+    final sColor = _statusColor(label);
+    final showCancel = _canCancel(
+      cancelled: booking.isCancelled,
+      shipmentStatus: booking.shipmentStatus,
+    );
+    final unit = booking.dimensionUnit;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Text('Order #${order.serviceInquiryId}'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: _gradientOrange),
-          ),
-        ),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: _gradientAppBar('Booking #${booking.bookingNumber}'),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPaddingHorizontal),
         children: [
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Order header ──
-          _Card(
+          // ── Courier + Status header ──
+          _SectionCard(
             child: Row(
               children: [
                 Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: _gradientOrange),
+                    gradient: const LinearGradient(colors: _gradient),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(
@@ -671,160 +749,174 @@ class _CourierOrderDetailPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Order #${order.serviceInquiryId}',
+                        booking.courierName.isNotEmpty
+                            ? booking.courierName
+                            : 'Courier Booking',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      if (order.trackingId != null)
-                        Text(
-                          'Tracking: ${order.trackingId}',
-                          style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 13,
-                          ),
-                        ),
+                      Text(
+                        'Booking #${booking.bookingNumber}',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: sColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: sColor.withValues(alpha: 0.3)),
-                  ),
-                  child: Text(
-                    order.status.toUpperCase().replaceAll('_', ' '),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                      color: sColor,
-                    ),
-                  ),
-                ),
+                _StatusPill(label: label, color: sColor),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Dates ──
-          _Card(
-            child: Column(
-              children: [
-                _InfoRow(
-                  label: 'Order Placed On',
-                  value: _formatDate(order.bookingDate),
-                ),
-                _InfoRow(
-                  label: 'Order Delivered On',
-                  value: _formatDate(order.completedDate),
-                ),
-                if (order.customerName != null)
-                  _InfoRow(
-                    label: 'Customer / Seller',
-                    value: order.customerName!,
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-
-          // ── Address Info ──
-          _Card(
+          // ── Pickup ──
+          _SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _SectionLabel(
-                  icon: Icons.location_on_rounded,
-                  title: 'Address Details',
+                const _SectionTitle(
+                  icon: Icons.person_rounded,
+                  title: 'Pickup Details',
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                _InfoRow(
-                  label: 'Pickup Address',
-                  value: order.pickupAddress ?? '—',
-                ),
-                _InfoRow(
-                  label: 'Pickup Pincode',
-                  value: order.pickupPincode ?? '—',
-                ),
-                _InfoRow(
-                  label: 'Delivery Address',
-                  value: order.deliveryAddress ?? '—',
-                ),
-                _InfoRow(
-                  label: 'Delivery Pincode',
-                  value: order.deliveryPincode ?? '—',
-                ),
+                _DetailRow(label: 'Name', value: booking.customerName),
+                _DetailRow(label: 'Mobile', value: booking.customerMobile),
+                _DetailRow(label: 'Address', value: booking.pickupAddress),
+                _DetailRow(label: 'Pincode', value: booking.pickupPincode),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Order Status Tracking ──
-          _Card(
+          // ── Delivery ──
+          _SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _SectionLabel(
-                  icon: Icons.track_changes_rounded,
-                  title: 'Order Status',
+                const _SectionTitle(
+                  icon: Icons.location_on_rounded,
+                  title: 'Delivery Details',
                 ),
-                const SizedBox(height: AppSpacing.md),
-                ...List.generate(steps.length, (i) {
-                  final step = steps[i];
-                  final isLast = i == steps.length - 1;
-                  return _TrackingStepWidget(step: step, isLast: isLast);
-                }),
+                const SizedBox(height: AppSpacing.sm),
+                _DetailRow(label: 'Receiver', value: booking.deliveryName),
+                _DetailRow(label: 'Mobile', value: booking.deliveryMobile),
+                _DetailRow(label: 'Address', value: booking.deliveryAddress),
+                _DetailRow(label: 'Pincode', value: booking.deliveryPincode),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Payment Information ──
-          _Card(
+          // ── Parcel ──
+          _SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _SectionLabel(
+                const _SectionTitle(
+                  icon: Icons.inventory_2_rounded,
+                  title: 'Parcel Details',
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                if (booking.productDetails != null)
+                  _DetailRow(label: 'Product', value: booking.productDetails!),
+                if (booking.packagingDetails != null)
+                  _DetailRow(
+                    label: 'Packaging',
+                    value: booking.packagingDetails!,
+                  ),
+                _DetailRow(
+                  label: 'Weight',
+                  value: '${_formatAmount(booking.weightGrams)} g',
+                ),
+                _DetailRow(
+                  label: 'Chargeable',
+                  value: '${_formatAmount(booking.chargeableWeightGrams)} g',
+                ),
+                _DetailRow(
+                  label: 'Dimensions',
+                  value:
+                      '${_formatAmount(booking.length)} × ${_formatAmount(booking.height)} × ${_formatAmount(booking.width)} $unit',
+                ),
+                if (booking.customerNotes != null)
+                  _DetailRow(label: 'Notes', value: booking.customerNotes!),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // ── Courier & tracking ──
+          if (booking.courierName.isNotEmpty || booking.awbCode != null) ...[
+            _SectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionTitle(
+                    icon: Icons.route_rounded,
+                    title: 'Courier & Tracking',
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  if (booking.courierName.isNotEmpty)
+                    _DetailRow(label: 'Courier', value: booking.courierName),
+                  if (booking.awbCode != null)
+                    _DetailRow(label: 'AWB', value: booking.awbCode!),
+                  if (booking.estimatedDeliveryDays != null)
+                    _DetailRow(
+                      label: 'Est. delivery',
+                      value: '${booking.estimatedDeliveryDays} days',
+                    ),
+                  if (booking.trackingUrl != null)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () => launchUrl(
+                          Uri.parse(booking.trackingUrl!),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                        icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                        label: const Text('Track shipment'),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+
+          // ── Payment ──
+          _SectionCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionTitle(
                   icon: Icons.payment_rounded,
                   title: 'Payment Information',
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                _PriceRow(
-                  label: 'Booking Charge',
-                  amount: order.bookingCharge ?? order.tokenAmount,
-                ),
-                _PriceRow(
-                  label: 'Platform Fees',
-                  amount: order.platformFees ?? 0,
-                ),
-                _PriceRow(label: 'CGST', amount: order.cgst ?? 0),
-                _PriceRow(label: 'SGST', amount: order.sgst ?? 0),
-                _PriceRow(
-                  label: 'Other Charges',
-                  amount: order.otherCharges ?? 0,
-                ),
-                const Divider(height: 20),
-                _PriceRow(
-                  label: 'Total Charges',
-                  amount: order.totalCharges ?? order.tokenAmount,
-                  isBold: true,
-                ),
-                if ((order.discount ?? 0) > 0)
+                if (booking.courierRate != null)
                   _PriceRow(
-                    label: 'Discount',
-                    amount: -(order.discount ?? 0),
+                    label: 'Courier Charge',
+                    amount: booking.courierRate!,
+                  ),
+                if (booking.serviceCharge != null)
+                  _PriceRow(
+                    label: 'Service Charge',
+                    amount: booking.serviceCharge!,
+                  ),
+                _PriceRow(
+                  label: 'Paid Amount',
+                  amount: booking.paidAmount ?? 0,
+                ),
+                if ((booking.refundAmount ?? 0) > 0)
+                  _PriceRow(
+                    label: 'Refund Amount',
+                    amount: booking.refundAmount!,
                     isDiscount: true,
                   ),
                 const Divider(height: 20),
                 _PriceRow(
-                  label: 'Final Amount',
-                  amount: order.finalAmount ?? order.tokenAmount,
+                  label: 'Total',
+                  amount: booking.totalAmount,
                   isBold: true,
-                  color: _gradientOrange.first,
+                  color: _gradient.first,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Container(
@@ -841,105 +933,140 @@ class _CourierOrderDetailPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Payment Mode',
+                        'Payment Status',
                         style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _statusColor(
-                            order.paymentStatus,
-                          ).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          order.paymentMode?.toUpperCase() ??
-                              order.paymentStatus.toUpperCase(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            color: _statusColor(order.paymentStatus),
-                          ),
-                        ),
+                      _StatusPill(
+                        label: booking.paymentStatus,
+                        color: _statusColor(booking.paymentStatus),
+                        small: true,
                       ),
                     ],
                   ),
                 ),
+                if (booking.refundStatus != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'Refund: ${booking.refundStatus!.replaceAll('_', ' ')}',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                ],
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
 
-          // ── Cancel + Invoice ──
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 48,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: Implement cancel
-                    },
-                    icon: Icon(
-                      Icons.cancel_outlined,
-                      size: 18,
-                      color: Colors.red[400],
-                    ),
-                    label: Text(
-                      'Cancel Order',
-                      style: TextStyle(
-                        color: Colors.red[400],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.red[200]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+          // ── Timeline ──
+          if (booking.timeline.isNotEmpty || booking.createdAt != null) ...[
+            _SectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionTitle(
+                    icon: Icons.timeline_rounded,
+                    title: 'Timeline',
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _TimelineRow(title: 'Booking created', at: booking.createdAt),
+                  if (booking.paidAt != null)
+                    _TimelineRow(title: 'Payment received', at: booking.paidAt),
+                  ...booking.timeline.map(
+                    (e) => _TimelineRow(
+                      title: e.title,
+                      at: e.eventTime,
+                      note: [
+                        if (e.location != null) e.location!,
+                        if (e.description != null) e.description!,
+                      ].join(' • '),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: SizedBox(
-                  height: 48,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: _gradientOrange),
-                      borderRadius: BorderRadius.circular(14),
+                  if (booking.cancelledAt != null)
+                    _TimelineRow(
+                      title: 'Booking cancelled',
+                      at: booking.cancelledAt,
+                      note: booking.cancellationReason,
                     ),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement invoice download
-                      },
-                      icon: const Icon(Icons.download_rounded, size: 18),
-                      label: const Text(
-                        'Download Invoice',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+
+          // ── Cancel + Download Invoice ──
+          if (showCancel || booking.isPaid)
+            Row(
+              children: [
+                if (showCancel) ...[
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _confirmCancel(
+                          context,
+                          context.read<HomeServiceCubit>(),
+                          booking.id,
+                        ),
+                        icon: Icon(
+                          Icons.cancel_outlined,
+                          size: 18,
+                          color: Colors.red[400],
+                        ),
+                        label: Text(
+                          'Cancel Booking',
+                          style: TextStyle(
+                            color: Colors.red[400],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.red[200]!),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
+                  if (booking.isPaid) const SizedBox(width: AppSpacing.sm),
+                ],
+                if (booking.isPaid)
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: _gradient),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: () => _downloadInvoice(
+                            context,
+                            booking.id,
+                            booking.bookingNumber,
+                          ),
+                          icon: const Icon(Icons.download_rounded, size: 18),
+                          label: const Text(
+                            'Download Invoice',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           const SizedBox(height: AppSpacing.lg),
 
           // ── Need Help ──
-          _Card(
+          _SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -962,7 +1089,7 @@ class _CourierOrderDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Do you have any issues with this order?',
+                  'Do you have any issues with this booking?',
                   style: TextStyle(color: Colors.grey[600], fontSize: 13),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -970,7 +1097,10 @@ class _CourierOrderDetailPage extends StatelessWidget {
                   width: double.infinity,
                   height: 44,
                   child: ElevatedButton.icon(
-                    onPressed: () => _openWhatsApp(),
+                    onPressed: () => launchUrl(
+                      Uri.parse('https://wa.me/919518365510'),
+                      mode: LaunchMode.externalApplication,
+                    ),
                     icon: const Icon(
                       Icons.chat_bubble_outline_rounded,
                       size: 18,
@@ -990,37 +1120,16 @@ class _CourierOrderDetailPage extends StatelessWidget {
                   width: double.infinity,
                   height: 44,
                   child: OutlinedButton.icon(
-                    onPressed: () => _openEmail(),
+                    onPressed: () => launchUrl(
+                      Uri.parse(
+                        'mailto:customersupport@takshallinone.in?subject=Courier Booking Support&body=Hi, I need help with my courier booking #${booking.bookingNumber}',
+                      ),
+                    ),
                     icon: const Icon(Icons.email_outlined, size: 18),
                     label: const Text('Send us an email'),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryOrange),
                       foregroundColor: AppColors.primaryOrange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  height: 44,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: Implement callback request
-                    },
-                    icon: const Icon(
-                      Icons.phone_callback_rounded,
-                      size: 18,
-                      color: AppColors.secondaryGreen,
-                    ),
-                    label: const Text(
-                      'Call me back',
-                      style: TextStyle(color: AppColors.secondaryGreen),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.secondaryGreen),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -1035,137 +1144,13 @@ class _CourierOrderDetailPage extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> _openWhatsApp() async {
-    const phoneNumber = '919518365510';
-    final whatsappUrl = Uri.parse('https://wa.me/$phoneNumber');
-    if (await canLaunchUrl(whatsappUrl)) {
-      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Future<void> _openEmail() async {
-    final emailUrl = Uri.parse(
-      'mailto:customersupport@takshallinone.in?subject=Courier Order Support&body=Hi, I need help with my courier order #${order.serviceInquiryId}',
-    );
-    if (await canLaunchUrl(emailUrl)) {
-      await launchUrl(emailUrl);
-    }
-  }
-}
-
-// ─── Tracking Step Widget ──────────────────────────────────────────────────
-
-class _TrackingStepWidget extends StatelessWidget {
-  final _TrackingStep step;
-  final bool isLast;
-
-  const _TrackingStepWidget({required this.step, required this.isLast});
-
-  @override
-  Widget build(BuildContext context) {
-    Color dotColor;
-    Color lineColor;
-    IconData? dotIcon;
-
-    if (step.isCancelled) {
-      dotColor = const Color(0xFFC62828);
-      lineColor = const Color(0xFFC62828);
-      dotIcon = Icons.close_rounded;
-    } else if (step.isCompleted) {
-      dotColor = const Color(0xFF2E7D32);
-      lineColor = const Color(0xFF2E7D32);
-      dotIcon = Icons.check_rounded;
-    } else {
-      dotColor = Colors.grey[300]!;
-      lineColor = Colors.grey[300]!;
-      dotIcon = null;
-    }
-
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Timeline column ──
-          SizedBox(
-            width: 32,
-            child: Column(
-              children: [
-                // Dot
-                Container(
-                  width: step.isCurrent ? 22 : 18,
-                  height: step.isCurrent ? 22 : 18,
-                  decoration: BoxDecoration(
-                    color: dotColor,
-                    shape: BoxShape.circle,
-                    border: step.isCurrent
-                        ? Border.all(
-                            color: dotColor.withValues(alpha: 0.3),
-                            width: 3,
-                          )
-                        : null,
-                    boxShadow: step.isCurrent
-                        ? [
-                            BoxShadow(
-                              color: dotColor.withValues(alpha: 0.3),
-                              blurRadius: 6,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: dotIcon != null
-                      ? Icon(
-                          dotIcon,
-                          size: step.isCurrent ? 14 : 12,
-                          color: Colors.white,
-                        )
-                      : null,
-                ),
-                // Line
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 2,
-                      margin: const EdgeInsets.symmetric(vertical: 2),
-                      color: lineColor,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-
-          // ── Label ──
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 20),
-              child: Text(
-                step.title,
-                style: TextStyle(
-                  fontSize: step.isCurrent ? 14 : 13,
-                  fontWeight: step.isCurrent
-                      ? FontWeight.w700
-                      : FontWeight.w500,
-                  color: step.isCancelled
-                      ? const Color(0xFFC62828)
-                      : step.isCompleted
-                      ? Colors.grey[800]
-                      : Colors.grey[400],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ─── Reusable Widgets ──────────────────────────────────────────────────────
 
-class _Card extends StatelessWidget {
+class _SectionCard extends StatelessWidget {
   final Widget child;
-  const _Card({required this.child});
+  const _SectionCard({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -1188,11 +1173,11 @@ class _Card extends StatelessWidget {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
+class _SectionTitle extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _SectionLabel({required this.icon, required this.title});
+  const _SectionTitle({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -1202,7 +1187,7 @@ class _SectionLabel extends StatelessWidget {
           width: 30,
           height: 30,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: _gradientOrange),
+            gradient: const LinearGradient(colors: _gradient),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.white, size: 16),
@@ -1219,11 +1204,11 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _InfoRow extends StatelessWidget {
+class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoRow({required this.label, required this.value});
+  const _DetailRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -1233,7 +1218,7 @@ class _InfoRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 130,
+            width: 110,
             child: Text(
               label,
               style: TextStyle(color: Colors.grey[600], fontSize: 13),
@@ -1241,7 +1226,7 @@ class _InfoRow extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              value,
+              value.isEmpty ? '—' : value,
               style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
             ),
           ),
@@ -1301,7 +1286,111 @@ class _PriceRow extends StatelessWidget {
   }
 }
 
-// ─── Empty View ────────────────────────────────────────────────────────────
+class _TimelineRow extends StatelessWidget {
+  final String title;
+  final DateTime? at;
+  final String? note;
+
+  const _TimelineRow({required this.title, this.at, this.note});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFF6B35),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              Container(width: 2, height: 22, color: Colors.grey[300]),
+            ],
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+                if (at != null)
+                  Text(
+                    _formatDate(at),
+                    style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                  ),
+                if (note != null && note!.isNotEmpty)
+                  Text(
+                    note!,
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.screenPaddingHorizontal),
+      child: Column(
+        children: List.generate(
+          3,
+          (index) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: Container(
+              height: 140,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 120,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
@@ -1327,14 +1416,14 @@ class _EmptyView extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.local_shipping_rounded,
+                Icons.history_rounded,
                 size: 44,
                 color: AppColors.primaryOrange.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'No courier orders',
+              'No previous bookings',
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -1351,8 +1440,6 @@ class _EmptyView extends StatelessWidget {
     );
   }
 }
-
-// ─── Error View ────────────────────────────────────────────────────────────
 
 class _ErrorView extends StatelessWidget {
   final String message;
@@ -1383,7 +1470,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Could not load history',
+              'Could not load bookings',
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),

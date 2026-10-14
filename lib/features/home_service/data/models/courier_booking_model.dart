@@ -1,88 +1,107 @@
+import 'package:taksh_e_commerce/features/home_service/data/models/courier_json.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/courier_booking.dart';
 
-int _bookingAsInt(dynamic value) {
-  if (value is int) {
-    return value;
+class CourierPaymentOrderModel extends CourierPaymentOrder {
+  const CourierPaymentOrderModel({
+    required super.razorpayOrderId,
+    required super.razorpayKey,
+    required super.amountInPaise,
+    required super.currency,
+  });
+
+  /// The `payment` object embedded in `POST /service/courier/bookings`
+  /// (`amount` is in rupees there, `amount_in_paise` in paise).
+  factory CourierPaymentOrderModel.fromBooking(Map<String, dynamic> json) {
+    final paise = json['amount_in_paise'] != null
+        ? cInt(json['amount_in_paise'])
+        : (cDouble(json['amount']) * 100).round();
+    return CourierPaymentOrderModel(
+      razorpayOrderId: cStr(
+        json['razorpay_order_id'] ?? json['payment_order_id'],
+      ),
+      razorpayKey: cStr(json['gateway_key']),
+      amountInPaise: paise,
+      currency: cStr(json['currency']).isEmpty ? 'INR' : cStr(json['currency']),
+    );
   }
-  if (value is num) {
-    return value.toInt();
+
+  /// `POST /service/courier/payment/create` (`amount` is in paise).
+  factory CourierPaymentOrderModel.fromPaymentCreate(
+    Map<String, dynamic> json,
+  ) {
+    final paise = json['amount'] != null && json['amount_in_rupees'] != null
+        ? cInt(json['amount'])
+        : (cDouble(json['amount_in_rupees']) * 100).round();
+    return CourierPaymentOrderModel(
+      razorpayOrderId: cStr(
+        json['razorpay_order_id'] ?? json['payment_order_id'],
+      ),
+      razorpayKey: cStr(json['gateway_key']),
+      amountInPaise: paise,
+      currency: cStr(json['currency']).isEmpty ? 'INR' : cStr(json['currency']),
+    );
   }
-
-  return int.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-double _bookingAsDouble(dynamic value) {
-  if (value is num) {
-    return value.toDouble();
-  }
-
-  return double.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-String _bookingAsString(dynamic value) {
-  if (value == null) {
-    return '';
-  }
-
-  return value.toString().trim();
-}
-
-String? _bookingAsNullableString(dynamic value) {
-  final normalizedValue = _bookingAsString(value);
-  return normalizedValue.isEmpty ? null : normalizedValue;
 }
 
 class CourierBookingModel extends CourierBooking {
   const CourierBookingModel({
     required super.bookingId,
     required super.bookingNumber,
-    required super.actualWeightGrams,
-    required super.volumetricWeightGrams,
+    required super.courierName,
     required super.chargeableWeightGrams,
-    required super.chargeableWeightSource,
-    required super.courierDeliveryPartnerId,
-    required super.partnerName,
     required super.totalAmount,
     required super.status,
     required super.paymentStatus,
-    super.itemPhotoPath,
+    super.courierRate,
+    super.serviceCharge,
+    super.estimatedDeliveryDays,
+    super.payment,
   });
 
   factory CourierBookingModel.fromJson(Map<String, dynamic> json) {
+    final pay = json['payment'];
+    final payment = pay is Map
+        ? CourierPaymentOrderModel.fromBooking(Map<String, dynamic>.from(pay))
+        : null;
     return CourierBookingModel(
-      bookingId: _bookingAsInt(json['booking_id']),
-      bookingNumber: _bookingAsString(json['booking_number']),
-      actualWeightGrams: _bookingAsInt(json['actual_weight_grams']),
-      volumetricWeightGrams: _bookingAsInt(json['volumetric_weight_grams']),
-      chargeableWeightGrams: _bookingAsInt(json['chargeable_weight_grams']),
-      chargeableWeightSource: _bookingAsString(
-        json['chargeable_weight_source'],
-      ),
-      courierDeliveryPartnerId: _bookingAsInt(
-        json['courier_delivery_partner_id'],
-      ),
-      partnerName: _bookingAsString(json['partner_name']),
-      totalAmount: _bookingAsDouble(json['total_amount']),
-      status: _bookingAsString(json['status']),
-      paymentStatus: _bookingAsString(json['payment_status']),
-      itemPhotoPath: _bookingAsNullableString(json['item_photo_path']),
+      bookingId: cInt(json['booking_id']),
+      bookingNumber: cStr(json['booking_number']),
+      courierName: cStr(json['courier_name'] ?? json['partner_name']),
+      chargeableWeightGrams: cDouble(json['chargeable_weight_grams']),
+      totalAmount: cDouble(json['total_amount']),
+      courierRate: cNullDouble(json['shiprocket_rate']),
+      serviceCharge: cNullDouble(json['service_charge']),
+      estimatedDeliveryDays: cNullInt(json['estimated_delivery_days']),
+      status: cStr(json['status']),
+      paymentStatus: cStr(json['payment_status']),
+      payment: (payment != null && payment.razorpayOrderId.isNotEmpty)
+          ? payment
+          : null,
     );
   }
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'booking_id': bookingId,
-      'booking_number': bookingNumber,
-      'actual_weight_grams': actualWeightGrams,
-      'volumetric_weight_grams': volumetricWeightGrams,
-      'chargeable_weight_grams': chargeableWeightGrams,
-      'chargeable_weight_source': chargeableWeightSource,
-      'courier_delivery_partner_id': courierDeliveryPartnerId,
-      'partner_name': partnerName,
-      'total_amount': totalAmount,
-      'status': status,
-      'payment_status': paymentStatus,
-      'item_photo_path': itemPhotoPath,
-    };
+class CourierPaymentResultModel extends CourierPaymentResult {
+  const CourierPaymentResultModel({
+    required super.bookingId,
+    required super.status,
+    required super.paymentStatus,
+    required super.amount,
+    required super.courierName,
+    super.transactionId,
+    super.awbCode,
+  });
+
+  factory CourierPaymentResultModel.fromJson(Map<String, dynamic> json) {
+    final shipment = cMap(json['shipment']);
+    return CourierPaymentResultModel(
+      bookingId: cInt(json['courier_booking_id']),
+      status: cStr(json['status']),
+      paymentStatus: cStr(json['payment_status']),
+      amount: cDouble(json['amount_in_rupees']),
+      courierName: cStr(json['courier_name']),
+      transactionId: cNullStr(json['transaction_id']),
+      awbCode: cNullStr(shipment['awb_code']),
+    );
   }
 }

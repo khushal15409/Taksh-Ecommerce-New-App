@@ -62,6 +62,7 @@ class _HomePageState extends State<_HomePageContent> {
   // Tab selection state - default to standard delivery where products are displayed
   DeliveryType _selectedDeliveryType = DeliveryType.standard;
   bool _expressLoaded = false;
+  int _servicesReloadCount = 0;
 
   @override
   void initState() {
@@ -227,16 +228,50 @@ class _HomePageState extends State<_HomePageContent> {
     }
   }
 
+  /// Pull-to-refresh: re-calls the API of the selected mode and keeps the
+  /// spinner until the response (or an error) arrives.
   Future<void> _handleRefresh() async {
     switch (_selectedDeliveryType) {
       case DeliveryType.standard:
-        _refreshDashboard();
+        final bloc = context.read<DashboardBloc>();
+        if (bloc.state is DashboardLoaded) {
+          _refreshDashboard();
+        } else {
+          _loadDashboard();
+        }
+        await _waitFor(
+          bloc.stream,
+          (s) => s is DashboardLoaded || s is DashboardError,
+        );
         break;
       case DeliveryType.quick:
-        _refreshExpressDashboard();
+        final bloc = context.read<ExpressDashboardBloc>();
+        if (bloc.state is ExpressDashboardLoaded) {
+          _refreshExpressDashboard();
+        } else {
+          _loadExpressDashboard();
+        }
+        await _waitFor(
+          bloc.stream,
+          (s) => s is ExpressDashboardLoaded || s is ExpressDashboardError,
+        );
         break;
-      default:
+      case DeliveryType.services:
+        // Recreating the services content (new key) fetches the services and
+        // banners again.
+        setState(() => _servicesReloadCount++);
+        await Future<void>.delayed(const Duration(milliseconds: 800));
         break;
+    }
+  }
+
+  Future<void> _waitFor<S>(Stream<S> stream, bool Function(S) done) async {
+    try {
+      await stream
+          .firstWhere(done)
+          .timeout(const Duration(seconds: 15));
+    } catch (_) {
+      // Timed out or the bloc closed: just stop the spinner.
     }
   }
 
@@ -392,7 +427,7 @@ class _HomePageState extends State<_HomePageContent> {
           ],
         );
       case DeliveryType.services:
-        return const HomeServiceContent();
+        return HomeServiceContent(key: ValueKey(_servicesReloadCount));
     }
   }
 

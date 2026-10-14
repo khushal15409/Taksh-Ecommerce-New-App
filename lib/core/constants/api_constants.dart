@@ -190,6 +190,20 @@ class ApiConstants {
       '/service/courier/delivery-partners';
   static const String courierQuote = '/service/courier/quote';
   static const String courierBookings = '/service/courier/bookings';
+  static const String courierPaymentCreate = '/service/courier/payment/create';
+  static const String courierPaymentVerify = '/service/courier/payment/verify';
+
+  static String courierBookingDetail(int id) => '/service/courier/bookings/$id';
+
+  static String courierBookingCancel(int id) =>
+      '/service/courier/bookings/$id/cancel';
+
+  /// Invoice PDF of a paid courier booking (own bookings only).
+  static String courierBookingInvoice(int id) =>
+      '/service/courier/bookings/$id/invoice';
+
+  /// Invoice PDF of a paid marketplace service booking (own bookings only).
+  static String serviceBookInvoice(int id) => '/service/book/$id/invoice';
   static const String electricianBookings = '/service/electrician/bookings';
   static const String plumberBookings = '/service/plumber/bookings';
   static const String salonBookings = '/service/salon/bookings';

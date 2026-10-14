@@ -8,6 +8,8 @@ import 'package:taksh_e_commerce/core/theme/app_spacing.dart';
 import 'package:taksh_e_commerce/features/home_service/domain/entities/service_booking.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_cubit.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
+import 'package:taksh_e_commerce/core/constants/api_constants.dart';
+import 'package:taksh_e_commerce/features/home_service/presentation/utils/service_invoice_downloader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Page displaying service booking history with rich detail view.
@@ -109,6 +111,17 @@ IconData _serviceIcon(String slug) {
     default:
       return Icons.home_repair_service_rounded;
   }
+}
+
+bool _isPaid(ServiceBooking booking) =>
+    booking.paymentStatus.toLowerCase() == 'paid';
+
+void _downloadInvoice(BuildContext context, ServiceBooking booking) {
+  downloadServiceInvoice(
+    context,
+    path: ApiConstants.serviceBookInvoice(booking.id),
+    bookingNumber: booking.bookingNumber,
+  );
 }
 
 bool _canCancel(ServiceBooking booking) {
@@ -649,34 +662,33 @@ class _BookingCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                   ],
-                  Expanded(
-                    child: SizedBox(
-                      height: 36,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement invoice download
-                        },
-                        icon: Icon(
-                          Icons.download_rounded,
-                          size: 16,
-                          color: grad.first,
-                        ),
-                        label: Text(
-                          'Invoice',
-                          style: TextStyle(color: grad.first, fontSize: 12),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: grad.first.withValues(alpha: 0.4),
+                  if (_isPaid(booking))
+                    Expanded(
+                      child: SizedBox(
+                        height: 36,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _downloadInvoice(context, booking),
+                          icon: Icon(
+                            Icons.download_rounded,
+                            size: 16,
+                            color: grad.first,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                          label: Text(
+                            'Invoice',
+                            style: TextStyle(color: grad.first, fontSize: 12),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: grad.first.withValues(alpha: 0.4),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ],
@@ -1131,35 +1143,34 @@ class _BookingDetailBody extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Expanded(
-                child: SizedBox(
-                  height: 48,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: grad),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement invoice download
-                      },
-                      icon: const Icon(Icons.download_rounded, size: 18),
-                      label: const Text(
-                        'Download Invoice',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+              if (_isPaid(booking))
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: grad),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                      child: ElevatedButton.icon(
+                        onPressed: () => _downloadInvoice(context, booking),
+                        icon: const Icon(Icons.download_rounded, size: 18),
+                        label: const Text(
+                          'Download Invoice',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
