@@ -130,17 +130,17 @@ class AddToCartButton extends StatelessWidget {
           customBorder: const CircleBorder(),
           onTap: isLoading ? null : () => _addToCart(context),
           child: SizedBox(
-            width: 22,
-            height: 22,
+            width: 28,
+            height: 28,
             child: isLoading
                 ? const Padding(
-                    padding: EdgeInsets.all(5),
+                    padding: EdgeInsets.all(7),
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Icon(Icons.add_rounded, color: Colors.white, size: 14),
+                : const Icon(Icons.add_rounded, color: Colors.white, size: 18),
           ),
         ),
       );
@@ -191,10 +191,12 @@ class AddToCartButton extends StatelessWidget {
           onPressed: isLoading ? null : () => _addToCart(context),
           style: OutlinedButton.styleFrom(
             foregroundColor: accent,
-            side: const BorderSide(color: accent, width: 1.6),
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            side: const BorderSide(color: accent, width: 1.2),
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            minimumSize: const Size(0, 36),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(9),
             ),
           ),
           child: isLoading
@@ -211,13 +213,13 @@ class AddToCartButton extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shopping_cart_outlined, size: 20),
+                      Icon(Icons.shopping_cart_outlined, size: 14),
                       SizedBox(width: 6),
                       Text(
                         'Add to Cart',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                          fontSize: 12.5,
                         ),
                       ),
                     ],

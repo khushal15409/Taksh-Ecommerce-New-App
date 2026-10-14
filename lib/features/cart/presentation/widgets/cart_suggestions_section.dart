@@ -113,12 +113,12 @@ class _CartSuggestionsSectionState extends State<CartSuggestionsSection> {
           ),
         ),
         SizedBox(
-          height: 118,
+          height: 168,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
             itemCount: visible.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 9),
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
             itemBuilder: (context, index) => _SuggestionCard(
               product: visible[index],
               isQuickDelivery: widget.isQuickDelivery,
@@ -139,12 +139,23 @@ class _SuggestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final variant = product.variants!.firstWhere(
+    final variants = product.variants ?? const [];
+    final variant = variants.firstWhere(
       (v) => !v.hasStockInfo || v.isAvailableForSale,
-      orElse: () => product.variants!.first,
+      orElse: () => variants.first,
     );
     final imageUrl = product.primaryImageUrl;
     final price = product.salePrice ?? product.originalPrice;
+
+    Widget placeholder() => Container(
+      color: const Color(0xFFF3F3F3),
+      alignment: Alignment.center,
+      child: const Icon(
+        Icons.image_outlined,
+        size: 26,
+        color: Color(0xFFBDBDBD),
+      ),
+    );
 
     return GestureDetector(
       onTap: () => context.push(
@@ -155,76 +166,72 @@ class _SuggestionCard extends StatelessWidget {
         ),
       ),
       child: Container(
-        width: 91,
-        padding: const EdgeInsets.fromLTRB(14, 8, 14, 7),
+        width: 118,
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.92),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFFFE6CC)),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(13),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
+            SizedBox(
+              height: 78,
+              width: double.infinity,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(7),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: imageUrl == null || imageUrl.isEmpty
-                      ? Container(
-                          color: AppColors.grey100,
-                          child: const Icon(Icons.image_not_supported),
-                        )
-                      : CachedNetworkImage(
-                          imageUrl: imageUrl,
-                          fit: BoxFit.cover,
-                          errorWidget: (context, url, error) => Container(
-                            color: AppColors.grey100,
-                            child: const Icon(Icons.broken_image),
-                          ),
-                        ),
+                borderRadius: BorderRadius.circular(9),
+                child: imageUrl == null || imageUrl.isEmpty
+                    ? placeholder()
+                    : CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => placeholder(),
+                        errorWidget: (context, url, error) => placeholder(),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            SizedBox(
+              height: 30,
+              child: Text(
+                product.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                  color: AppColors.grey900,
                 ),
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              product.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 10,
-                height: 1.2,
-                color: AppColors.grey900,
-              ),
-            ),
-            const SizedBox(height: 2),
+            const Spacer(),
             Row(
               children: [
-                Flexible(
-                  flex: 5,
+                Expanded(
                   child: Text(
                     price == null ? '' : '₹$price',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primaryOrange,
                     ),
                   ),
                 ),
-                Flexible(
-                  flex: 4,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: AddToCartButton(
-                        productVariantId: variant.id,
-                        productId: product.id,
-                        size: 'icon',
-                        isQuickDelivery: isQuickDelivery,
-                      ),
-                    ),
-                  ),
+                AddToCartButton(
+                  productVariantId: variant.id,
+                  productId: product.id,
+                  size: 'icon',
+                  isQuickDelivery: isQuickDelivery,
                 ),
               ],
             ),
