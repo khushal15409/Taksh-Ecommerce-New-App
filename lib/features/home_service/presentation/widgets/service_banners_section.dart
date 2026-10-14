@@ -7,59 +7,51 @@ import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
 
-/// Banners of type `service`, managed from the admin panel.
+/// Fetches the banners of type `service` managed from the admin panel.
 ///
-/// One banner renders as a static card, several as a slider. The section is
-/// hidden while loading, on error, or when admin has no service banners.
-class ServiceBannersSection extends StatefulWidget {
-  const ServiceBannersSection({super.key});
-
-  @override
-  State<ServiceBannersSection> createState() => _ServiceBannersSectionState();
+/// Never throws: on any failure an empty list is returned so the services
+/// screen keeps working without banners.
+Future<List<BannerModel>> fetchServiceBanners() async {
+  final log = loggerWithContext({
+    'feature': 'home_service',
+    'action': 'fetchServiceBanners',
+  });
+  try {
+    final response = await getIt<ApiClient>().get(
+      ApiConstants.ecommerceBanners,
+      queryParameters: {'type': 'service'},
+    );
+    final body = response.data;
+    final raw = body is Map ? body['data'] : null;
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map>()
+        .map((e) => BannerModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  } catch (e) {
+    log.warnWithContext('Failed to load service banners', {
+      'error': e.toString(),
+    });
+    return const [];
+  }
 }
 
-class _ServiceBannersSectionState extends State<ServiceBannersSection> {
-  final _log = loggerWithContext({
-    'feature': 'home_service',
-    'widget': 'ServiceBannersSection',
-  });
+/// A block of service banners for one position (top / middle / bottom).
+///
+/// One banner renders as a static card, several as a slider. Renders nothing
+/// when [banners] is empty.
+class ServiceBannersSection extends StatelessWidget {
+  final List<BannerModel> banners;
 
-  List<BannerModel> _banners = const [];
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    try {
-      final response = await getIt<ApiClient>().get(
-        ApiConstants.ecommerceBanners,
-        queryParameters: {'type': 'service'},
-      );
-      final body = response.data;
-      final raw = body is Map ? body['data'] : null;
-      if (raw is! List) return;
-      final banners = raw
-          .whereType<Map>()
-          .map((e) => BannerModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
-      if (mounted) setState(() => _banners = banners);
-    } catch (e) {
-      _log.warnWithContext('Failed to load service banners', {
-        'error': e.toString(),
-      });
-    }
-  }
+  const ServiceBannersSection({super.key, required this.banners});
 
   @override
   Widget build(BuildContext context) {
-    if (_banners.isEmpty) return const SizedBox.shrink();
+    if (banners.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       // The parent already applies the screen padding.
-      child: BannerCarousel(banners: _banners, horizontalPadding: 0),
+      child: BannerCarousel(banners: banners, horizontalPadding: 0),
     );
   }
 }

@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
+import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
 import 'package:taksh_e_commerce/features/home/data/models/dashboard_section_model.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/recent_views_cubit.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/recent_views_state.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/category_catalog_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/pages/view_all_products_page.dart';
@@ -42,7 +44,7 @@ class _DashboardContentState extends State<DashboardContent> {
   @override
   Widget build(BuildContext context) {
     final sections = widget.dashboard.sections as List<dynamic>;
-    final bannerWidgets = <Widget>[];
+    Map<BannerSlot, List<BannerModel>> bannerSlots = groupBannersBySlot(const []);
     final productWidgets = <Widget>[];
     List<Category>? categoryData;
 
@@ -54,21 +56,7 @@ class _DashboardContentState extends State<DashboardContent> {
       if (section.key == 'Banners') {
         // Hide the whole banner section when admin has no banners for this type.
         if (section.banners.isEmpty) continue;
-        bannerWidgets.add(
-          Padding(
-            padding: const EdgeInsets.only(top: 6, bottom: 10),
-            child: BannerCarousel(
-              banners: section.banners,
-              onBannerTap: (banner) {
-                _log.infoWithContext(
-                  'Banner tapped',
-                  {'banner_id': banner.id, 'title': banner.title},
-                );
-                // TODO: Handle banner tap navigation
-              },
-            ),
-          ),
-        );
+        bannerSlots = groupBannersBySlot(section.banners);
         continue;
       }
 
@@ -116,10 +104,18 @@ class _DashboardContentState extends State<DashboardContent> {
       }
     }
 
+    // Middle banners sit between the product sections (after the first half).
+    final middleBanners = _bannerBlock(bannerSlots[BannerSlot.middle]!);
+    if (middleBanners != null) {
+      productWidgets.insert(productWidgets.length ~/ 2, middleBanners);
+    }
+    final topBanners = _bannerBlock(bannerSlots[BannerSlot.top]!);
+    final bottomBanners = _bannerBlock(bannerSlots[BannerSlot.bottom]!);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ...bannerWidgets,
+        if (topBanners != null) topBanners,
         // Recent Views Section (moved near top, below banners)
         BlocBuilder<RecentViewsCubit, RecentViewsState>(
           builder: (context, state) {
@@ -149,8 +145,26 @@ class _DashboardContentState extends State<DashboardContent> {
             deliveryType: 'standard',
           ),
         ),
+        if (bottomBanners != null) bottomBanners,
         const SizedBox(height: 32),
       ],
+    );
+  }
+
+  Widget? _bannerBlock(List<BannerModel> banners) {
+    if (banners.isEmpty) return null;
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 10),
+      child: BannerCarousel(
+        banners: banners,
+        onBannerTap: (banner) {
+          _log.infoWithContext(
+            'Banner tapped',
+            {'banner_id': banner.id, 'title': banner.title},
+          );
+          // TODO: Handle banner tap navigation
+        },
+      ),
     );
   }
 }

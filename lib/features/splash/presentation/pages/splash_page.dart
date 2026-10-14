@@ -93,192 +93,224 @@ class _SplashPageState extends State<SplashPage> {
       ],
       child: Scaffold(
         body: Container(
+          width: double.infinity,
+          height: double.infinity,
           decoration: const BoxDecoration(
-            gradient: IndiaGradients.splashGradient,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFFFA43A),
+                Color(0xFFFFD9A8),
+                Color(0xFFFFF3E0),
+                Color(0xFFEAF6E6),
+                Color(0xFFBFE6BE),
+              ],
+              stops: [0, 0.18, 0.42, 0.75, 1],
+            ),
           ),
           child: Stack(
             children: [
-              // Decorative circles for visual interest
               Positioned(
-                top: -100,
-                left: -100,
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primaryOrangeLight.withOpacity(0.2),
+                top: 0,
+                left: 0,
+                child: IgnorePointer(
+                  child: Image.asset(
+                    'assets/images/redesign/lantern_l.png',
+                    height: 150,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
               Positioned(
-                bottom: -150,
-                right: -100,
-                child: Container(
-                  width: 350,
-                  height: 350,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.secondaryGreenLight.withOpacity(0.2),
+                top: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Image.asset(
+                    'assets/images/redesign/lantern_r.png',
+                    height: 170,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-              // Main content
-              Center(
+              SafeArea(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // App Logo with stylish container
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.light ? Colors.white.withOpacity(0.75) : Colors.black.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.light ? Colors.white.withOpacity(0.6) : Colors.white.withOpacity(0.2),
-                          width: 1.2,
+                    const SizedBox(height: 28),
+                    _buildLogoCard(),
+                    const SizedBox(height: 12),
+                    _buildMadeInIndia(context),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryOrange.withOpacity(0.18),
-                            blurRadius: 28,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 10),
-                          ),
-                          BoxShadow(
-                            color: AppColors.secondaryGreen.withOpacity(0.12),
-                            blurRadius: 20,
-                            spreadRadius: 1,
-                            offset: const Offset(0, -6),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(28),
                         child: Image.asset(
-                          'docs/splash_logo.jpeg',
-                          width: 160,
-                          height: 120,
+                          'assets/images/redesign/splash_art.png',
                           fit: BoxFit.contain,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    // Tagline
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.light ? Colors.white.withOpacity(0.9) : Theme.of(context).cardColor.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primaryOrange,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLocalizations.of(context)!.madeInIndia,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.secondaryGreen,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 60),
-                    // Loading Indicator with tricolor
-                    SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 3,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.primaryOrange,
-                        ),
-                        backgroundColor:
-                            AppColors.secondaryGreen.withOpacity(0.3),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Loading message
-                    BlocBuilder<SplashCubit, SplashState>(
-                      builder: (context, state) {
-                        final l10n = AppLocalizations.of(context)!;
-                        String message = l10n.initializing;
-                        if (state is SplashLoading && state.message != null) {
-                          message = state.message!;
-                        } else if (state is SplashCompleted) {
-                          if (!_authResolved) {
-                            message = l10n.checkingAuthentication;
-                          } else if (_authState is Authenticated) {
-                            message = l10n.loadingData;
-                          }
-                        }
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.light ? Colors.white.withOpacity(0.8) : Theme.of(context).cardColor.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            message,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).textTheme.bodyMedium?.color,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    _buildLoader(context),
+                    const SizedBox(height: 18),
+                    _buildTrustRow(context),
+                    const SizedBox(height: 14),
                   ],
-                ),
-              ),
-              // Bottom tricolor stripe
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    gradient: IndiaGradients.tricolorHorizontal,
-                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLogoCard() {
+    return Container(
+      width: 286,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryOrange.withOpacity(0.18),
+            blurRadius: 26,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'docs/splash_logo.jpeg',
+          height: 132,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMadeInIndia(BuildContext context) {
+    Widget line(Color color) =>
+        Container(width: 60, height: 3, color: color);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        line(AppColors.primaryOrange),
+        const SizedBox(width: 10),
+        Text(
+          AppLocalizations.of(context)!.madeInIndia,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.grey900,
+          ),
+        ),
+        const SizedBox(width: 10),
+        line(AppColors.secondaryGreen),
+      ],
+    );
+  }
+
+  Widget _buildLoader(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          width: 62,
+          height: 62,
+          child: CircularProgressIndicator(
+            strokeWidth: 5,
+            valueColor: const AlwaysStoppedAnimation<Color>(
+              AppColors.primaryOrange,
+            ),
+            backgroundColor: Colors.black.withOpacity(0.08),
+          ),
+        ),
+        const SizedBox(height: 14),
+        BlocBuilder<SplashCubit, SplashState>(
+          builder: (context, state) {
+            final l10n = AppLocalizations.of(context)!;
+            String message = l10n.initializing;
+            if (state is SplashLoading && state.message != null) {
+              message = state.message!;
+            } else if (state is SplashCompleted) {
+              if (!_authResolved) {
+                message = l10n.checkingAuthentication;
+              } else if (_authState is Authenticated) {
+                message = l10n.loadingData;
+              }
+            }
+            return Column(
+              children: [
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.grey900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 60),
+                  child: Text(
+                    l10n.splashPreparing,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      height: 1.3,
+                      color: AppColors.grey800,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTrustRow(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    Widget cell(IconData icon, String label) => Expanded(
+      child: Column(
+        children: [
+          Icon(icon, size: 28, color: AppColors.secondaryGreen),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12.5,
+              height: 1.25,
+              color: AppColors.grey900,
+            ),
+          ),
+        ],
+      ),
+    );
+    Widget divider() => Container(
+      width: 1,
+      height: 44,
+      color: Colors.black.withOpacity(0.1),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Row(
+        children: [
+          cell(Icons.local_shipping_rounded, l10n.trustFastDelivery),
+          divider(),
+          cell(Icons.verified_user_rounded, l10n.trustSecureShopping),
+          divider(),
+          cell(Icons.workspace_premium_rounded, l10n.trustQualityProducts),
+          divider(),
+          cell(Icons.favorite_border_rounded, l10n.trustByIndia),
+        ],
       ),
     );
   }

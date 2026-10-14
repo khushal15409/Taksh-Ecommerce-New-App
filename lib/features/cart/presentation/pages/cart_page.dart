@@ -441,75 +441,140 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildEmptyCart(BuildContext context) {
-    return Center(
+    final l10n = AppLocalizations.of(context)!;
+
+    Widget perk(IconData icon, String label) => Expanded(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryOrange.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.shopping_cart,
-              size: 60,
-              color: AppColors.primaryOrange,
-            ),
-          ),
-          const SizedBox(height: 24),
+          Icon(icon, size: 28, color: const Color(0xFF2F9E55)),
+          const SizedBox(height: 5),
           Text(
-            AppLocalizations.of(context)!.cartEmptyTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            AppLocalizations.of(context)!.cartEmptySubtitle,
-            style: TextStyle(
-              color: Theme.of(context).textTheme.bodyMedium?.color,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            decoration: BoxDecoration(
-              gradient: IndiaGradients.saffronGradient,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryOrange.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: () {
-                context.go(AppRoutes.home);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 12,
-                ),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.startShopping,
-                style: const TextStyle(color: Colors.white),
-              ),
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12.5,
+              height: 1.25,
+              color: AppColors.grey900,
             ),
           ),
         ],
+      ),
+    );
+    Widget divider() => Container(
+      width: 1,
+      height: 46,
+      color: Colors.black.withOpacity(0.08),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: Image.asset(
+                  'assets/images/redesign/empty_cart_art.png',
+                  height: 220,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                l10n.cartEmptyTitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.grey900,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  l10n.cartEmptyDescription,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.35,
+                    color: AppColors.grey800,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFA43A), Color(0xFFFF8A1F)],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryOrange.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.go(AppRoutes.home);
+                    },
+                    icon: const Icon(Icons.shopping_bag_rounded, size: 22),
+                    label: Text(l10n.startShopping),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(0, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 14),
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    perk(Icons.shopping_bag_outlined, l10n.trustWideSelection),
+                    divider(),
+                    perk(Icons.local_offer_outlined, l10n.trustBestPrices),
+                    divider(),
+                    perk(Icons.local_shipping_outlined, l10n.trustFastDelivery),
+                    divider(),
+                    perk(Icons.verified_user_outlined, l10n.trustSecurePayment),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
       ),
     );
   }

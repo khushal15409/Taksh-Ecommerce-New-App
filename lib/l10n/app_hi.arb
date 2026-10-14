@@ -746,5 +746,15 @@
   "onboardingTitle2": "तेज़ और भरोसेमंद डिलीवरी",
   "onboardingSubtitle2": "अपने ऑर्डर को रियल-टाइम में ट्रैक करें और मिनटों में डिलीवरी पाएं।",
   "onboardingTitle3": "सुरक्षित भुगतान",
-  "onboardingSubtitle3": "भरोसेमंद भुगतान विधियों के साथ निश्चिंत होकर भुगतान करें।"
+  "onboardingSubtitle3": "भरोसेमंद भुगतान विधियों के साथ निश्चिंत होकर भुगतान करें।",
+  "exitAppSavedNote": "आपकी शॉपिंग कार्ट और प्रगति सहेज ली जाएगी।",
+  "cartEmptyDescription": "लगता है आपने अभी तक कुछ नहीं जोड़ा है।\nहमारे उत्पादों की विस्तृत श्रृंखला देखना शुरू करें।",
+  "splashPreparing": "आपके लिए सबसे अच्छा शॉपिंग अनुभव तैयार हो रहा है",
+  "trustFastDelivery": "तेज़ डिलीवरी",
+  "trustSecureShopping": "सुरक्षित शॉपिंग",
+  "trustQualityProducts": "गुणवत्तापूर्ण उत्पाद",
+  "trustByIndia": "भारत का भरोसा",
+  "trustWideSelection": "विस्तृत चयन",
+  "trustBestPrices": "सर्वोत्तम कीमतें",
+  "trustSecurePayment": "सुरक्षित भुगतान"
 }

@@ -4279,6 +4279,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pay with confidence using trusted payment methods, every single time.'**
   String get onboardingSubtitle3;
+
+  /// No description provided for @exitAppSavedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your shopping cart and progress will be saved.'**
+  String get exitAppSavedNote;
+
+  /// No description provided for @cartEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Looks like you haven\'t added anything yet.\nStart exploring our wide range of products.'**
+  String get cartEmptyDescription;
+
+  /// No description provided for @splashPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing the best shopping experience for you'**
+  String get splashPreparing;
+
+  /// No description provided for @trustFastDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast Delivery'**
+  String get trustFastDelivery;
+
+  /// No description provided for @trustSecureShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Shopping'**
+  String get trustSecureShopping;
+
+  /// No description provided for @trustQualityProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality Products'**
+  String get trustQualityProducts;
+
+  /// No description provided for @trustByIndia.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted by India'**
+  String get trustByIndia;
+
+  /// No description provided for @trustWideSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Wide Selection'**
+  String get trustWideSelection;
+
+  /// No description provided for @trustBestPrices.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Prices'**
+  String get trustBestPrices;
+
+  /// No description provided for @trustSecurePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Payment'**
+  String get trustSecurePayment;
 }
 
 class _AppLocalizationsDelegate

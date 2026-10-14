@@ -5,6 +5,7 @@ import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
+import 'package:taksh_e_commerce/core/widgets/festive_confirm_dialog.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/dashboard_bloc.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/express_dashboard_bloc.dart';
@@ -135,23 +136,12 @@ class _MainShellState extends State<MainShell> {
     final shouldExit = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.exitAppTitle),
-        content: Text(l10n.exitAppContent),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(l10n.exit),
-          ),
-        ],
+      builder: (context) => FestiveConfirmDialog(
+        title: l10n.exitAppTitle,
+        message: l10n.exitAppContent,
+        note: l10n.exitAppSavedNote,
+        cancelLabel: l10n.cancel,
+        confirmLabel: l10n.exit,
       ),
     );
 

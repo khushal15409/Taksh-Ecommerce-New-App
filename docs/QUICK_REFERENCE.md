@@ -622,3 +622,14 @@ flutter pub outdated
 ---
 
 This quick reference should help you navigate common development tasks quickly!
+
+## Toasts (success / error / warning / info)
+
+All user messages use the top-center toast in `lib/core/widgets/app_toast.dart`
+(white card, status icon, title + message, close button, countdown bar).
+
+- Preferred: `AppToast.success/error/warning/info(context, 'Title', message: '...')`
+- Errors: `AppErrorToast.show(context, message: ...)`
+- Legacy `AppToastMessenger.of(context).showSnackBar(SnackBar(...))` (a drop-in
+  for `ScaffoldMessenger.of`) renders the same toast; the type is inferred from
+  the SnackBar `backgroundColor` (or keywords in the text when it has none).

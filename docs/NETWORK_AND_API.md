@@ -19,7 +19,7 @@ Also: [API_RESPONSE_MODELS.md](API_RESPONSE_MODELS.md)
 https://taksh-admin.takshallinone.in/api
 ```
 
-Same value for dev / staging / production constants today. Invoice PDFs use **server origin without `/api`** via `ApiConstants.serverOriginFromBaseUrl` / `orderInvoiceFile`.
+Same value for dev / staging / production constants today. Invoice PDFs are downloaded from `GET /api/orders/{order_number}/invoice` via `ApiConstants.orderInvoiceFile` (the web route `/orders/{n}/invoice/file` is admin-session only and returns the login page to customers).
 
 Timeouts: **30s** connect / receive / send.
 

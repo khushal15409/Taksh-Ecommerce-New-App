@@ -2292,4 +2292,34 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get onboardingSubtitle3 =>
       'भरोसेमंद भुगतान विधियों के साथ निश्चिंत होकर भुगतान करें।';
+
+  @override
+  String get exitAppSavedNote => 'आपकी शॉपिंग कार्ट और प्रगति सहेज ली जाएगी।';
+
+  @override
+  String get cartEmptyDescription => 'लगता है आपने अभी तक कुछ नहीं जोड़ा है।\nहमारे उत्पादों की विस्तृत श्रृंखला देखना शुरू करें।';
+
+  @override
+  String get splashPreparing => 'आपके लिए सबसे अच्छा शॉपिंग अनुभव तैयार हो रहा है';
+
+  @override
+  String get trustFastDelivery => 'तेज़ डिलीवरी';
+
+  @override
+  String get trustSecureShopping => 'सुरक्षित शॉपिंग';
+
+  @override
+  String get trustQualityProducts => 'गुणवत्तापूर्ण उत्पाद';
+
+  @override
+  String get trustByIndia => 'भारत का भरोसा';
+
+  @override
+  String get trustWideSelection => 'विस्तृत चयन';
+
+  @override
+  String get trustBestPrices => 'सर्वोत्तम कीमतें';
+
+  @override
+  String get trustSecurePayment => 'सुरक्षित भुगतान';
 }

@@ -219,7 +219,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try Again';
 
   @override
-  String get exitAppTitle => 'Exit app?';
+  String get exitAppTitle => 'Exit App?';
 
   @override
   String get exitAppContent => 'Are you sure you want to exit?';
@@ -2281,4 +2281,34 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingSubtitle3 =>
       'Pay with confidence using trusted payment methods, every single time.';
+
+  @override
+  String get exitAppSavedNote => 'Your shopping cart and progress will be saved.';
+
+  @override
+  String get cartEmptyDescription => 'Looks like you haven\'t added anything yet.\nStart exploring our wide range of products.';
+
+  @override
+  String get splashPreparing => 'Preparing the best shopping experience for you';
+
+  @override
+  String get trustFastDelivery => 'Fast Delivery';
+
+  @override
+  String get trustSecureShopping => 'Secure Shopping';
+
+  @override
+  String get trustQualityProducts => 'Quality Products';
+
+  @override
+  String get trustByIndia => 'Trusted by India';
+
+  @override
+  String get trustWideSelection => 'Wide Selection';
+
+  @override
+  String get trustBestPrices => 'Best Prices';
+
+  @override
+  String get trustSecurePayment => 'Secure Payment';
 }

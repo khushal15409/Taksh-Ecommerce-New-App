@@ -39,7 +39,7 @@
 | Return media | `POST /return/customer/upload-media` |
 | Invoice file | `GET {origin}/orders/:orderNumber/invoice/file` (**not** under `/api`) |
 
-Invoice helper: `ApiConstants.orderInvoiceFile(orderNumber, baseUrl:)`.
+Invoice helper: `ApiConstants.orderInvoiceFile(orderNumber, baseUrl:)` -> `/api/orders/{order_number}/invoice` (PDF, scoped to the Bearer user).
 
 ---
 

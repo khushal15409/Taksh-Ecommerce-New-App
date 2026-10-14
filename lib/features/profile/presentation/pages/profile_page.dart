@@ -43,7 +43,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool _isAppearanceExpanded = false;
   bool _isLanguageExpanded = false;
 
   @override
@@ -185,10 +184,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // _buildStatsSection(context), // Removed as per design
                 _buildQuickActions(context, state),
-
-                const SizedBox(height: 16),
-
-                _buildAppearanceSection(context),
 
                 const SizedBox(height: 16),
 
@@ -459,184 +454,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildAppearanceSection(BuildContext context) {
-    final splashState = context.watch<SplashCubit>().state;
-    ThemeMode currentThemeMode = ThemeMode.system;
-
-    if (splashState is SplashCompleted) {
-      currentThemeMode = splashState.themeMode;
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Appearance Header
-                ListTile(
-                  onTap: () {
-                    setState(() {
-                      _isAppearanceExpanded = !_isAppearanceExpanded;
-                    });
-                  },
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.black.withOpacity(0.07),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.palette_outlined,
-                      color: AppColors.black,
-                      size: 24,
-                    ),
-                  ),
-                  title: Text(
-                    AppLocalizations.of(context)!.appearance,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                    ),
-                  ),
-                  trailing: Icon(
-                    _isAppearanceExpanded
-                        ? Icons.expand_less
-                        : Icons.expand_more,
-                    color: AppColors.grey400,
-                    size: 24,
-                  ),
-                ),
-                // Dropdown Options
-                if (_isAppearanceExpanded)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Column(
-                      children: [
-                        const Divider(
-                          height: 1,
-                          color: AppColors.grey200,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildThemeOption(
-                          context,
-                          AppLocalizations.of(context)!.light,
-                          ThemeMode.light,
-                          currentThemeMode == ThemeMode.light,
-                        ),
-                        const SizedBox(height: 4),
-                        _buildThemeOption(
-                          context,
-                          AppLocalizations.of(context)!.dark,
-                          ThemeMode.dark,
-                          currentThemeMode == ThemeMode.dark,
-                        ),
-                        const SizedBox(height: 4),
-                        _buildThemeOption(
-                          context,
-                          AppLocalizations.of(context)!.system,
-                          ThemeMode.system,
-                          currentThemeMode == ThemeMode.system,
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThemeOption(
-    BuildContext context,
-    String label,
-    ThemeMode mode,
-    bool isSelected,
-  ) {
-    return InkWell(
-      onTap: () {
-        context.read<SplashCubit>().updateTheme(mode);
-        AppToastMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.themeChanged(label)),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryOrange.withOpacity(0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? AppColors.primaryOrange : AppColors.grey200,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              mode == ThemeMode.light
-                  ? Icons.light_mode
-                  : (mode == ThemeMode.dark
-                        ? Icons.dark_mode
-                        : Icons.brightness_auto),
-              color: isSelected ? AppColors.primaryOrange : AppColors.grey600,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected
-                    ? AppColors.primaryOrange
-                    : Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
-            const Spacer(),
-            if (isSelected)
-              const Icon(
-                Icons.check_circle,
-                color: AppColors.primaryOrange,
-                size: 20,
-              ),
-          ],
-        ),
-      ),
     );
   }
 

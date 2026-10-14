@@ -85,3 +85,19 @@ See [ROUTING.md](../ROUTING.md).
 - New home section types → extend entities/models + UI section widgets; run codegen.  
 - Services tab should stay a thin embed of `home_service` to avoid duplicating booking logic.  
 - Update l10n for any new section titles.
+
+## Banner types
+
+Banners carry a `type` (`standard` | `quick` | `service`) set in the admin panel. Standard home uses the `Banners` section of `/dashboard`, Quick uses `/express-30/dashboard`, Service uses `GET /ecommerce/banners?type=service` (`ServiceBannersSection`). One banner renders as a static card, several as an auto-playing slider (`BannerCarousel`); with none, the section is hidden.
+
+## Banners: type and position (dynamic)
+Banners come from the admin panel and are filtered by **type** on the server:
+Standard tab → `GET /api/ecommerce/dashboard` (type `standard`), Quick tab → express
+dashboard (type `quick`), Service tab → `GET /api/ecommerce/banners?type=service`.
+
+**Position** (`position` field) decides where the banner shows on that tab, via
+`banner_slots.dart` (`bannerSlotFor` / `groupBannersBySlot`):
+`home_top` and `dashboard` → above all sections; `home_middle` → between the
+product sections (service tab: after the first half of the services);
+`home_bottom` → below all sections. Order inside a slot follows admin `sort_order`.
+Empty slots render nothing. Admin form labels were updated to match.

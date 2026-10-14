@@ -9,6 +9,8 @@ import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_s
 import 'package:taksh_e_commerce/features/home_service/presentation/cubit/home_service_state.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/courier_booking_page.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/pages/general_service_page.dart';
+import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
 import 'package:taksh_e_commerce/features/home_service/presentation/widgets/service_banners_section.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
@@ -119,7 +121,7 @@ class _ServiceStyle {
   });
 }
 
-class _ServicesView extends StatelessWidget {
+class _ServicesView extends StatefulWidget {
   final List<HomeService> services;
   final _ServiceStyle Function(String slug) styleForSlug;
   final void Function(HomeService service) onServiceTap;
@@ -131,8 +133,28 @@ class _ServicesView extends StatelessWidget {
   });
 
   @override
+  State<_ServicesView> createState() => _ServicesViewState();
+}
+
+class _ServicesViewState extends State<_ServicesView> {
+  Map<BannerSlot, List<BannerModel>> _banners = groupBannersBySlot(const []);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBanners();
+  }
+
+  Future<void> _loadBanners() async {
+    final banners = await fetchServiceBanners();
+    if (!mounted || banners.isEmpty) return;
+    setState(() => _banners = groupBannersBySlot(banners));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final services = widget.services;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -144,6 +166,50 @@ class _ServicesView extends StatelessWidget {
 
         final mainAxisExtent = constraints.maxWidth >= 640 ? 230.0 : 210.0;
 
+        Widget grid(List<HomeService> items) => GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: items.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: AppSpacing.md,
+            crossAxisSpacing: AppSpacing.md,
+            mainAxisExtent: mainAxisExtent,
+          ),
+          itemBuilder: (context, index) {
+            final service = items[index];
+            return _ServiceCard(
+              service: service,
+              style: widget.styleForSlug(service.slug),
+              onTap: () => widget.onServiceTap(service),
+            );
+          },
+        );
+
+        final middle = _banners[BannerSlot.middle]!;
+        final List<Widget> body;
+        if (services.isEmpty) {
+          body = [
+            _EmptyView(subtitle: l10n.homeServicesSubtitle),
+            ServiceBannersSection(banners: middle),
+          ];
+        } else if (middle.isEmpty) {
+          body = [grid(services)];
+        } else {
+          // Middle banners go after the first half of the services, on a
+          // whole grid row so the layout stays aligned.
+          final rows = (services.length / crossAxisCount).ceil();
+          final split = ((rows + 1) ~/ 2) * crossAxisCount;
+          final firstHalf = services.take(split).toList();
+          final secondHalf = services.skip(split).toList();
+          body = [
+            grid(firstHalf),
+            const SizedBox(height: AppSpacing.md),
+            ServiceBannersSection(banners: middle),
+            if (secondHalf.isNotEmpty) grid(secondHalf),
+          ];
+        }
+
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPaddingHorizontal,
@@ -154,29 +220,12 @@ class _ServicesView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ServiceBannersSection(),
-              if (services.isEmpty)
-                _EmptyView(subtitle: l10n.homeServicesSubtitle)
-              else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: services.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    mainAxisSpacing: AppSpacing.md,
-                    crossAxisSpacing: AppSpacing.md,
-                    mainAxisExtent: mainAxisExtent,
-                  ),
-                  itemBuilder: (context, index) {
-                    final service = services[index];
-                    return _ServiceCard(
-                      service: service,
-                      style: styleForSlug(service.slug),
-                      onTap: () => onServiceTap(service),
-                    );
-                  },
-                ),
+              ServiceBannersSection(banners: _banners[BannerSlot.top]!),
+              ...body,
+              if (_banners[BannerSlot.bottom]!.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.md),
+                ServiceBannersSection(banners: _banners[BannerSlot.bottom]!),
+              ],
             ],
           ),
         );

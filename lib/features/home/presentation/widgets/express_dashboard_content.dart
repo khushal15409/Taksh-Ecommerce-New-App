@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
+import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
 import 'package:taksh_e_commerce/features/home/data/models/dashboard_section_model.dart';
 import 'package:taksh_e_commerce/features/home/domain/entities/express_dashboard_entity.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/category_catalog_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/product_section.dart';
 import 'package:taksh_e_commerce/features/home/data/models/product_model.dart';
@@ -34,7 +36,7 @@ class ExpressDashboardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sections = dashboard.sections as List<dynamic>;
-    final bannerWidgets = <Widget>[];
+    Map<BannerSlot, List<BannerModel>> bannerSlots = groupBannersBySlot(const []);
     final productWidgets = <Widget>[];
     List<Category>? categoryData;
 
@@ -46,20 +48,7 @@ class ExpressDashboardContent extends StatelessWidget {
       if (section.key == 'Banners') {
         // Hide the whole banner section when admin has no banners for this type.
         if (section.banners.isEmpty) continue;
-        bannerWidgets.add(
-          Padding(
-            padding: const EdgeInsets.only(top: 6, bottom: 10),
-            child: BannerCarousel(
-              banners: section.banners,
-              onBannerTap: (banner) {
-                _log.infoWithContext('Express banner tapped', {
-                  'banner_id': banner.id,
-                  'title': banner.title,
-                });
-              },
-            ),
-          ),
-        );
+        bannerSlots = groupBannersBySlot(section.banners);
         continue;
       }
 
@@ -101,10 +90,18 @@ class ExpressDashboardContent extends StatelessWidget {
       }
     }
 
+    // Middle banners sit between the product sections (after the first half).
+    final middleBanners = _bannerBlock(bannerSlots[BannerSlot.middle]!);
+    if (middleBanners != null) {
+      productWidgets.insert(productWidgets.length ~/ 2, middleBanners);
+    }
+    final topBanners = _bannerBlock(bannerSlots[BannerSlot.top]!);
+    final bottomBanners = _bannerBlock(bannerSlots[BannerSlot.bottom]!);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ...bannerWidgets,
+        if (topBanners != null) topBanners,
         ...productWidgets,
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
@@ -113,8 +110,25 @@ class ExpressDashboardContent extends StatelessWidget {
             deliveryType: 'quick',
           ),
         ),
+        if (bottomBanners != null) bottomBanners,
         const SizedBox(height: 32),
       ],
+    );
+  }
+
+  Widget? _bannerBlock(List<BannerModel> banners) {
+    if (banners.isEmpty) return null;
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 10),
+      child: BannerCarousel(
+        banners: banners,
+        onBannerTap: (banner) {
+          _log.infoWithContext('Express banner tapped', {
+            'banner_id': banner.id,
+            'title': banner.title,
+          });
+        },
+      ),
     );
   }
 }

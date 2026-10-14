@@ -38,7 +38,10 @@ class WishlistItemModel extends WishlistItem {
   /// }
   /// ```
   factory WishlistItemModel.fromJson(Map<String, dynamic> json) {
-    final product = json['product'] as Map<String, dynamic>?;
+    final rawProduct = json['product'];
+    final Map<String, dynamic>? product = rawProduct is Map
+        ? Map<String, dynamic>.from(rawProduct)
+        : null;
 
     // ── Extract product ID ─────────────────────────────────────────────
     // Check multiple possible key names (snake_case, camelCase, nested)
@@ -49,10 +52,10 @@ class WishlistItemModel extends WishlistItem {
         0;
 
     // ── Extract product name ───────────────────────────────────────────
-    final String parsedName = (product?['name'] as String?) ??
-        (json['product_name'] as String?) ??
-        (json['productName'] as String?) ??
-        (json['name'] as String?) ??
+    final String parsedName = _asString(product?['name']) ??
+        _asString(json['product_name']) ??
+        _asString(json['productName']) ??
+        _asString(json['name']) ??
         '';
 
     // ── Extract primary image URL ──────────────────────────────────────
@@ -64,7 +67,7 @@ class WishlistItemModel extends WishlistItem {
     String? imageUrl;
     if (product != null) {
       // 1️⃣ Direct image_url on product (common in list responses)
-      imageUrl = product['image_url'] as String?;
+      imageUrl = _asString(product['image_url']);
 
       // 2️⃣ Walk images array – prefer is_primary, else first image
       if (imageUrl == null || imageUrl.isEmpty) {
@@ -72,35 +75,35 @@ class WishlistItemModel extends WishlistItem {
         if (imagesData is List && imagesData.isNotEmpty) {
           for (final img in imagesData) {
             if (img is Map && img['is_primary'] == true) {
-              imageUrl = img['image_url'] as String?;
+              imageUrl = _asString(img['image_url']);
               break;
             }
           }
           // 3️⃣ Fall back to first image
           if ((imageUrl == null || imageUrl.isEmpty) &&
               imagesData.first is Map) {
-            imageUrl = (imagesData.first as Map)['image_url'] as String?;
+            imageUrl = _asString((imagesData.first as Map)['image_url']);
           }
         }
       }
 
-      imageUrl ??= product['primary_image_url'] as String?;
-      imageUrl ??= product['image'] as String?;
-      imageUrl ??= product['thumbnail'] as String?;
-      imageUrl ??= product['thumbnail_url'] as String?;
+      imageUrl ??= _asString(product['primary_image_url']);
+      imageUrl ??= _asString(product['image']);
+      imageUrl ??= _asString(product['thumbnail']);
+      imageUrl ??= _asString(product['thumbnail_url']);
     }
 
     // Flat fallback keys on the wishlist item itself
-    imageUrl ??= json['thumbnail'] as String?;
-    imageUrl ??= json['thumbnail_url'] as String?;
-    imageUrl ??= json['product_image'] as String?;
-    imageUrl ??= json['image'] as String?;
-    imageUrl ??= json['image_url'] as String?;
+    imageUrl ??= _asString(json['thumbnail']);
+    imageUrl ??= _asString(json['thumbnail_url']);
+    imageUrl ??= _asString(json['product_image']);
+    imageUrl ??= _asString(json['image']);
+    imageUrl ??= _asString(json['image_url']);
 
     // ── Extract slug ───────────────────────────────────────────────────
-    final String? parsedSlug = (product?['slug'] as String?) ??
-        (json['product_slug'] as String?) ??
-        (json['slug'] as String?);
+    final String? parsedSlug = _asString(product?['slug']) ??
+        _asString(json['product_slug']) ??
+        _asString(json['slug']);
 
     // ── Extract prices ─────────────────────────────────────────────────
     final int? parsedOriginalPrice = _parseInt(product?['original_price']) ??
@@ -112,8 +115,8 @@ class WishlistItemModel extends WishlistItem {
         _parseInt(json['sale_price']);
 
     // ── Extract stock status ───────────────────────────────────────────
-    final bool parsedInStock = (product?['in_stock'] as bool?) ??
-        (json['in_stock'] as bool?) ??
+    final bool parsedInStock = _parseBool(product?['in_stock']) ??
+        _parseBool(json['in_stock']) ??
         true;
 
     return WishlistItemModel(
@@ -148,12 +151,32 @@ class WishlistItemModel extends WishlistItem {
     };
   }
 
+  static String? _asString(dynamic value) {
+    if (value == null) return null;
+    return value is String ? value : value.toString();
+  }
+
+  /// Handles bool, 1/0 and "true"/"false"/"1"/"0".
+  static bool? _parseBool(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final v = value.toLowerCase().trim();
+      if (v == 'true' || v == '1') return true;
+      if (v == 'false' || v == '0') return false;
+    }
+    return null;
+  }
+
   /// Safely parse an int from dynamic (handles String, int, double, null)
   static int? _parseInt(dynamic value) {
     if (value == null) return null;
     if (value is int) return value;
     if (value is double) return value.toInt();
-    if (value is String) return int.tryParse(value);
+    if (value is String) {
+      return int.tryParse(value) ?? double.tryParse(value)?.toInt();
+    }
     return null;
   }
 }

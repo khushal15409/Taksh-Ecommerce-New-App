@@ -85,12 +85,22 @@ class ApiConstants {
     return trimmed;
   }
 
-  /// Absolute URL for the invoice PDF file stream.
-  /// GET requires Bearer auth. Path is outside `/api`.
+  /// Absolute URL for the invoice PDF download.
+  ///
+  /// Uses the API route (`/api/orders/{order_number}/invoice`), which streams
+  /// the PDF and, when a Bearer token is sent, is scoped to the user's own
+  /// orders. The web route `/orders/{n}/invoice/file` is behind the admin
+  /// session `auth` middleware and redirects customers to an HTML login page.
   static String orderInvoiceFile(
     String orderNumber, {
     required String baseUrl,
-  }) => '${serverOriginFromBaseUrl(baseUrl)}/orders/$orderNumber/invoice/file';
+  }) {
+    final trimmed = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final apiBase = trimmed.endsWith('/api') ? trimmed : '$trimmed/api';
+    return '$apiBase/orders/${Uri.encodeComponent(orderNumber)}/invoice';
+  }
 
   /// Address endpoints
   static const String addresses = '/address/addresses';

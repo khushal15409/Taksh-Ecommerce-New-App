@@ -61,10 +61,18 @@ class WishlistRemoteDataSourceImpl implements WishlistRemoteDataSource {
       }
     }
 
-    return items
-        .whereType<Map<String, dynamic>>()
-        .map((json) => WishlistItemModel.fromJson(json))
-        .toList();
+    final result = <WishlistItemModel>[];
+    for (final raw in items) {
+      if (raw is! Map) continue;
+      try {
+        result.add(
+          WishlistItemModel.fromJson(Map<String, dynamic>.from(raw)),
+        );
+      } catch (_) {
+        // Skip a malformed entry instead of failing the whole wishlist.
+      }
+    }
+    return result;
   }
 
   @override

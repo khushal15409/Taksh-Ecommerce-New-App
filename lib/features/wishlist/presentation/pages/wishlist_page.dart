@@ -58,7 +58,7 @@ class _WishlistPageState extends State<WishlistPage> {
             );
           }
           if (state is WishlistError) {
-            AppErrorToast.show(context);
+            AppErrorToast.show(context, message: state.message);
           }
         },
         builder: (context, state) {

@@ -557,15 +557,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
             : 1;
         final mainAxisExtent = _homeDeliveryType == DeliveryType.quick
             ? (crossAxisCount == 1
-                  ? 292.0
+                  ? 270.0
                   : crossAxisCount == 2
-                  ? 268.0
-                  : 254.0)
+                  ? 236.0
+                  : 226.0)
             : (crossAxisCount == 1
-                  ? 264.0
+                  ? 250.0
                   : crossAxisCount == 2
-                  ? 244.0
-                  : 232.0);
+                  ? 214.0
+                  : 206.0);
 
         return GridView.builder(
           padding: EdgeInsets.fromLTRB(

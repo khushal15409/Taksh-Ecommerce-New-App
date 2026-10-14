@@ -101,7 +101,7 @@
   "searchHint": "Search for products...",
   "somethingWentWrong": "Oops! Something went wrong",
   "tryAgain": "Try Again",
-  "exitAppTitle": "Exit app?",
+  "exitAppTitle": "Exit App?",
   "exitAppContent": "Are you sure you want to exit?",
   "cancel": "Cancel",
   "exit": "Exit",
@@ -897,5 +897,15 @@
   "onboardingTitle2": "Fast & reliable delivery",
   "onboardingSubtitle2": "Track your orders in real-time and get them delivered in minutes, not days.",
   "onboardingTitle3": "Safe & secure payments",
-  "onboardingSubtitle3": "Pay with confidence using trusted payment methods, every single time."
+  "onboardingSubtitle3": "Pay with confidence using trusted payment methods, every single time.",
+  "exitAppSavedNote": "Your shopping cart and progress will be saved.",
+  "cartEmptyDescription": "Looks like you haven't added anything yet.\nStart exploring our wide range of products.",
+  "splashPreparing": "Preparing the best shopping experience for you",
+  "trustFastDelivery": "Fast Delivery",
+  "trustSecureShopping": "Secure Shopping",
+  "trustQualityProducts": "Quality Products",
+  "trustByIndia": "Trusted by India",
+  "trustWideSelection": "Wide Selection",
+  "trustBestPrices": "Best Prices",
+  "trustSecurePayment": "Secure Payment"
 }
