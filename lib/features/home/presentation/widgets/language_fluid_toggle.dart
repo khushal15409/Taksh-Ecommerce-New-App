@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/splash/presentation/cubit/splash_cubit.dart';
@@ -25,7 +26,7 @@ class LanguageFluidToggle extends StatelessWidget {
             context.read<SplashCubit>().updateLocale(newLocale);
             
             final languageName = newLocale.languageCode == 'en' ? 'English' : 'हिंदी';
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(AppLocalizations.of(context)!.languageChanged(languageName)),
                 duration: const Duration(seconds: 1),

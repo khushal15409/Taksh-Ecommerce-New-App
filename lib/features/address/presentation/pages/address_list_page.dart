@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
@@ -73,7 +74,7 @@ class _AddressListView extends StatelessWidget {
       body: BlocConsumer<AddressBloc, AddressState>(
         listener: (context, state) {
           if (state is AddressOperationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   state.message,
@@ -85,7 +86,7 @@ class _AddressListView extends StatelessWidget {
             // Reload addresses after successful operation
             context.read<AddressBloc>().add(const LoadAddressesEvent());
           } else if (state is AddressOperationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   l10n.somethingWentWrong,
@@ -95,7 +96,7 @@ class _AddressListView extends StatelessWidget {
               ),
             );
           } else if (state is AddressError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   l10n.somethingWentWrong,

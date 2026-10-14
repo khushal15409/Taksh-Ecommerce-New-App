@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
 
@@ -214,7 +215,7 @@ class WalletPage extends StatelessWidget {
                   AppErrorToast.show(context);
                 } else {
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  AppToastMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
                         'Withdrawal request for $amount points submitted successfully',

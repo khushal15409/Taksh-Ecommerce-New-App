@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
@@ -106,7 +107,7 @@ class _AddressSelectionBottomSheetState
                 child: BlocConsumer<AddressBloc, AddressState>(
                   listener: (context, state) {
                     if (state is AddressOperationSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      AppToastMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(state.message),
                           backgroundColor: Colors.green,

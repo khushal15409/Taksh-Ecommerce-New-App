@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/constants/app_constants.dart';
@@ -120,7 +121,7 @@ class _UpdateProfileDetailsPageState extends State<UpdateProfileDetailsPage> {
           if (state is AuthProfileUpdateSuccess) {
             if (mounted) {
               setState(() => _isSubmitting = false);
-              ScaffoldMessenger.of(
+              AppToastMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(state.message)));
               Navigator.of(context).pop();

@@ -9,6 +9,7 @@
 /// ```
 library;
 
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/splash/presentation/cubit/splash_cubit.dart';
@@ -85,11 +86,11 @@ class ExamplePermissionListener extends StatelessWidget {
     return BlocListener<SplashCubit, SplashState>(
       listener: (context, state) {
         if (state is LocationPermissionGranted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Location permission granted')),
           );
         } else if (state is LocationPermissionDenied) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Location permission denied')),
           );
         }

@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
@@ -113,7 +114,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                 child: BlocConsumer<AddressBloc, AddressState>(
                   listener: (context, state) {
                     if (state is AddressOperationSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      AppToastMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
                             state.message,
@@ -124,7 +125,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                       );
                       context.read<AddressBloc>().add(const LoadAddressesEvent());
                     } else if (state is AddressOperationError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      AppToastMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
                             'Oops! Something went wrong',
@@ -134,7 +135,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                         ),
                       );
                     } else if (state is AddressError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      AppToastMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
                             'Oops! Something went wrong',

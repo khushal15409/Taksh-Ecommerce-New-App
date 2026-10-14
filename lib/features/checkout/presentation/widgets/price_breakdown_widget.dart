@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/dashed_divider.dart';
-import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
+import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_section_card.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/price_breakdown.dart';
@@ -19,33 +19,11 @@ class PriceBreakdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.receipt_long_rounded,
-              color: AppColors.grey900,
-              size: 30,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              AppLocalizations.of(context)!.priceDetails,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: AppColors.grey900,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Container(
-      decoration: festiveCardDecoration(radius: 22),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
+    return CheckoutSectionCard(
+      icon: Icons.description_outlined,
+      title: AppLocalizations.of(context)!.priceDetails,
+      bodyPadding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
+      child: Column(
           children: [
             _buildPriceRow(
               context,
@@ -53,7 +31,7 @@ class PriceBreakdownWidget extends StatelessWidget {
               priceBreakdown.itemTotalInRupees,
               isRegular: true,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             _buildPriceRow(
               context,
               'Delivery Charges',
@@ -91,10 +69,7 @@ class PriceBreakdownWidget extends StatelessWidget {
               isTotal: true,
             ),
           ],
-        ),
       ),
-        ),
-      ],
     );
   }
 

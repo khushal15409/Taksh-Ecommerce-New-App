@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -155,7 +156,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
       return true;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    AppToastMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(errorMessage),
         backgroundColor: AppColors.error,
@@ -564,7 +565,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
           } else if (state is HomeServiceCourierBookingSuccess) {
             _showSuccessDialog(context, state);
           } else if (state is HomeServiceCourierBookingError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: AppColors.error,

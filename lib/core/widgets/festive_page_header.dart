@@ -50,6 +50,12 @@ class FestivePageHeader extends StatelessWidget {
   /// Places the title block to the right of the back button instead of below.
   final bool inlineTitle;
 
+  /// Optional content under the title (e.g. a progress stepper).
+  final Widget? bottom;
+
+  /// Opacity of the lantern/sparkle artwork blended into the gradient.
+  final double artOpacity;
+
   const FestivePageHeader({
     super.key,
     required this.title,
@@ -57,6 +63,8 @@ class FestivePageHeader extends StatelessWidget {
     required this.onBack,
     this.trailing,
     this.inlineTitle = false,
+    this.bottom,
+    this.artOpacity = 0.55,
   });
 
   static const Color _accent = Color(0xFFFF8A1F);
@@ -115,7 +123,7 @@ class FestivePageHeader extends StatelessWidget {
           Positioned.fill(
             child: IgnorePointer(
               child: Opacity(
-                opacity: 0.55,
+                opacity: artOpacity,
                 child: Image.asset(
                   FestiveHeaderBackdrop.festiveOrangeAsset,
                   fit: BoxFit.cover,
@@ -168,6 +176,10 @@ class FestivePageHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 titleBlock,
+                if (bottom != null) ...[
+                  const SizedBox(height: 12),
+                  bottom!,
+                ],
               ],
             ),
         ],

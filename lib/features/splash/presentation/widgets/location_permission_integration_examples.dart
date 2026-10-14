@@ -4,6 +4,7 @@
 /// throughout your app at different touchpoints.
 library;
 
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/splash/presentation/cubit/splash_cubit.dart';
@@ -32,7 +33,7 @@ class HomePageWithLocationPrompt extends StatelessWidget {
             LocationPermissionPrompt(
               onPermissionGranted: () {
                 // Permission granted - you can refresh data, update UI, etc.
-                ScaffoldMessenger.of(context).showSnackBar(
+                AppToastMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Location enabled! Showing nearby stores...'),
                   ),
@@ -135,7 +136,7 @@ class StoreLocatorPage extends StatelessWidget {
 
   void _loadNearbyStores(BuildContext context) {
     // Your logic to load nearby stores
-    ScaffoldMessenger.of(context).showSnackBar(
+    AppToastMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Loading nearby stores...')),
     );
   }
@@ -299,7 +300,7 @@ class DeliveryAddressPage extends StatelessWidget {
 
     if (location != null && context.mounted) {
       // Use the location to fetch address
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppToastMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Location: ${location.latitude}, ${location.longitude}',

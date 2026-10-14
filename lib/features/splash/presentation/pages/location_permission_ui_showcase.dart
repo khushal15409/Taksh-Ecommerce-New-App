@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/splash/presentation/cubit/splash_cubit.dart';
@@ -112,7 +113,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
                   await LocationPermissionHandler.requestPermissionWithUI(
                       context);
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                AppToastMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
                       granted ? 'Permission granted!' : 'Permission denied',
@@ -139,7 +140,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
               final location =
                   await context.read<SplashCubit>().refreshLocation();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                AppToastMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
                       location != null

@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -248,7 +249,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
   }
 
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    AppToastMessenger.of(context).showSnackBar(
       SnackBar(content: Text(msg), backgroundColor: AppColors.error),
     );
   }
@@ -280,7 +281,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
           setState(() => _isSubmitting = true);
         } else if (state is VendorJoinRequestSuccess) {
           setState(() => _isSubmitting = false);
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.vendorJoinSuccess),
               backgroundColor: AppColors.secondaryGreen,
@@ -712,7 +713,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                     onPressed: () {
                       if (sheetFormKey.currentState?.validate() != true) return;
                       if (docFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        AppToastMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.vendorAadhaarFileRequired),
                             backgroundColor: AppColors.error,
@@ -822,7 +823,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                     onPressed: () {
                       if (sheetFormKey.currentState?.validate() != true) return;
                       if (docFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        AppToastMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.vendorPanFileRequired),
                             backgroundColor: AppColors.error,
@@ -970,7 +971,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                     onPressed: () {
                       if (sheetFormKey.currentState?.validate() != true) return;
                       if (docFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        AppToastMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.vendorBankFileRequired),
                             backgroundColor: AppColors.error,
@@ -1077,7 +1078,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                     onPressed: () {
                       if (sheetFormKey.currentState?.validate() != true) return;
                       if (docFile == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        AppToastMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.vendorGstFileRequired),
                             backgroundColor: AppColors.error,

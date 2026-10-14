@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 /// Thin dashed horizontal rule.
 class DashedDivider extends StatelessWidget {
-  const DashedDivider({super.key});
+  final Color color;
+
+  const DashedDivider({super.key, this.color = const Color(0xFFD9D9D9)});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class DashedDivider extends StatelessWidget {
             (_) => Container(
               width: dash,
               height: 1.2,
-              color: const Color(0xFFD9D9D9),
+              color: color,
             ),
           ),
         );

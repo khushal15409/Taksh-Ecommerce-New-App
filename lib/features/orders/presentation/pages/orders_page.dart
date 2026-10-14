@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -137,7 +138,7 @@ class _OrdersPageState extends State<OrdersPage> {
             if (state is OrdersError) {
               AppErrorToast.show(context);
             } else if (state is OrderStatusUpdated) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              AppToastMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
                   backgroundColor: Colors.green,
@@ -537,7 +538,7 @@ class _OrdersPageState extends State<OrdersPage> {
           }
 
           this.context.read<OrdersCubit>().fetchOrders();
-          ScaffoldMessenger.of(this.context).showSnackBar(
+          AppToastMessenger.of(this.context).showSnackBar(
             SnackBar(
               content: Text(statusMessage),
               backgroundColor: Colors.green,

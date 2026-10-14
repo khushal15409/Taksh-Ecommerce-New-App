@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
@@ -202,7 +203,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
         l10n?.outOfStock ??
         'Out of stock';
 
-    ScaffoldMessenger.of(context)
+    AppToastMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
@@ -357,7 +358,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
           if (!showErrors) return false;
 
           final l10n = AppLocalizations.of(context);
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 l10n?.couldNotLoadProduct ??
@@ -395,7 +396,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
             if (!showErrors) return false;
 
             final l10n = AppLocalizations.of(context);
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   l10n?.noVariantsAvailable ??
@@ -438,7 +439,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
       if (!showErrors) return false;
 
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppToastMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             l10n?.cartUnexpectedError ??
@@ -579,7 +580,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
         onTap: () {
           final l10n = AppLocalizations.of(context);
           final message = l10n?.outOfStock ?? 'Out of stock';
-          ScaffoldMessenger.of(context)
+          AppToastMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(

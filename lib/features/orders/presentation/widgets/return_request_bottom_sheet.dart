@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -83,7 +84,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
         if (state is ReturnCompleted || state is ReturnRequested) {
           setState(() => _isSubmitting = false);
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 state is ReturnCompleted
@@ -424,7 +425,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
             // Limit to 5 images
             if (_selectedImages.length > 5) {
               _selectedImages.removeRange(5, _selectedImages.length);
-              ScaffoldMessenger.of(context).showSnackBar(
+              AppToastMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Maximum 5 images allowed'),
                   backgroundColor: Colors.orange,
@@ -441,7 +442,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
             if (_selectedImages.length < 5) {
               _selectedImages.add(image);
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
+              AppToastMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Maximum 5 images allowed'),
                   backgroundColor: Colors.orange,
@@ -452,7 +453,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppToastMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to pick image: $e'),
           backgroundColor: Colors.red,

@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/constants/app_constants.dart';
@@ -90,7 +91,7 @@ class _DevelopmentRequestPageState extends State<DevelopmentRequestPage> {
               setState(() => _isSubmitting = true);
             } else if (state is DevelopmentRequestSuccess) {
               setState(() => _isSubmitting = false);
-              ScaffoldMessenger.of(context).showSnackBar(
+              AppToastMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
                   backgroundColor: AppColors.secondaryGreen,

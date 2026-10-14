@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,7 +46,7 @@ class _WishlistPageState extends State<WishlistPage> {
       body: BlocConsumer<WishlistCubit, WishlistState>(
         listener: (context, state) {
           if (state is WishlistOperationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 behavior: SnackBarBehavior.floating,

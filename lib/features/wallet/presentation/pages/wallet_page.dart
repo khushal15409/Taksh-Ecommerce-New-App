@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -988,7 +989,7 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedAccount == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppToastMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please select a bank account'),
           backgroundColor: AppColors.error,

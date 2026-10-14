@@ -121,6 +121,31 @@ class AddToCartButton extends StatelessWidget {
 
   /// Build the initial "Add" button
   Widget _buildAddButton(BuildContext context, {required bool isLoading}) {
+    // Round "+" button (compact cards, e.g. cart suggestions).
+    if (size == 'icon') {
+      return Material(
+        color: const Color(0xFFFF8A1F),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: isLoading ? null : () => _addToCart(context),
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: isLoading
+                ? const Padding(
+                    padding: EdgeInsets.all(11),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Icon(Icons.add_rounded, color: Colors.white, size: 26),
+          ),
+        ),
+      );
+    }
+
     final isSmall = size == 'small';
 
     if (isSmall) {
@@ -245,7 +270,7 @@ class AddToCartButton extends StatelessWidget {
     required int cartItemId,
     required bool isLoading,
   }) {
-    final isSmall = size == 'small';
+    final isSmall = size != 'large';
 
     if (isSmall) {
       return Container(

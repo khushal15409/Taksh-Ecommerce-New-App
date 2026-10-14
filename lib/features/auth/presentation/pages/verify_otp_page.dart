@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -119,7 +120,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
           if (state is Authenticated) {
             // Navigate to home page or the original destination
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(AppLocalizations.of(context)!.loginSuccess),
                 backgroundColor: AppColors.secondaryGreen,
@@ -134,7 +135,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
           }
 
           if (state is AuthOtpSent) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(AppLocalizations.of(context)!.otpResentSuccess),
                 backgroundColor: AppColors.secondaryGreen,
@@ -259,7 +260,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   top: 0,
                                   left: 0,
                                   right: 0,
-                                  height: 56,
+                                  height: 64,
                                   child: IgnorePointer(
                                     child: ValueListenableBuilder<
                                       TextEditingValue
@@ -281,17 +282,25 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                                   ),
                                                   alignment: Alignment.center,
                                                   decoration: BoxDecoration(
-                                                    color: AppColors.grey50,
+                                                    color: filled
+                                                        ? const Color(
+                                                            0xFFFFF4E6,
+                                                          )
+                                                        : Colors.white,
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                          14,
+                                                          16,
                                                         ),
                                                     border: Border.all(
-                                                      color: active
+                                                      color: active ||
+                                                              filled
                                                           ? AppColors
                                                                 .primaryOrange
                                                           : theme.dividerColor,
-                                                      width: active ? 2 : 1,
+                                                      width:
+                                                          active || filled
+                                                          ? 2
+                                                          : 1.2,
                                                     ),
                                                   ),
                                                   child: Text(
@@ -303,7 +312,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                                         .titleLarge
                                                         ?.copyWith(
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                              FontWeight.w800,
+                                                          fontSize: 28,
+                                                          color: AppColors
+                                                              .grey900,
                                                         ),
                                                   ),
                                                 ),
@@ -320,11 +332,16 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   keyboardType: TextInputType.number,
                                   maxLength: AppConstants.otpLength,
                                   enabled: !_isLoading,
+                                  autofocus: true,
                                   showCursor: false,
                                   enableInteractiveSelection: false,
+                                  autofillHints: const [
+                                    AutofillHints.oneTimeCode,
+                                  ],
                                   style: const TextStyle(
                                     color: Colors.transparent,
                                     fontSize: 24,
+                                    height: 1.0,
                                   ),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
@@ -334,12 +351,16 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   ],
                                   decoration: const InputDecoration(
                                     counterText: '',
+                                    // The app theme fills inputs; without
+                                    // this the field hides the digit boxes.
+                                    filled: false,
+                                    fillColor: Colors.transparent,
                                     border: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     disabledBorder: InputBorder.none,
                                     contentPadding: EdgeInsets.symmetric(
-                                      vertical: 14,
+                                      vertical: 20,
                                     ),
                                   ),
                                   validator: (value) => Validators.getOtpError(

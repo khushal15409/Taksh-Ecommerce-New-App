@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -79,7 +80,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
 
           if (!mounted) return;
 
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(message),
               backgroundColor: AppColors.secondaryGreen,
@@ -472,7 +473,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
         });
 
         if (_selectedImages.length == 5 && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Maximum 5 images allowed')),
           );
         }
@@ -484,7 +485,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
 
       if (_selectedImages.length >= 5) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppToastMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Maximum 5 images allowed')),
         );
         return;
@@ -495,7 +496,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
+      AppToastMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
     }
@@ -505,7 +506,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedItem == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppToastMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No order item selected for return')),
       );
       return;

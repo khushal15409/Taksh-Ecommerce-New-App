@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -232,7 +233,7 @@ class _ServiceHistoryBody extends StatelessWidget {
       body: BlocListener<HomeServiceCubit, HomeServiceState>(
         listener: (context, state) {
           if (state is ServiceBookingCancelled) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Booking cancelled successfully'),
                 backgroundColor: Color(0xFF2E7D32),
@@ -241,7 +242,7 @@ class _ServiceHistoryBody extends StatelessWidget {
             );
             context.read<HomeServiceCubit>().fetchServiceBookings(perPage: 15);
           } else if (state is ServiceBookingCancelError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            AppToastMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: AppColors.error,
@@ -758,7 +759,7 @@ class _BookingDetailBody extends StatelessWidget {
     return BlocListener<HomeServiceCubit, HomeServiceState>(
       listener: (context, state) {
         if (state is ServiceBookingCancelled) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Booking cancelled successfully'),
               backgroundColor: Color(0xFF2E7D32),
@@ -767,7 +768,7 @@ class _BookingDetailBody extends StatelessWidget {
           );
           context.read<HomeServiceCubit>().fetchServiceBookingDetail(bookingId);
         } else if (state is ServiceBookingCancelError) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppToastMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
               backgroundColor: AppColors.error,

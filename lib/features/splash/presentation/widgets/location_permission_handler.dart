@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -190,7 +191,7 @@ class LocationPermissionHandler extends StatelessWidget {
 
   /// Show a snackbar with location status
   static void showLocationStatus(BuildContext context, bool granted) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    AppToastMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [

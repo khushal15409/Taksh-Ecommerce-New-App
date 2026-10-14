@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
-import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
+import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_section_card.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Widget for selecting payment method (COD or Online)
@@ -36,58 +36,34 @@ class _PaymentMethodSelectorWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.credit_card_rounded,
-              color: AppColors.primaryOrange,
-              size: 30,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              AppLocalizations.of(context)!.paymentMethod,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: AppColors.grey900,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: festiveCardDecoration(radius: 22),
-          child: Column(
-            children: [
-              // COD Payment Method
-              _buildPaymentMethodTile(
-                method: PaymentMethodSelection.cod,
-                icon: Icons.payments_outlined,
-                title: PaymentMethodType.cod.displayName,
-                subtitle: PaymentMethodSelection.cod.description,
-                isSelected: _selectedMethod.type == PaymentMethodType.cod,
-                onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
-              ),
-              const SizedBox(height: 8),
-              // Online Payment Method
-              _buildPaymentMethodTile(
-                method: PaymentMethodSelection.online,
-                icon: Icons.credit_card_rounded,
-                title: PaymentMethodType.online.displayName,
-                subtitle: PaymentMethodSelection.online.description,
-                isSelected: _selectedMethod.type == PaymentMethodType.online,
-                onTap: () =>
-                    _selectPaymentMethod(PaymentMethodSelection.online),
-                trailing: _buildPaymentLogos(),
-              ),
-            ],
+    return CheckoutSectionCard(
+      icon: Icons.account_balance_wallet_outlined,
+      title: AppLocalizations.of(context)!.paymentMethod,
+      bodyPadding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+      child: Column(
+        children: [
+          // COD Payment Method
+          _buildPaymentMethodTile(
+            method: PaymentMethodSelection.cod,
+            icon: Icons.payments_outlined,
+            title: PaymentMethodType.cod.displayName,
+            subtitle: PaymentMethodSelection.cod.description,
+            isSelected: _selectedMethod.type == PaymentMethodType.cod,
+            onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          // Online Payment Method
+          _buildPaymentMethodTile(
+            method: PaymentMethodSelection.online,
+            icon: Icons.credit_card_rounded,
+            title: PaymentMethodType.online.displayName,
+            subtitle: PaymentMethodSelection.online.description,
+            isSelected: _selectedMethod.type == PaymentMethodType.online,
+            onTap: () => _selectPaymentMethod(PaymentMethodSelection.online),
+            trailing: _buildPaymentLogos(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -122,8 +98,8 @@ class _PaymentMethodSelectorWidgetState
           children: [
             // Icon
             Container(
-              width: 64,
-              height: 64,
+              width: 58,
+              height: 58,
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primaryOrange.withOpacity(0.18)
@@ -147,7 +123,7 @@ class _PaymentMethodSelectorWidgetState
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 19,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: isSelected
                           ? AppColors.primaryOrange
@@ -176,7 +152,7 @@ class _PaymentMethodSelectorWidgetState
                 isSelected
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
-                size: 34,
+                size: 32,
                 color: isSelected
                     ? AppColors.primaryOrange
                     : AppColors.grey900,
@@ -191,46 +167,31 @@ class _PaymentMethodSelectorWidgetState
   Widget _buildPaymentLogos() {
     return Wrap(
       spacing: 8,
-      runSpacing: 8,
+      runSpacing: 6,
       children: [
-        _buildPaymentLogo('Razorpay', Icons.bolt_rounded, Colors.blue.shade700),
-        _buildPaymentLogo('Cards', Icons.credit_card, Colors.green.shade700),
-        _buildPaymentLogo(
-          'UPI',
-          Icons.account_balance_outlined,
-          Colors.orange.shade700,
-        ),
-        _buildPaymentLogo(
-          'Wallets',
-          Icons.account_balance_wallet_rounded,
-          Colors.purple.shade700,
-        ),
+        _buildPaymentLogo('Razorpay', Colors.blue.shade700),
+        _buildPaymentLogo('Cards', Colors.green.shade700),
+        _buildPaymentLogo('UPI', Colors.orange.shade700),
+        _buildPaymentLogo('Wallets', Colors.purple.shade700),
       ],
     );
   }
 
-  Widget _buildPaymentLogo(String label, IconData icon, Color color) {
+  Widget _buildPaymentLogo(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withOpacity(0.35)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }

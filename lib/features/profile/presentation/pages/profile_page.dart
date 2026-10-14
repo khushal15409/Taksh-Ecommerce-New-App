@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
@@ -343,7 +344,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           );
                         } else {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            AppToastMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
                                   AppLocalizations.of(context)!.whatsappError,
@@ -584,7 +585,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return InkWell(
       onTap: () {
         context.read<SplashCubit>().updateTheme(mode);
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppToastMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.themeChanged(label)),
             duration: const Duration(seconds: 1),
@@ -770,7 +771,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // Update app locale via SplashCubit
         context.read<SplashCubit>().updateLocale(Locale(langCode));
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppToastMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.languageChanged(label)),
             duration: const Duration(seconds: 1),
@@ -1212,7 +1213,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     await launchUrl(emailUri);
                   } else {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      AppToastMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(l10n.emailAppError)),
                       );
                     }
@@ -1236,7 +1237,7 @@ class _ProfilePageState extends State<ProfilePage> {
           listener: (context, state) {
             if (state is CallbackRequestSuccess) {
               Navigator.of(dialogContext).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
+              AppToastMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
                   backgroundColor: AppColors.secondaryGreen,

@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
@@ -432,11 +433,30 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     priceBlock,
                     const SizedBox(width: 10),
                     Expanded(
-                      child: AddToCartButton(
-                        productVariantId: variantId!,
-                        productId: product.id,
-                        size: 'large',
-                        outlined: true,
+                      // Once this variant is in the cart, offer "View Cart"
+                      // instead of "Add to Cart".
+                      child: BlocBuilder<CartCubit, CartState>(
+                        builder: (context, _) {
+                          final inCart = context
+                              .read<CartCubit>()
+                              .standardCart
+                              .items
+                              .any(
+                                (item) =>
+                                    item.productVariantId == variantId &&
+                                    CartCubit.matchesDeliveryType(
+                                      item,
+                                      CartCubit.deliveryTypeStandard,
+                                    ),
+                              );
+                          if (inCart) return _buildViewCartButton();
+                          return AddToCartButton(
+                            productVariantId: variantId!,
+                            productId: product.id,
+                            size: 'large',
+                            outlined: true,
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -444,6 +464,37 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ],
                 )
               : _buildOutOfStockActions(product),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildViewCartButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: () => context.go(AppRoutes.cart),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _accent,
+          side: const BorderSide(color: _accent, width: 1.6),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        child: const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.shopping_cart_checkout_rounded, size: 20),
+              SizedBox(width: 6),
+              Text(
+                'View Cart',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -623,7 +674,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ? cart
           : _getCartFromState(cartState);
       if (updatedCart == null || updatedCart.items.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppToastMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Cart is empty. Please try again.'),
             behavior: SnackBarBehavior.floating,
@@ -677,7 +728,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   void _showOutOfStockSnackBar(String message) {
-    ScaffoldMessenger.of(context)
+    AppToastMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
@@ -1113,7 +1164,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         : () {
                             final pincode = _pincodeController.text.trim();
                             if (pincode.length != 6) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              AppToastMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
                                     AppLocalizations.of(
