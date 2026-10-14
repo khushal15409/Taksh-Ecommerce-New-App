@@ -130,17 +130,17 @@ class AddToCartButton extends StatelessWidget {
           customBorder: const CircleBorder(),
           onTap: isLoading ? null : () => _addToCart(context),
           child: SizedBox(
-            width: 40,
-            height: 40,
+            width: 22,
+            height: 22,
             child: isLoading
                 ? const Padding(
-                    padding: EdgeInsets.all(11),
+                    padding: EdgeInsets.all(5),
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Icon(Icons.add_rounded, color: Colors.white, size: 26),
+                : const Icon(Icons.add_rounded, color: Colors.white, size: 14),
           ),
         ),
       );

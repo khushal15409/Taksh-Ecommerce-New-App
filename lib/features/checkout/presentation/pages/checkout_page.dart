@@ -9,7 +9,6 @@ import 'package:taksh_e_commerce/core/services/razorpay_service.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
 import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
-import 'package:taksh_e_commerce/core/widgets/festive_page_header.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart_item.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
@@ -21,7 +20,7 @@ import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_ev
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_state.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/pages/order_review_page.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/address_selector_widget.dart';
-import 'package:taksh_e_commerce/core/widgets/dashed_divider.dart';
+import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_item_card.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_section_card.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/payment_method_selector_widget.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/price_breakdown_widget.dart';
@@ -359,11 +358,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
         child: BlocBuilder<CheckoutBloc, CheckoutState>(
           buildWhen: (previous, current) => current is OrderCreating,
           builder: (context, state) {
-            final header = FestivePageHeader(
+            final header = _CheckoutHeader(
               title: AppLocalizations.of(context)!.checkout,
-              subtitle: 'Review your order and complete the payment',
-              artOpacity: 0.9,
-              bottom: const _CheckoutStepper(),
+              subtitle: 'Review your order and complete payment',
               onBack: () => Navigator.of(context).maybePop(),
             );
 
@@ -383,17 +380,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 header,
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _OrderItemsSection(),
-                        SizedBox(height: 14),
-                        AddressSelectorWidget(),
-                        SizedBox(height: 14),
-                        PaymentMethodSelectorWidget(),
-                        SizedBox(height: 14),
-                        _PriceBreakdownSection(),
+                        SizedBox(height: 10),
+                        _SectionInset(child: AddressSelectorWidget()),
+                        SizedBox(height: 9),
+                        _SectionInset(child: PaymentMethodSelectorWidget()),
+                        SizedBox(height: 9),
+                        _SectionInset(child: _PriceBreakdownSection()),
                       ],
                     ),
                   ),
@@ -473,21 +470,155 @@ class _OrderItemsSectionState extends State<_OrderItemsSection> {
         }
 
         final items = state.summary.items;
+        final first = items.isNotEmpty ? items.first : null;
 
-        return CheckoutSectionCard(
-          icon: Icons.shopping_bag_outlined,
-          iconColor: AppColors.primaryOrange,
-          title: AppLocalizations.of(context)!.itemsCount(items.length),
-          actionLabel: AppLocalizations.of(context)!.edit,
-          onAction: () => context.pop(),
-          expanded: _showItemDetails,
-          onToggle: () => setState(() => _showItemDetails = !_showItemDetails),
-          bodyPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        return Container(
+          decoration: checkoutCardDecoration(),
           child: Column(
             children: [
-              for (var i = 0; i < items.length; i++) ...[
-                if (i > 0) const Divider(height: 20),
-                _buildItemRow(context, items[i]),
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => setState(() => _showItemDetails = !_showItemDetails),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(9, 8, 10, 9),
+                  child: first == null
+                      ? Text(AppLocalizations.of(context)!.itemsCount(0))
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: first.image != null
+                                  ? Image.network(
+                                      first.image!,
+                                      width: 64,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              _itemPlaceholder(context),
+                                    )
+                                  : _itemPlaceholder(context),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 3,
+                                          ),
+                                          child: Text(
+                                            first.productName,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.grey900,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        _showItemDetails
+                                            ? Icons.keyboard_arrow_up_rounded
+                                            : Icons.keyboard_arrow_down_rounded,
+                                        color: AppColors.primaryOrange,
+                                        size: 16,
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    first.variantName != null &&
+                                            first.variantName!.trim().isNotEmpty
+                                        ? first.variantName!
+                                        : AppLocalizations.of(
+                                            context,
+                                          )!.sku(first.sku),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 10.5,
+                                      color: AppColors.grey600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '₹${first.price}',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.primaryOrange,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 84,
+                                        height: 25,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFF4E6),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          border: Border.all(
+                                            color: AppColors.primaryOrange,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Qty: ${first.qty}',
+                                          style: const TextStyle(
+                                            color: AppColors.primaryOrange,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 11.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+              if (_showItemDetails) ...[
+                const Divider(height: 1),
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: items.length,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    return CheckoutItemCard(item: items[index]);
+                  },
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () => context.pop(),
+                    icon: const Icon(Icons.edit_rounded, size: 14),
+                    label: Text(AppLocalizations.of(context)!.edit),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primaryOrange,
+                      textStyle: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ),
               ],
             ],
           ),
@@ -496,96 +627,14 @@ class _OrderItemsSectionState extends State<_OrderItemsSection> {
     );
   }
 
-  Widget _buildItemRow(BuildContext context, CartItem item) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: item.image != null
-              ? Image.network(
-                  item.image!,
-                  width: 82,
-                  height: 82,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      _itemPlaceholder(context),
-                )
-              : _itemPlaceholder(context),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.productName,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.grey900,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                item.variantName != null && item.variantName!.trim().isNotEmpty
-                    ? item.variantName!
-                    : AppLocalizations.of(context)!.sku(item.sku),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14, color: AppColors.grey600),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '₹${item.price}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primaryOrange,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF1E0),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${item.qty}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.grey900,
-                ),
-              ),
-              Text(
-                item.qty == 1 ? 'item' : 'items',
-                style: const TextStyle(fontSize: 14, color: AppColors.grey700),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _itemPlaceholder(BuildContext context) {
     return Container(
-      width: 82,
-      height: 82,
+      width: 64,
+      height: 60,
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Icon(
         Icons.image_not_supported,
-        size: 28,
+        size: 22,
         color: Theme.of(context).disabledColor,
       ),
     );
@@ -648,103 +697,85 @@ class _CheckoutBottomBar extends StatelessWidget {
             addressState is AddressesLoaded && addressState.addresses.isEmpty;
 
         return Container(
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+            color: const Color(0xFFFFF3E6),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.08),
                 blurRadius: 10,
                 offset: const Offset(0, -3),
               ),
             ],
           ),
-          padding: const EdgeInsets.fromLTRB(20, 12, 16, 8),
-          child: SafeArea(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IntrinsicWidth(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+          child: Stack(
+            children: [
+              const Positioned(
+                left: -18,
+                bottom: -14,
+                child: IgnorePointer(
+                  child: Icon(
+                    Icons.filter_vintage_rounded,
+                    size: 80,
+                    color: Color(0xFFFFE3C2),
+                  ),
+                ),
+              ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(46, 9, 14, 9),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        AppLocalizations.of(context)!.totalAmount,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: AppColors.grey700,
+                      IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.totalAmount,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                color: AppColors.grey700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              hasNoAddresses
+                                  ? '₹0.00'
+                                  : '₹${grandTotal.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryOrange,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        hasNoAddresses
-                            ? '₹0.00'
-                            : '₹${grandTotal.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryOrange,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _PlaceOrderButton(
+                          enabled:
+                              canPlaceOrder && !isProcessing && !hasNoAddresses,
+                          isProcessing: isProcessing,
+                          hasNoAddresses: hasNoAddresses,
+                          isCod: paymentMethod.type == PaymentMethodType.cod,
+                          onTap: () => context
+                              .findAncestorStateOfType<_CheckoutPageState>()
+                              ?._processCheckout(),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: FestiveGradientButton(
-                    onPressed: canPlaceOrder && !isProcessing && !hasNoAddresses
-                        ? () => context
-                              .findAncestorStateOfType<_CheckoutPageState>()
-                              ?._processCheckout()
-                        : null,
-                    child: isProcessing
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (!hasNoAddresses) ...[
-                                const Icon(Icons.verified_user_rounded, size: 22),
-                                const SizedBox(width: 8),
-                              ],
-                              Flexible(
-                                child: Text(
-                                  hasNoAddresses
-                                      ? AppLocalizations.of(context)!.addAddress
-                                      : (paymentMethod.type ==
-                                                PaymentMethodType.cod
-                                            ? AppLocalizations.of(
-                                                context,
-                                              )!.placeOrder
-                                            : AppLocalizations.of(
-                                                context,
-                                              )!.proceedToPay),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward_rounded, size: 22),
-                            ],
-                          ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -752,72 +783,231 @@ class _CheckoutBottomBar extends StatelessWidget {
   }
 }
 
-/// Decorative Cart → Address → Payment progress shown in the header.
-class _CheckoutStepper extends StatelessWidget {
-  const _CheckoutStepper();
+class _PlaceOrderButton extends StatelessWidget {
+  final bool enabled;
+  final bool isProcessing;
+  final bool hasNoAddresses;
+  final bool isCod;
+  final VoidCallback onTap;
+
+  const _PlaceOrderButton({
+    required this.enabled,
+    required this.isProcessing,
+    required this.hasNoAddresses,
+    required this.isCod,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Widget step(IconData icon, String label, {bool done = false}) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
+    final l10n = AppLocalizations.of(context)!;
+    final label = hasNoAddresses
+        ? l10n.addAddress
+        : (isCod ? l10n.placeOrder : l10n.proceedToPay);
+
+    return Container(
+      height: 36,
+      decoration: BoxDecoration(
+        gradient: enabled ? festiveOrangeGradient : null,
+        color: enabled ? null : Theme.of(context).disabledColor,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: enabled
+            ? [
+                BoxShadow(
+                  color: AppColors.primaryOrange.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: enabled ? onTap : null,
+          child: Center(
+            child: isProcessing
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (!hasNoAddresses) ...[
+                        const Icon(
+                          Icons.verified_user_rounded,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Adds the small extra side inset the section cards have in the design.
+class _SectionInset extends StatelessWidget {
+  final Widget child;
+
+  const _SectionInset({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3.5),
+      child: child,
+    );
+  }
+}
+
+/// Festive checkout header: back button, title and subtitle.
+class _CheckoutHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final VoidCallback onBack;
+
+  const _CheckoutHeader({
+    required this.title,
+    required this.subtitle,
+    required this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return Container(
+      height: topPadding + 79,
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 0),
+      clipBehavior: Clip.hardEdge,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFE8431C), Color(0xFFFF8A1F), Color(0xFFFFB75E)],
+        ),
+      ),
+      child: Stack(
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: done ? Colors.white : Colors.transparent,
-              border: Border.all(color: Colors.white, width: 2),
-            ),
-            child: Icon(
-              icon,
-              size: 26,
-              color: done ? const Color(0xFFE8431C) : Colors.white,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.9,
+                child: Image.asset(
+                  FestiveHeaderBackdrop.festiveOrangeAsset,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                  gaplessPlayback: true,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
+          const Positioned(
+            left: 0,
+            bottom: 8,
+            child: IgnorePointer(
+              child: Icon(Icons.eco_rounded, size: 34, color: Color(0xFF3E8E41)),
+            ),
+          ),
+          const Positioned(
+            right: 4,
+            bottom: 6,
+            child: IgnorePointer(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.local_fire_department_rounded,
+                    size: 26,
+                    color: Color(0xFFFFD36B),
+                  ),
+                  SizedBox(width: 2),
+                  Icon(
+                    Icons.card_giftcard_rounded,
+                    size: 40,
+                    color: Color(0xFFD64A8A),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 14,
+            top: topPadding + 3,
+            child: Material(
               color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              borderRadius: BorderRadius.circular(8),
+              elevation: 2,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: onBack,
+                child: const SizedBox(
+                  width: 30,
+                  height: 29,
+                  child: Icon(
+                    Icons.arrow_back_rounded,
+                    size: 17,
+                    color: AppColors.grey900,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 56,
+            top: topPadding + 21,
+            right: 120,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                ),
+              ],
             ),
           ),
         ],
-      );
-    }
-
-    Widget link({bool check = false}) {
-      return Expanded(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 22),
-          child: Row(
-            children: [
-              const Expanded(child: DashedDivider(color: Colors.white)),
-              if (check)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: Icon(Icons.check_rounded, color: Colors.white, size: 18),
-                ),
-              if (check)
-                const Expanded(child: DashedDivider(color: Colors.white)),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        step(Icons.shopping_cart_outlined, 'Cart', done: true),
-        link(check: true),
-        step(Icons.location_on_outlined, 'Address'),
-        link(),
-        step(Icons.currency_rupee_rounded, 'Payment'),
-      ],
+      ),
     );
   }
 }

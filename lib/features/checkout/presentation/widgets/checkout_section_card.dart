@@ -107,3 +107,57 @@ class CheckoutSectionCard extends StatelessWidget {
     );
   }
 }
+
+/// Section heading used above the checkout cards (icon + title + optional
+/// trailing action).
+class CheckoutSectionTitle extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final Widget? trailing;
+
+  const CheckoutSectionTitle({
+    super.key,
+    required this.icon,
+    required this.title,
+    this.iconColor = AppColors.primaryOrange,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 7),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 16),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.grey900,
+              ),
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
+      ),
+    );
+  }
+}
+
+/// White rounded card used under [CheckoutSectionTitle].
+BoxDecoration checkoutCardDecoration() => BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(12),
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.06),
+      blurRadius: 10,
+      offset: const Offset(0, 2),
+    ),
+  ],
+);

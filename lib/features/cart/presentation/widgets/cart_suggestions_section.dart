@@ -76,14 +76,14 @@ class _CartSuggestionsSectionState extends State<CartSuggestionsSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(2, 6, 2, 10),
+          padding: const EdgeInsets.fromLTRB(2, 12, 2, 8),
           child: Row(
             children: [
               const Expanded(
                 child: Text(
                   'You may also like',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
@@ -98,12 +98,13 @@ class _CartSuggestionsSectionState extends State<CartSuggestionsSection> {
                       style: TextStyle(
                         color: AppColors.primaryOrange,
                         fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                        fontSize: 11.5,
                       ),
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
                       color: AppColors.primaryOrange,
+                      size: 16,
                     ),
                   ],
                 ),
@@ -112,19 +113,19 @@ class _CartSuggestionsSectionState extends State<CartSuggestionsSection> {
           ),
         ),
         SizedBox(
-          height: 206,
+          height: 118,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
             itemCount: visible.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, __) => const SizedBox(width: 9),
             itemBuilder: (context, index) => _SuggestionCard(
               product: visible[index],
               isQuickDelivery: widget.isQuickDelivery,
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
       ],
     );
   }
@@ -154,11 +155,11 @@ class _SuggestionCard extends StatelessWidget {
         ),
       ),
       child: Container(
-        width: 148,
-        padding: const EdgeInsets.all(10),
+        width: 91,
+        padding: const EdgeInsets.fromLTRB(14, 8, 14, 7),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.92),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xFFFFE6CC)),
         ),
         child: Column(
@@ -166,7 +167,7 @@ class _SuggestionCard extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(7),
                 child: SizedBox(
                   width: double.infinity,
                   child: imageUrl == null || imageUrl.isEmpty
@@ -185,35 +186,45 @@ class _SuggestionCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               product.name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 10,
                 height: 1.2,
                 color: AppColors.grey900,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Row(
               children: [
-                Expanded(
+                Flexible(
+                  flex: 5,
                   child: Text(
                     price == null ? '' : '₹$price',
                     style: const TextStyle(
-                      fontSize: 17,
+                      fontSize: 12.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primaryOrange,
                     ),
                   ),
                 ),
-                AddToCartButton(
-                  productVariantId: variant.id,
-                  productId: product.id,
-                  size: 'icon',
-                  isQuickDelivery: isQuickDelivery,
+                Flexible(
+                  flex: 4,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: AddToCartButton(
+                        productVariantId: variant.id,
+                        productId: product.id,
+                        size: 'icon',
+                        isQuickDelivery: isQuickDelivery,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

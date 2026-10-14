@@ -162,7 +162,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                       // Icon with tricolor circle
                       Center(
                         child: Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
                             shape: BoxShape.circle,
@@ -178,7 +178,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           ),
                           child: Icon(
                             Icons.phonelink_ring_outlined,
-                            size: 40,
+                            size: 32,
                             color: Theme.of(context).primaryColor,
                           ),
                         ),
@@ -188,11 +188,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                       // Title
                       Text(
                         AppLocalizations.of(context)!.verifyOtp,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(
-                            context,
-                          ).textTheme.headlineSmall?.color,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.grey900,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -216,8 +215,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               AppLocalizations.of(
                                 context,
                               )!.enterOtpDescription(widget.phone),
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.textTheme.bodyMedium?.color,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                height: 1.35,
+                                color: AppColors.grey700,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -238,10 +239,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
                       // OTP Card
                       Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
                         decoration: BoxDecoration(
                           color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
@@ -254,13 +255,16 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           children: [
                             // OTP input: transparent real field on top of
                             // visual digit boxes (keeps controller/validator).
-                            Stack(
+                            Center(
+                              child: SizedBox(
+                                width: 4 * 58.0 + 3 * 12.0,
+                                child: Stack(
                               children: [
                                 Positioned(
                                   top: 0,
                                   left: 0,
                                   right: 0,
-                                  height: 64,
+                                  height: 58,
                                   child: IgnorePointer(
                                     child: ValueListenableBuilder<
                                       TextEditingValue
@@ -278,7 +282,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                               return Expanded(
                                                 child: Container(
                                                   margin: EdgeInsets.only(
-                                                    left: i == 0 ? 0 : 10,
+                                                    left: i == 0 ? 0 : 12,
                                                   ),
                                                   alignment: Alignment.center,
                                                   decoration: BoxDecoration(
@@ -313,7 +317,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                                         ?.copyWith(
                                                           fontWeight:
                                                               FontWeight.w800,
-                                                          fontSize: 28,
+                                                          fontSize: 24,
                                                           color: AppColors
                                                               .grey900,
                                                         ),
@@ -360,7 +364,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                     focusedBorder: InputBorder.none,
                                     disabledBorder: InputBorder.none,
                                     contentPadding: EdgeInsets.symmetric(
-                                      vertical: 20,
+                                      vertical: 17,
                                     ),
                                   ),
                                   validator: (value) => Validators.getOtpError(
@@ -371,6 +375,8 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                   onFieldSubmitted: (_) => _handleVerifyOtp(),
                                 ),
                               ],
+                            ),
+                              ),
                             ),
 
                             const SizedBox(
@@ -399,8 +405,8 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                         context,
                                       )!.verifyOtpButton,
                                       style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
                             ),
@@ -416,8 +422,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                         children: [
                           Text(
                             AppLocalizations.of(context)!.didNotReceiveCode,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.textTheme.bodySmall?.color,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.grey700,
                             ),
                           ),
                           if (_resendTimer > 0)
@@ -435,8 +442,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 AppLocalizations.of(
                                   context,
                                 )!.resendIn(_resendTimer),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.textTheme.bodyMedium?.color,
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: AppColors.grey800,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -450,7 +458,8 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               child: Text(
                                 AppLocalizations.of(context)!.resendOtp,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),

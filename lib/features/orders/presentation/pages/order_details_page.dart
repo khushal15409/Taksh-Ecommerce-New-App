@@ -72,7 +72,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget _buildPageHeader(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     return Container(
-      height: topPadding + 124,
+      height: topPadding + 73,
       width: double.infinity,
       clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(
@@ -86,13 +86,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       child: Stack(
         children: [
           Positioned(
-            right: 8,
-            top: topPadding + 4,
+            right: 2,
+            top: 0,
             child: const IgnorePointer(child: _OrderBoxArt()),
           ),
           Positioned(
-            left: 16,
-            top: topPadding + 22,
+            left: 13.5,
+            top: topPadding + 15,
             child: Material(
               color: Colors.white.withOpacity(0.92),
               shape: const CircleBorder(),
@@ -102,11 +102,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 customBorder: const CircleBorder(),
                 onTap: () => Navigator.of(context).maybePop(),
                 child: const SizedBox(
-                  width: 56,
-                  height: 56,
+                  width: 34,
+                  height: 34,
                   child: Icon(
                     Icons.arrow_back_rounded,
-                    size: 28,
+                    size: 18,
                     color: AppColors.grey900,
                   ),
                 ),
@@ -114,8 +114,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
           ),
           Positioned(
-            left: 88,
-            top: topPadding + 24,
+            left: 59,
+            top: topPadding + 15,
             right: 150,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,14 +123,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 Text(
                   AppLocalizations.of(context)!.orderDetails,
                   style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
                 ),
                 const Text(
                   'Track your order & view details',
-                  style: TextStyle(fontSize: 14, color: AppColors.grey700),
+                  style: TextStyle(fontSize: 11.5, color: AppColors.grey700),
                 ),
               ],
             ),
@@ -212,21 +212,21 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   /// Build order details content
   Widget _buildOrderDetails(BuildContext context, Order order) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+      padding: const EdgeInsets.fromLTRB(11, 0, 11, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildOrderHeaderCard(order),
-          const SizedBox(height: 14),
+          const SizedBox(height: 9),
           _buildOrderTimelineSection(order),
-          const SizedBox(height: 14),
+          const SizedBox(height: 9),
           _buildOrderItemsSection(order),
-          const SizedBox(height: 14),
+          const SizedBox(height: 9),
           _buildOrderSummarySection(order),
-          const SizedBox(height: 14),
+          const SizedBox(height: 9),
           if (order.address != null) ...[
             _buildDeliveryAddressSection(order),
-            const SizedBox(height: 14),
+            const SizedBox(height: 9),
           ],
           _buildActionButtons(order),
         ],
@@ -245,10 +245,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: const EdgeInsets.fromLTRB(7, 7, 7, 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -262,24 +262,25 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         children: [
           Row(
             children: [
+              const SizedBox(width: 4),
               if (filledIcon)
                 Container(
-                  width: 34,
-                  height: 34,
+                  width: 16,
+                  height: 16,
                   decoration: BoxDecoration(
                     color: iconColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: Colors.white, size: 20),
+                  child: Icon(icon, color: Colors.white, size: 10),
                 )
               else
-                Icon(icon, color: iconColor, size: 30),
-              const SizedBox(width: 10),
+                Icon(icon, color: iconColor, size: 16),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 21,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
@@ -288,7 +289,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               if (trailing != null) trailing,
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           child,
         ],
       ),
@@ -316,15 +317,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 29,
+              height: 29,
               decoration: BoxDecoration(
                 color: tint.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: tint, size: 24),
+              child: Icon(icon, color: tint, size: 16),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,8 +335,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
                       color: valueColor ?? AppColors.grey900,
                     ),
                   ),
@@ -344,7 +345,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 9.5,
                       color: AppColors.grey600,
                     ),
                   ),
@@ -357,10 +358,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(7, 10, 7, 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -375,8 +376,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 24,
+                height: 24,
                 decoration: const BoxDecoration(
                   color: Color(0xFFFFE7CC),
                   shape: BoxShape.circle,
@@ -384,10 +385,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 child: const Icon(
                   Icons.receipt_long_rounded,
                   color: AppColors.primaryOrange,
-                  size: 26,
+                  size: 14,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 7.5),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,7 +398,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 13.5,
                         fontWeight: FontWeight.w800,
                         color: AppColors.grey900,
                       ),
@@ -406,17 +407,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       l10n.placedOn(_formatDateTimeAmPm(order.createdAt)),
                       style: const TextStyle(
                         color: AppColors.grey600,
-                        fontSize: 14,
+                        fontSize: 10.5,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               _buildStatusChip(order.orderStatus),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 13),
           Row(
             children: [
               infoCell(
@@ -427,7 +428,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 width: 1,
-                height: 40,
+                height: 24,
                 margin: const EdgeInsets.symmetric(horizontal: 6),
                 color: Colors.black.withOpacity(0.08),
               ),
@@ -439,7 +440,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 width: 1,
-                height: 40,
+                height: 24,
                 margin: const EdgeInsets.symmetric(horizontal: 6),
                 color: Colors.black.withOpacity(0.08),
               ),
@@ -462,50 +463,56 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               _formatDate(order.estimatedDeliveryTime!),
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 11),
           Row(
             children: [
               Expanded(
+                flex: 12,
                 child: OutlinedButton.icon(
                   onPressed: () => _downloadInvoice(order),
-                  icon: const Icon(Icons.download_rounded, size: 20),
+                  icon: const Icon(Icons.download_rounded, size: 13),
                   label: const Text('Download Invoice'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 6),
                     side: const BorderSide(
                       color: AppColors.secondaryGreen,
                       width: 1.5,
                     ),
                     foregroundColor: AppColors.secondaryGreen,
                     backgroundColor: const Color(0xFFF2FAF3),
+                    minimumSize: const Size(0, 26),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 15,
+                      fontSize: 10.5,
                     ),
                   ),
                 ),
               ),
               if (canCancel) ...[
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
+                  flex: 10,
                   child: OutlinedButton.icon(
                     onPressed: () => _cancelOrder(order),
-                    icon: const Icon(Icons.cancel_rounded, size: 22),
+                    icon: const Icon(Icons.cancel_rounded, size: 14),
                     label: Text(l10n.cancelOrder),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       side: const BorderSide(color: Color(0xFFE53935), width: 1.5),
                       foregroundColor: const Color(0xFFE53935),
                       backgroundColor: const Color(0xFFFFF4F4),
+                      minimumSize: const Size(0, 26),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       textStyle: const TextStyle(
                         fontWeight: FontWeight.w700,
-                        fontSize: 15,
+                        fontSize: 10.5,
                       ),
                     ),
                   ),
@@ -531,7 +538,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         children: [
           const Positioned(
             right: 0,
-            top: 40,
+            top: 16,
             child: IgnorePointer(child: _ParcelIllustration()),
           ),
           Padding(
@@ -564,25 +571,25 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 34,
+            width: 46,
             child: Column(
               children: [
                 Container(
-                  width: 30,
-                  height: 30,
+                  width: 14,
+                  height: 14,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: step.isCompleted ? completedColor : Colors.white,
                     border: Border.all(color: indicatorColor, width: 2),
                   ),
                   child: step.isCompleted
-                      ? const Icon(Icons.check, size: 18, color: Colors.white)
+                      ? const Icon(Icons.check, size: 9, color: Colors.white)
                       : null,
                 ),
                 if (!isLast)
                   Expanded(
                     child: Container(
-                      width: 2,
+                      width: 1.5,
                       margin: const EdgeInsets.symmetric(vertical: 2),
                       color: step.isCompleted ? completedColor : pendingColor,
                     ),
@@ -590,18 +597,18 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ],
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 12, right: 90),
+              padding: const EdgeInsets.only(bottom: 6, right: 95),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     step.title,
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
                       color: step.isCompleted
                           ? AppColors.grey900
                           : AppColors.grey800,
@@ -610,7 +617,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Text(
                     step.subtitle,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 10,
                       color: AppColors.grey600,
                     ),
                   ),
@@ -618,7 +625,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Text(
                       step.timeLabel,
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 10,
                         color: AppColors.grey600,
                       ),
                     ),
@@ -757,11 +764,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     final canReturn = order.orderStatus.toLowerCase() == 'delivered';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(bottom: 0),
+      padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(7),
         border: Border.all(color: Colors.black.withOpacity(0.12)),
       ),
       child: Column(
@@ -778,8 +785,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Text(
                       productName,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11.5,
                         color: AppColors.grey900,
                       ),
                     ),
@@ -788,7 +795,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         variantLabel,
                         style: const TextStyle(
                           color: AppColors.grey700,
-                          fontSize: 14,
+                          fontSize: 10,
                         ),
                       )
                     else if (sku.isNotEmpty)
@@ -796,17 +803,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         'SKU: $sku',
                         style: const TextStyle(
                           color: AppColors.grey700,
-                          fontSize: 14,
+                          fontSize: 10,
                         ),
                       ),
-                    const SizedBox(height: 2),
                     Text(
                       AppLocalizations.of(
                         context,
                       )!.qtyPrice(qty, unitPrice.toStringAsFixed(2)),
                       style: const TextStyle(
-                        color: AppColors.grey600,
-                        fontSize: 14,
+                        color: AppColors.grey700,
+                        fontSize: 10,
                       ),
                     ),
                   ],
@@ -815,19 +821,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 7,
+                  horizontal: 8,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFEBD6),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '₹${totalPrice.toStringAsFixed(2)}',
                   style: const TextStyle(
                     color: AppColors.primaryOrange,
                     fontWeight: FontWeight.w800,
-                    fontSize: 17,
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -871,7 +877,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       'returned',
     ].contains(order.orderStatus.toLowerCase());
     const bodyStyle = TextStyle(
-      fontSize: 16,
+      fontSize: 10.5,
       color: AppColors.grey800,
       height: 1.3,
     );
@@ -883,24 +889,24 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       trailing: canChange
           ? OutlinedButton.icon(
               onPressed: () => _requestAddressChange(order),
-              icon: const Icon(Icons.edit_note_rounded, size: 20),
+              icon: const Icon(Icons.edit_note_rounded, size: 12),
               label: const Text('Change Address'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primaryOrange,
                 side: const BorderSide(color: Color(0xFFFFB067)),
                 backgroundColor: const Color(0xFFFFF6EC),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: 8,
+                  vertical: 5,
                 ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 textStyle: const TextStyle(
                   fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                  fontSize: 10.5,
                 ),
               ),
             )
@@ -913,21 +919,21 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             child: IgnorePointer(child: _HouseIllustration()),
           ),
           ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 84),
+            constraints: const BoxConstraints(minHeight: 66),
             child: Padding(
-            padding: const EdgeInsets.only(left: 40, right: 100),
+            padding: const EdgeInsets.only(left: 25, right: 96),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   address.name,
                   style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11.5,
+                    height: 1.3,
                     color: AppColors.grey900,
                   ),
                 ),
-                const SizedBox(height: 2),
                 Text(address.mobile, style: bodyStyle),
                 Text(addressLine, style: bodyStyle),
                 Text(
@@ -986,7 +992,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             '₹${itemsTotal.toStringAsFixed(2)}',
           ),
           if (takshCharge != null && takshCharge != 0) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 3),
             _buildSummaryRow(
               l10n.takshCharge,
               '₹${takshCharge.toStringAsFixed(2)}',
@@ -994,33 +1000,35 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             ),
           ],
           if (platformFee != null && platformFee != 0) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 3),
             _buildSummaryRow(
               l10n.platformFee,
               '₹${platformFee.toStringAsFixed(2)}',
             ),
           ],
           if (quickDeliveryFee != null && quickDeliveryFee != 0) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 3),
             _buildSummaryRow(
               l10n.quickDeliveryFee,
               '₹${quickDeliveryFee.toStringAsFixed(2)}',
             ),
           ],
           if (discount != null && discount != 0) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 3),
             _buildSummaryRow(
               l10n.discountLabel,
               '- ₹${discount.abs().toStringAsFixed(2)}',
               valueColor: AppColors.secondaryGreen,
             ),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
+          Divider(height: 1, color: Colors.black.withOpacity(0.1)),
+          const SizedBox(height: 4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: const Color(0xFFFFEBD6),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1028,7 +1036,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 Text(
                   l10n.totalAmount,
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
@@ -1036,7 +1044,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 Text(
                   '₹${totalAmount.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryOrange,
                   ),
@@ -1050,7 +1058,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               'Refunds',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 3),
             for (final refund in order.refundTransactions)
               _buildRefundRow(refund),
           ],
@@ -1128,7 +1136,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
             ),
           ),
-        if (canReturn) const SizedBox(height: 14),
+        if (canReturn) const SizedBox(height: 9),
 
         // Need Help Section
         _sectionCard(
@@ -1142,51 +1150,55 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 AppLocalizations.of(context)!.orderIssues,
                 style: const TextStyle(
                   color: AppColors.grey700,
-                  fontSize: 15,
+                  fontSize: 10,
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 7),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: _openWhatsApp,
-                      icon: const Icon(Icons.chat_bubble_rounded, size: 20),
+                      icon: const Icon(Icons.chat_bubble_rounded, size: 14),
                       label: Text(AppLocalizations.of(context)!.chatWithUs),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         backgroundColor: const Color(0xFFFF8A1F),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        minimumSize: const Size(0, 30),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 15,
+                          fontSize: 11.5,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 7.5),
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: _openEmail,
-                      icon: const Icon(Icons.mail_outline_rounded, size: 20),
+                      icon: const Icon(Icons.mail_outline_rounded, size: 14),
                       label: Text(AppLocalizations.of(context)!.sendEmail),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         side: const BorderSide(
                           color: Color(0xFFFF8A1F),
                           width: 1.5,
                         ),
                         foregroundColor: const Color(0xFFFF8A1F),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        minimumSize: const Size(0, 30),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 15,
+                          fontSize: 11.5,
                         ),
                       ),
                     ),
@@ -1244,16 +1256,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 17, color: AppColors.grey800),
+              style: const TextStyle(fontSize: 11.5, color: AppColors.grey800),
             ),
             if (info) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               const Tooltip(
                 message: 'Taksh service charge',
                 triggerMode: TooltipTriggerMode.tap,
                 child: Icon(
                   Icons.info_outline_rounded,
-                  size: 22,
+                  size: 13,
                   color: AppColors.grey700,
                 ),
               ),
@@ -1264,8 +1276,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           value,
           style: TextStyle(
             color: valueColor ?? AppColors.grey900,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -1309,16 +1321,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         displayText,
         style: TextStyle(
           color: textColor,
-          fontSize: 14,
+          fontSize: 10,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -1775,15 +1787,15 @@ class _OrderItemThumbnailState extends State<_OrderItemThumbnail> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 76,
-      height: 76,
+      width: 49,
+      height: 49,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(7),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(11),
+        borderRadius: BorderRadius.circular(6),
         child: _resolvedImageUrl != null
             ? Image.network(
                 _resolvedImageUrl!,
@@ -1791,7 +1803,7 @@ class _OrderItemThumbnailState extends State<_OrderItemThumbnail> {
                 errorBuilder: (context, error, stackTrace) => Icon(
                   Icons.shopping_bag_outlined,
                   color: Theme.of(context).disabledColor,
-                  size: 30,
+                  size: 22,
                 ),
               )
             : Icon(
@@ -1825,32 +1837,28 @@ class _OrderBoxArt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 160,
-      height: 120,
+      width: 178,
+      height: 76,
       child: Stack(
         clipBehavior: Clip.none,
         children: const [
           Positioned(
-            left: 0,
-            bottom: 14,
-            child: Icon(Icons.eco_rounded, size: 46, color: Color(0xFF4CAF50)),
+            left: 8,
+            bottom: 6,
+            child: Icon(Icons.eco_rounded, size: 30, color: Color(0xFF4CAF50)),
           ),
           Positioned(
-            right: 0,
-            bottom: 14,
-            child: Icon(Icons.eco_rounded, size: 50, color: Color(0xFF66BB6A)),
+            right: 2,
+            bottom: 8,
+            child: Icon(Icons.eco_rounded, size: 34, color: Color(0xFF66BB6A)),
           ),
+          Positioned(right: 26, bottom: 4, child: _TakshBox()),
           Positioned(
-            right: 24,
-            bottom: 10,
-            child: _TakshBox(),
-          ),
-          Positioned(
-            left: 50,
-            top: 2,
+            left: 70,
+            top: 0,
             child: Icon(
               Icons.location_on_rounded,
-              size: 62,
+              size: 40,
               color: Color(0xFFE8531C),
             ),
           ),
@@ -1866,8 +1874,8 @@ class _TakshBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 96,
-      height: 66,
+      width: 70,
+      height: 48,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -1875,19 +1883,19 @@ class _TakshBox extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: const Text(
         'Taksh',
         style: TextStyle(
-          fontSize: 22,
+          fontSize: 16,
           fontWeight: FontWeight.w900,
           color: Color(0xFF5A3A1A),
         ),
@@ -1903,26 +1911,26 @@ class _ParcelIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-      width: 130,
-      height: 150,
+      width: 120,
+      height: 140,
       child: Stack(
         children: [
           Positioned(
             left: 0,
             bottom: 0,
-            child: Icon(Icons.eco_rounded, size: 40, color: Color(0xFFA5D6A7)),
+            child: Icon(Icons.eco_rounded, size: 28, color: Color(0xFFA5D6A7)),
           ),
           Positioned(
             right: 0,
-            bottom: 10,
-            child: Icon(Icons.eco_rounded, size: 48, color: Color(0xFF81C784)),
+            bottom: 8,
+            child: Icon(Icons.eco_rounded, size: 34, color: Color(0xFF81C784)),
           ),
           Positioned(
             left: 14,
-            bottom: 8,
+            bottom: 6,
             child: Icon(
               Icons.inventory_2_rounded,
-              size: 92,
+              size: 72,
               color: Color(0xFFE8A65D),
             ),
           ),
@@ -1931,7 +1939,7 @@ class _ParcelIllustration extends StatelessWidget {
             top: 0,
             child: Icon(
               Icons.location_on_rounded,
-              size: 52,
+              size: 36,
               color: Color(0xFFE8531C),
             ),
           ),
@@ -1948,26 +1956,26 @@ class _HouseIllustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-      width: 110,
-      height: 80,
+      width: 94,
+      height: 66,
       child: Stack(
         children: [
           Positioned(
             left: 0,
             bottom: 0,
-            child: Icon(Icons.park_rounded, size: 34, color: Color(0xFF81C784)),
+            child: Icon(Icons.park_rounded, size: 24, color: Color(0xFF81C784)),
           ),
           Positioned(
-            left: 26,
+            left: 20,
             bottom: 0,
-            child: Icon(Icons.home_rounded, size: 62, color: Color(0xFFE5532D)),
+            child: Icon(Icons.home_rounded, size: 46, color: Color(0xFFE5532D)),
           ),
           Positioned(
             right: 0,
             top: 0,
             child: Icon(
               Icons.location_on_rounded,
-              size: 36,
+              size: 26,
               color: Color(0xFFFF8A1F),
             ),
           ),

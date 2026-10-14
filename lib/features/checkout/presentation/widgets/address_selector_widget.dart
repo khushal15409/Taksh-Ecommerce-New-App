@@ -22,8 +22,6 @@ class AddressSelectorWidget extends StatefulWidget {
 }
 
 class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
-  bool _expanded = true;
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CheckoutBloc, CheckoutState>(
@@ -48,16 +46,44 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
           selectedAddress = checkoutState.selectedAddress;
         }
 
-        return CheckoutSectionCard(
-          icon: Icons.location_on_rounded,
-          title: AppLocalizations.of(context)!.deliveryAddress,
-          actionLabel: selectedAddress != null ? 'Change' : null,
-          onAction: () => _showAddressSelector(context),
-          expanded: _expanded,
-          onToggle: () => setState(() => _expanded = !_expanded),
-          child: selectedAddress == null
-              ? _buildNoAddressCard(context)
-              : _buildAddressCard(context, selectedAddress),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CheckoutSectionTitle(
+              icon: Icons.location_on_rounded,
+              title: AppLocalizations.of(context)!.deliveryAddress,
+              trailing: selectedAddress != null
+                  ? GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _showAddressSelector(context),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.edit_rounded,
+                            size: 10,
+                            color: AppColors.primaryOrange,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Edit',
+                            style: TextStyle(
+                              color: AppColors.primaryOrange,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : null,
+            ),
+            Container(
+              decoration: checkoutCardDecoration(),
+              child: selectedAddress == null
+                  ? _buildNoAddressCard(context)
+                  : _buildAddressCard(context, selectedAddress),
+            ),
+          ],
         );
       },
     );
@@ -98,129 +124,131 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
       address.location.state,
     ].whereType<String>().where((e) => e.isNotEmpty).join(', ');
     final postal = address.location.postalCode ?? '';
-    final lines = <String>[
-      [
-        address.addressLine1,
-        if (address.addressLine2 != null && address.addressLine2!.isNotEmpty)
-          address.addressLine2!,
-      ].join(', '),
-      if (address.landmark != null && address.landmark!.isNotEmpty)
-        'Landmark: ${address.landmark}',
-      if (cityLine.isNotEmpty || postal.isNotEmpty)
-        [cityLine, postal].where((e) => e.isNotEmpty).join(' - '),
-    ];
+    final cityPostal = [cityLine, postal].where((e) => e.isNotEmpty).join(' - ');
+    final street = [
+      address.addressLine1,
+      if (address.addressLine2 != null && address.addressLine2!.isNotEmpty)
+        address.addressLine2!,
+    ].join(', ');
 
-    return InkWell(
-      onTap: () => _showAddressSelector(context),
-      borderRadius: BorderRadius.circular(14),
-      child: Stack(
-        children: [
-          // Decorative map artwork on the right.
-          const Positioned(
-            right: 0,
-            bottom: 0,
-            child: IgnorePointer(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(Icons.map_rounded, size: 84, color: Color(0xFFDDE8F4)),
-                  Positioned(
-                    top: 0,
-                    child: Icon(
-                      Icons.location_on_rounded,
-                      size: 38,
-                      color: Color(0xFFE5532D),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
+      child: InkWell(
+        onTap: () => _showAddressSelector(context),
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFCF1E5),
+            borderRadius: BorderRadius.circular(10),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 96),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFCE3CB),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.home_rounded,
+                  color: Color(0xFF8A4B14),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Text(
-                        address.recipientName.isNotEmpty
-                            ? address.recipientName.toUpperCase()
-                            : address.displayLabel.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.grey900,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
+                        horizontal: 9,
+                        vertical: 1.5,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryOrange.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFFFDDCB8),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(
                         address.displayLabel,
                         style: const TextStyle(
                           color: Color(0xFFE07B12),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 10.5,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      street,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.grey900,
+                        height: 1.2,
+                      ),
+                    ),
+                    if (address.landmark != null &&
+                        address.landmark!.isNotEmpty)
+                      Text(
+                        'Landmark: ${address.landmark}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.grey600,
+                          height: 1.2,
+                        ),
+                      ),
+                    Text(
+                      cityPostal,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: AppColors.grey600,
+                        height: 1.25,
+                      ),
+                    ),
+                    if (address.instructions != null &&
+                        address.instructions!.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              size: 13,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                address.instructions!,
+                                style: const TextStyle(
+                                  fontSize: 10.5,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 4),
-                for (final line in lines)
-                  Text(
-                    line,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.grey700,
-                      height: 1.3,
-                    ),
-                  ),
-                if (address.instructions != null &&
-                    address.instructions!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info_outline,
-                          size: 16,
-                          color: Colors.blue,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            address.instructions!,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodySmall?.copyWith(color: Colors.blue),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.primaryOrange,
+                size: 18,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

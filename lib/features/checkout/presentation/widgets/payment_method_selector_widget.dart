@@ -36,34 +36,43 @@ class _PaymentMethodSelectorWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return CheckoutSectionCard(
-      icon: Icons.account_balance_wallet_outlined,
-      title: AppLocalizations.of(context)!.paymentMethod,
-      bodyPadding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
-      child: Column(
-        children: [
-          // COD Payment Method
-          _buildPaymentMethodTile(
-            method: PaymentMethodSelection.cod,
-            icon: Icons.payments_outlined,
-            title: PaymentMethodType.cod.displayName,
-            subtitle: PaymentMethodSelection.cod.description,
-            isSelected: _selectedMethod.type == PaymentMethodType.cod,
-            onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CheckoutSectionTitle(
+          icon: Icons.credit_card_rounded,
+          title: AppLocalizations.of(context)!.paymentMethod,
+        ),
+        Container(
+          decoration: checkoutCardDecoration(),
+          padding: const EdgeInsets.fromLTRB(6, 1, 6, 6),
+          child: Column(
+            children: [
+              // COD Payment Method
+              _buildPaymentMethodTile(
+                method: PaymentMethodSelection.cod,
+                icon: Icons.payments_outlined,
+                title: PaymentMethodType.cod.displayName,
+                subtitle: PaymentMethodSelection.cod.description,
+                isSelected: _selectedMethod.type == PaymentMethodType.cod,
+                onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
+              ),
+              const SizedBox(height: 6),
+              // Online Payment Method
+              _buildPaymentMethodTile(
+                method: PaymentMethodSelection.online,
+                icon: Icons.credit_card_rounded,
+                title: PaymentMethodType.online.displayName,
+                subtitle: PaymentMethodSelection.online.description,
+                isSelected: _selectedMethod.type == PaymentMethodType.online,
+                onTap: () =>
+                    _selectPaymentMethod(PaymentMethodSelection.online),
+                trailing: _buildPaymentLogos(),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          // Online Payment Method
-          _buildPaymentMethodTile(
-            method: PaymentMethodSelection.online,
-            icon: Icons.credit_card_rounded,
-            title: PaymentMethodType.online.displayName,
-            subtitle: PaymentMethodSelection.online.description,
-            isSelected: _selectedMethod.type == PaymentMethodType.online,
-            onTap: () => _selectPaymentMethod(PaymentMethodSelection.online),
-            trailing: _buildPaymentLogos(),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -78,17 +87,17 @@ class _PaymentMethodSelectorWidgetState
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.fromLTRB(9, 8, 12, 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFFF3E6) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? const Color(0xFFFFF4E6) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
                 ? AppColors.primaryOrange
                 : Colors.black.withOpacity(0.06),
-            width: isSelected ? 1.4 : 1,
+            width: isSelected ? 1.1 : 1,
           ),
         ),
         child: Row(
@@ -98,23 +107,23 @@ class _PaymentMethodSelectorWidgetState
           children: [
             // Icon
             Container(
-              width: 58,
-              height: 58,
+              width: 39,
+              height: 38,
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primaryOrange.withOpacity(0.18)
                     : const Color(0xFFEDEDED),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
                 color: isSelected
                     ? AppColors.primaryOrange
                     : AppColors.grey900,
-                size: 34,
+                size: 22,
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 13),
             // Title and subtitle
             Expanded(
               child: Column(
@@ -123,23 +132,23 @@ class _PaymentMethodSelectorWidgetState
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: isSelected
                           ? AppColors.primaryOrange
                           : AppColors.grey900,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 10.5,
                       color: AppColors.grey600,
                     ),
                   ),
                   if (trailing != null) ...[
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 7),
                     trailing,
                   ],
                 ],
@@ -147,12 +156,12 @@ class _PaymentMethodSelectorWidgetState
             ),
             // Radio indicator (the whole tile is tappable)
             Padding(
-              padding: EdgeInsets.only(top: trailing != null ? 14 : 0),
+              padding: EdgeInsets.only(top: trailing != null ? 4 : 10),
               child: Icon(
                 isSelected
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
-                size: 32,
+                size: 17,
                 color: isSelected
                     ? AppColors.primaryOrange
                     : AppColors.grey900,
@@ -169,29 +178,44 @@ class _PaymentMethodSelectorWidgetState
       spacing: 8,
       runSpacing: 6,
       children: [
-        _buildPaymentLogo('Razorpay', Colors.blue.shade700),
-        _buildPaymentLogo('Cards', Colors.green.shade700),
-        _buildPaymentLogo('UPI', Colors.orange.shade700),
-        _buildPaymentLogo('Wallets', Colors.purple.shade700),
+        _buildPaymentLogo('Razorpay', Icons.bolt_rounded, Colors.blue.shade700),
+        _buildPaymentLogo('Cards', Icons.credit_card, Colors.green.shade700),
+        _buildPaymentLogo(
+          'UPI',
+          Icons.account_balance_outlined,
+          Colors.orange.shade700,
+        ),
+        _buildPaymentLogo(
+          'Wallets',
+          Icons.account_balance_wallet_rounded,
+          Colors.purple.shade700,
+        ),
       ],
     );
   }
 
-  Widget _buildPaymentLogo(String label, Color color) {
+  Widget _buildPaymentLogo(String label, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.35)),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

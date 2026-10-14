@@ -183,12 +183,15 @@ class _CartPageState extends State<CartPage>
               children: [
                 _buildHeader(context, activeCart),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                  padding: const EdgeInsets.fromLTRB(14, 4, 14, 9),
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7.5,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.06),
@@ -207,7 +210,7 @@ class _CartPageState extends State<CartPage>
                                 '${AppLocalizations.of(context)!.quickDelivery} (${quickCart.totalItems})',
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 10.5),
                         Expanded(
                           child: _buildDeliveryChip(
                             index: 1,
@@ -247,14 +250,14 @@ class _CartPageState extends State<CartPage>
         : '${activeCart.totalItems} items';
 
     return SizedBox(
-      height: topPadding + 150,
+      height: topPadding + 100,
       child: Stack(
         children: [
           // Hanging diyas
-          const Positioned(left: 150, top: 0, child: _HangingDiya(drop: 88)),
-          const Positioned(left: 222, top: 0, child: _HangingDiya(drop: 34, small: true)),
-          const Positioned(right: 138, top: 0, child: _HangingDiya(drop: 28, small: true)),
-          const Positioned(right: 6, top: 0, child: _HangingDiya(drop: 50, small: true)),
+          const Positioned(left: 143, top: 0, child: _HangingDiya(drop: 54)),
+          const Positioned(left: 170, top: 0, child: _HangingDiya(drop: 18, small: true)),
+          const Positioned(right: 128, top: 0, child: _HangingDiya(drop: 16, small: true)),
+          const Positioned(right: 4, top: 0, child: _HangingDiya(drop: 30, small: true)),
           // Marigolds along the bottom
           const Positioned(
             left: 0,
@@ -265,21 +268,21 @@ class _CartPageState extends State<CartPage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Icon(Icons.local_florist_rounded, size: 44, color: Color(0xFFFF9A1F)),
-                  Icon(Icons.local_florist_rounded, size: 28, color: Color(0xFFFFB347)),
-                  Icon(Icons.local_florist_rounded, size: 34, color: Color(0xFFFF8A1F)),
-                  Icon(Icons.local_florist_rounded, size: 26, color: Color(0xFFFFB347)),
-                  Icon(Icons.local_florist_rounded, size: 34, color: Color(0xFFFF9A1F)),
-                  Icon(Icons.local_florist_rounded, size: 28, color: Color(0xFFFFB347)),
-                  Icon(Icons.local_florist_rounded, size: 40, color: Color(0xFFFF8A1F)),
+                  Icon(Icons.local_florist_rounded, size: 30, color: Color(0xFFFF9A1F)),
+                  Icon(Icons.local_florist_rounded, size: 18, color: Color(0xFFFFB347)),
+                  Icon(Icons.local_florist_rounded, size: 22, color: Color(0xFFFF8A1F)),
+                  Icon(Icons.local_florist_rounded, size: 17, color: Color(0xFFFFB347)),
+                  Icon(Icons.local_florist_rounded, size: 22, color: Color(0xFFFF9A1F)),
+                  Icon(Icons.local_florist_rounded, size: 18, color: Color(0xFFFFB347)),
+                  Icon(Icons.local_florist_rounded, size: 27, color: Color(0xFFFF8A1F)),
                 ],
               ),
             ),
           ),
           // Centre diya
           const Positioned(
-            left: 142,
-            bottom: 10,
+            left: 144,
+            bottom: 8,
             child: IgnorePointer(child: _DiyaBowl()),
           ),
           // Gifts on the right
@@ -290,29 +293,29 @@ class _CartPageState extends State<CartPage>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Icon(Icons.card_giftcard_rounded, size: 54, color: Color(0xFF3E9B5A)),
-                  Icon(Icons.card_giftcard_rounded, size: 40, color: Color(0xFFE8892B)),
+                  Icon(Icons.card_giftcard_rounded, size: 38, color: Color(0xFF3E9B5A)),
+                  Icon(Icons.card_giftcard_rounded, size: 28, color: Color(0xFFE8892B)),
                 ],
               ),
             ),
           ),
           // Greeting
-          const Positioned(
-            right: 70,
-            top: 40,
-            child: IgnorePointer(child: _DiwaliGreeting()),
+          Positioned(
+            left: 214,
+            top: topPadding + 8,
+            child: const IgnorePointer(child: _DiwaliGreeting()),
           ),
           // Title
           Positioned(
-            left: 16,
-            top: topPadding + 40,
+            left: 21,
+            top: topPadding + 20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'My Cart',
                   style: TextStyle(
-                    fontSize: 34,
+                    fontSize: 21,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
@@ -320,7 +323,7 @@ class _CartPageState extends State<CartPage>
                 Text(
                   '$itemsLabel • ₹$total',
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 13,
                     color: AppColors.grey700,
                   ),
                 ),
@@ -330,7 +333,7 @@ class _CartPageState extends State<CartPage>
           if (!activeCart.isEmpty)
             Positioned(
               right: 12,
-              top: topPadding + 6,
+              top: topPadding + 4,
               child: Material(
                 color: Colors.white.withOpacity(0.9),
                 shape: const CircleBorder(),
@@ -341,11 +344,11 @@ class _CartPageState extends State<CartPage>
                   child: Tooltip(
                     message: AppLocalizations.of(context)!.clearCart,
                     child: const SizedBox(
-                      width: 38,
-                      height: 38,
+                      width: 30,
+                      height: 30,
                       child: Icon(
                         Icons.delete_outline_rounded,
-                        size: 22,
+                        size: 17,
                         color: Color(0xFFE53935),
                       ),
                     ),
@@ -368,14 +371,14 @@ class _CartPageState extends State<CartPage>
       onTap: () => _tabController.animateTo(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 52,
+        height: 37,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFFFF4E6) : const Color(0xFFF1F2F6),
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected ? _accent : Colors.transparent,
-            width: 1.5,
+            width: 1.2,
           ),
         ),
         child: Row(
@@ -383,17 +386,17 @@ class _CartPageState extends State<CartPage>
           children: [
             Icon(
               icon,
-              size: 24,
+              size: 18,
               color: selected ? _accent : AppColors.grey900,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             Flexible(
               child: Text(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 12,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected ? _accent : AppColors.grey900,
                 ),
@@ -411,7 +414,7 @@ class _CartPageState extends State<CartPage>
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(14, 6, 14, 12),
+            padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
             children: [
               for (final item in cart.items) _buildCartItem(context, item),
               _buildTrustStrip(),
@@ -437,14 +440,14 @@ class _CartPageState extends State<CartPage>
     Widget cell(IconData icon, String label) => Expanded(
       child: Column(
         children: [
-          Icon(icon, size: 34, color: const Color(0xFF2F9E55)),
-          const SizedBox(height: 6),
+          Icon(icon, size: 24, color: const Color(0xFF2F9E55)),
+          const SizedBox(height: 5),
           Text(
             label,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 14,
-              height: 1.25,
+              fontSize: 10.5,
+              height: 1.3,
               color: AppColors.grey900,
             ),
           ),
@@ -453,18 +456,18 @@ class _CartPageState extends State<CartPage>
     );
     Widget divider() => Container(
       width: 1,
-      height: 54,
+      height: 44,
       color: Colors.black.withOpacity(0.08),
     );
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFFE6F5E8), Color(0xFFF1FAF2)],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -557,20 +560,20 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildCartItem(BuildContext context, CartItem item) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: festiveCardDecoration(radius: 22),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: festiveCardDecoration(radius: 14),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
               child: item.image != null
                   ? Image.network(
                       item.image!,
-                      width: 100,
-                      height: 100,
+                      width: 80,
+                      height: 80,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return _buildPlaceholderImage();
@@ -578,7 +581,7 @@ class _CartPageState extends State<CartPage>
                     )
                   : _buildPlaceholderImage(),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,7 +594,7 @@ class _CartPageState extends State<CartPage>
                           item.productName,
                           style: const TextStyle(
                             fontWeight: FontWeight.w800,
-                            fontSize: 18,
+                            fontSize: 14,
                             color: AppColors.grey900,
                           ),
                           maxLines: 2,
@@ -601,31 +604,31 @@ class _CartPageState extends State<CartPage>
                       const SizedBox(width: 8),
                       InkWell(
                         onTap: () => _showRemoveItemDialog(context, item),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(6),
                         child: Container(
-                          width: 36,
-                          height: 36,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
                             color: const Color(0xFFFDECEC),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Icon(
                             Icons.delete_outline_rounded,
-                            size: 20,
+                            size: 13,
                             color: Color(0xFFE53935),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   if (item.variantName != null &&
                       item.variantName!.trim().isNotEmpty)
                     Text(
                       item.variantName!,
                       style: const TextStyle(
                         color: AppColors.grey600,
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
                     )
@@ -634,33 +637,33 @@ class _CartPageState extends State<CartPage>
                       AppLocalizations.of(context)!.sku(item.sku),
                       style: const TextStyle(
                         color: AppColors.grey600,
-                        fontSize: 14,
+                        fontSize: 11,
                       ),
                     ),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
+                      horizontal: 8,
+                      vertical: 3,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE3F5E6),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(9),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.check_circle_rounded,
-                          size: 16,
+                          size: 12,
                           color: AppColors.secondaryGreen,
                         ),
-                        SizedBox(width: 5),
+                        SizedBox(width: 4),
                         Text(
                           'In stock',
                           style: TextStyle(
                             color: AppColors.secondaryGreen,
-                            fontSize: 14,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -681,7 +684,7 @@ class _CartPageState extends State<CartPage>
                               style: const TextStyle(
                                 color: _accent,
                                 fontWeight: FontWeight.w800,
-                                fontSize: 26,
+                                fontSize: 19,
                               ),
                             ),
                             if (item.qty > 1)
@@ -713,15 +716,15 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildPlaceholderImage() {
     return Container(
-      width: 100,
-      height: 100,
+      width: 80,
+      height: 80,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
         Icons.image,
-        size: 40,
+        size: 30,
         color: Theme.of(context).disabledColor,
       ),
     );
@@ -730,20 +733,20 @@ class _CartPageState extends State<CartPage>
   Widget _buildQuantityControls(BuildContext context, CartItem item) {
     Widget button(IconData icon, VoidCallback onTap) => InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
       child: SizedBox(
-        width: 38,
-        height: 44,
-        child: Icon(icon, size: 22, color: _accent),
+        width: 33,
+        height: 32,
+        child: Icon(icon, size: 15, color: _accent),
       ),
     );
 
     return Container(
-      height: 46,
+      height: 34,
       decoration: BoxDecoration(
         color: const Color(0xFFFFF4E6),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFC27A), width: 1.3),
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(color: const Color(0xFFFFC27A), width: 1.1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -760,7 +763,7 @@ class _CartPageState extends State<CartPage>
               style: const TextStyle(
                 color: _accent,
                 fontWeight: FontWeight.w700,
-                fontSize: 18,
+                fontSize: 14,
               ),
             ),
           ),
@@ -855,8 +858,8 @@ class _CartPageState extends State<CartPage>
     final itemsText = cart.totalItems == 1 ? '1 item' : '${cart.totalItems} items';
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-      decoration: festiveCardDecoration(radius: 22),
+      padding: const EdgeInsets.fromLTRB(13, 12, 13, 13),
+      decoration: festiveCardDecoration(radius: 14),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -864,17 +867,17 @@ class _CartPageState extends State<CartPage>
             children: [
               Icon(
                 Icons.receipt_long_outlined,
-                size: 26,
+                size: 15,
                 color: Color(0xFF2F9E55),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: 9),
               Text(
                 'Order Summary',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           _buildSummaryRow(
             context,
             '${AppLocalizations.of(context)!.subtotal} ($itemsText)',
@@ -899,23 +902,23 @@ class _CartPageState extends State<CartPage>
             '₹${ExtraCharge.platformFeeAmount}',
             info: true,
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 0),
           Divider(height: 1, color: Colors.black.withOpacity(0.08)),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 AppLocalizations.of(context)!.totalAmount,
                 style: const TextStyle(
-                  fontSize: 21,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               Text(
                 '₹$displayTotal',
                 style: const TextStyle(
-                  fontSize: 30,
+                  fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: _accent,
                 ),
@@ -929,44 +932,63 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildCheckoutBar(BuildContext context, Cart cart) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
       color: Colors.transparent,
       child: SafeArea(
         top: false,
-        child: FestiveGradientButton(
-          onPressed: () {
-            if (cart.items.isEmpty) {
-              return;
-            }
-
-            context.push(
-              AppRoutes.checkout,
-              extra: SelectedCheckoutItems(
-                items: cart.items,
-                itemIds: cart.items.map((item) => item.id).toList(),
-                subtotal: cart.total,
-                totalQuantity: cart.totalItems,
-                extraCharges: cart.extraCharges,
-                deliveryType: _selectedDeliveryType,
-              ),
-            );
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lock_rounded, size: 24),
-              const SizedBox(width: 12),
-              Flexible(
-                child: Text(
-                  AppLocalizations.of(context)!.proceedToCheckout,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
-                  ),
-                ),
+        child: Container(
+          height: 45,
+          decoration: BoxDecoration(
+            gradient: festiveOrangeGradient,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: _accent.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
             ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () {
+                if (cart.items.isEmpty) {
+                  return;
+                }
+
+                context.push(
+                  AppRoutes.checkout,
+                  extra: SelectedCheckoutItems(
+                    items: cart.items,
+                    itemIds: cart.items.map((item) => item.id).toList(),
+                    subtotal: cart.total,
+                    totalQuantity: cart.totalItems,
+                    extraCharges: cart.extraCharges,
+                    deliveryType: _selectedDeliveryType,
+                  ),
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.lock_rounded, size: 17, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      AppLocalizations.of(context)!.proceedToCheckout,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -981,7 +1003,7 @@ class _CartPageState extends State<CartPage>
     bool info = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 7),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -990,16 +1012,16 @@ class _CartPageState extends State<CartPage>
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 16, color: AppColors.grey700),
+                style: const TextStyle(fontSize: 12.5, color: AppColors.grey700),
               ),
               if (info) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 const Tooltip(
                   message: 'Platform fee',
                   triggerMode: TooltipTriggerMode.tap,
                   child: Icon(
                     Icons.info_outline_rounded,
-                    size: 20,
+                    size: 14,
                     color: AppColors.grey700,
                   ),
                 ),
@@ -1009,7 +1031,7 @@ class _CartPageState extends State<CartPage>
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 12.5,
               fontWeight: FontWeight.w600,
               color: valueColor,
             ),
@@ -1035,12 +1057,12 @@ class _HangingDiya extends StatelessWidget {
           Container(width: 1.5, height: drop, color: const Color(0xFFE0A93B)),
           Icon(
             Icons.local_fire_department_rounded,
-            size: small ? 18 : 24,
+            size: small ? 12 : 16,
             color: const Color(0xFFFFB300),
           ),
           Container(
-            width: small ? 26 : 36,
-            height: small ? 12 : 16,
+            width: small ? 18 : 26,
+            height: small ? 8 : 11,
             decoration: const BoxDecoration(
               color: Color(0xFFE59A2E),
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
@@ -1063,12 +1085,12 @@ class _DiyaBowl extends StatelessWidget {
       children: [
         const Icon(
           Icons.local_fire_department_rounded,
-          size: 40,
+          size: 26,
           color: Color(0xFFFFB300),
         ),
         Container(
-          width: 86,
-          height: 30,
+          width: 58,
+          height: 20,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFFD2691E), Color(0xFFB8501A)],
@@ -1095,7 +1117,7 @@ class _DiwaliGreeting extends StatelessWidget {
           'Happy',
           style: TextStyle(
             color: Color(0xFF2E7D32),
-            fontSize: 15,
+            fontSize: 10,
             fontStyle: FontStyle.italic,
             fontWeight: FontWeight.w600,
           ),
@@ -1105,19 +1127,19 @@ class _DiwaliGreeting extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'serif',
             color: Color(0xFFE8620F),
-            fontSize: 44,
+            fontSize: 30,
             height: 1,
             fontWeight: FontWeight.w900,
             fontStyle: FontStyle.italic,
           ),
         ),
-        SizedBox(height: 6),
+        SizedBox(height: 3),
         Text(
           'Shop More\nSave More',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Color(0xFFC2511A),
-            fontSize: 15,
+            fontSize: 11,
             height: 1.2,
             fontWeight: FontWeight.w700,
           ),

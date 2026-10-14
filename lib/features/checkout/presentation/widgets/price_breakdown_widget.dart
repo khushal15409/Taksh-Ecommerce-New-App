@@ -19,57 +19,61 @@ class PriceBreakdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CheckoutSectionCard(
-      icon: Icons.description_outlined,
-      title: AppLocalizations.of(context)!.priceDetails,
-      bodyPadding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-      child: Column(
-          children: [
-            _buildPriceRow(
-              context,
-              'Item Total',
-              priceBreakdown.itemTotalInRupees,
-              isRegular: true,
-            ),
-            const SizedBox(height: 10),
-            _buildPriceRow(
-              context,
-              'Delivery Charges',
-              priceBreakdown.deliveryChargesInRupees,
-              isRegular: true,
-              isFree: priceBreakdown.deliveryCharges == 0,
-            ),
-            for (final charge in extraCharges) ...[
-              const SizedBox(height: 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CheckoutSectionTitle(
+          icon: Icons.description_rounded,
+          iconColor: AppColors.grey900,
+          title: AppLocalizations.of(context)!.priceDetails,
+        ),
+        Container(
+          decoration: checkoutCardDecoration(),
+          padding: const EdgeInsets.fromLTRB(15, 10, 15, 8),
+          child: Column(
+            children: [
               _buildPriceRow(
                 context,
-                charge.label,
-                charge.amount.toDouble(),
+                'Item Total',
+                priceBreakdown.itemTotalInRupees,
                 isRegular: true,
-                isDiscount: charge.isDiscount,
               ),
-            ],
-            if (priceBreakdown.discount > 0) ...[
-              const SizedBox(height: 12),
               _buildPriceRow(
                 context,
-                'Discount',
-                -priceBreakdown.discountInRupees,
+                'Delivery Charges',
+                priceBreakdown.deliveryChargesInRupees,
                 isRegular: true,
-                isDiscount: true,
+                isFree: priceBreakdown.deliveryCharges == 0,
+              ),
+              for (final charge in extraCharges)
+                _buildPriceRow(
+                  context,
+                  charge.label,
+                  charge.amount.toDouble(),
+                  isRegular: true,
+                  isDiscount: charge.isDiscount,
+                ),
+              if (priceBreakdown.discount > 0)
+                _buildPriceRow(
+                  context,
+                  'Discount',
+                  -priceBreakdown.discountInRupees,
+                  isRegular: true,
+                  isDiscount: true,
+                ),
+              const SizedBox(height: 2),
+              const DashedDivider(),
+              const SizedBox(height: 10),
+              _buildPriceRow(
+                context,
+                'Grand Total',
+                priceBreakdown.grandTotalInRupees,
+                isTotal: true,
               ),
             ],
-            const SizedBox(height: 14),
-            const DashedDivider(),
-            const SizedBox(height: 14),
-            _buildPriceRow(
-              context,
-              'Grand Total',
-              priceBreakdown.grandTotalInRupees,
-              isTotal: true,
-            ),
-          ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -82,51 +86,53 @@ class PriceBreakdownWidget extends StatelessWidget {
     bool isFree = false,
     bool isDiscount = false,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: isTotal
-              ? const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)
-              : const TextStyle(fontSize: 16, color: AppColors.grey700),
-        ),
-        const SizedBox(width: 16),
-        if (isFree)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.secondaryGreen,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: const Text(
-              'FREE',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-          )
-        else
+    return Padding(
+      padding: EdgeInsets.only(bottom: isTotal ? 0 : 7),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           Text(
-            '${isDiscount ? '-' : ''}₹${amount.abs().toStringAsFixed(2)}',
+            label,
             style: isTotal
                 ? const TextStyle(
-                    fontSize: 28,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.primaryOrange,
+                    color: AppColors.grey900,
                   )
-                : TextStyle(
-                    fontSize: 16,
-                    color: isDiscount
-                        ? AppColors.secondaryGreen
-                        : AppColors.grey900,
-                    fontWeight: isDiscount ? FontWeight.bold : FontWeight.w500,
-                  ),
+                : const TextStyle(fontSize: 11, color: AppColors.grey700),
           ),
-      ],
+          const SizedBox(width: 16),
+          if (isFree)
+            const Text(
+              'FREE',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.secondaryGreen,
+              ),
+            )
+          else
+            Text(
+              '${isDiscount ? '-' : ''}₹${amount.abs().toStringAsFixed(2)}',
+              style: isTotal
+                  ? const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryOrange,
+                    )
+                  : TextStyle(
+                      fontSize: 11,
+                      color: isDiscount
+                          ? AppColors.secondaryGreen
+                          : AppColors.grey900,
+                      fontWeight: isDiscount
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                    ),
+            ),
+        ],
+      ),
     );
   }
 }
