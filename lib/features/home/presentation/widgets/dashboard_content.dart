@@ -104,7 +104,7 @@ class _DashboardContentState extends State<DashboardContent> {
             padding: const EdgeInsets.only(bottom: 12),
             // A section with an admin-picked design uses that template;
             // no design = the normal product row.
-            child: SectionDesign.isKnown(section.design)
+            child: SectionDesign.usesLayout(section)
                 ? DesignedProductSection(
                     section: section,
                     showDeliveryTime: false,

@@ -86,7 +86,7 @@ class ExpressDashboardContent extends StatelessWidget {
         productWidgets.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: SectionDesign.isKnown(section.design)
+            child: SectionDesign.usesLayout(section)
                 ? DesignedProductSection(
                     section: section,
                     showDeliveryTime: true,
