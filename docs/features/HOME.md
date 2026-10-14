@@ -113,3 +113,13 @@ Admin (App Home Sections) now sets, per section:
 - **Rows × products per row** (rows 1–10, per row 1–4; default 2×2) — only for a design.
 
 The API adds `id`, `design`, `rows`, `items_per_row` to each section. In the app `DashboardSectionModel` parses them and `DashboardContent` / `ExpressDashboardContent` render a section with `DesignedProductSection` when `design` is a known template, otherwise with the unchanged `ProductSection`. Unknown design keys fall back to the normal row. Banners/Logo/Categories are not affected.
+
+### Update: layout also for normal sections, up to 10 per row, carousel
+- Rows (1–10) and products per row (1–10) are available with **or without** a design. Admin defaults: 1 × 3 for a normal section (= the built-in layout, stored as unset), 2 × 2 with a design.
+- `SectionDesign.usesLayout(section)` decides: a design, or any saved rows / per-row, → `DesignedProductSection`; otherwise the unchanged `ProductSection`.
+- Each row shows at most 3 cards at once; a row with more products is a horizontal carousel (peek of the next card, thin progress bar; a single-row carousel auto-advances every 4 s and pauses 8 s after a touch).
+- Templates got extra polish (gold glow + crown for Premium, fire header for Hot Deals, leaf motifs for Fresh Picks, "FEATURED" ribbon for Spotlight).
+
+### Update: sharper logo, Services tab header
+- The Taksh logo is a cleaned, higher-resolution copy (`assets/images/logo/taksh_logo.png` for splash/login, `taksh_logo_tight.png` — cropped to the artwork — for the home header, which is also a bit wider now). Same artwork as before; the old 553 px image was being scaled down ~8× in the header.
+- On the **Services** tab the address picker in the header is hidden and a (compact) search box takes its place; the separate search row below is removed for that tab only. Standard / Quick headers are unchanged.

@@ -76,6 +76,9 @@ import 'package:taksh_e_commerce/features/wishlist/domain/usecases/get_wishlist.
 import 'package:taksh_e_commerce/features/wishlist/domain/usecases/add_to_wishlist.dart';
 import 'package:taksh_e_commerce/features/wishlist/domain/usecases/remove_from_wishlist.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
+// Notifications feature imports
+import 'package:taksh_e_commerce/features/notifications/data/notifications_repository.dart';
+import 'package:taksh_e_commerce/features/notifications/presentation/cubit/notifications_cubit.dart';
 
 import 'package:taksh_e_commerce/core/di/secure_store_di.dart';
 
@@ -163,6 +166,7 @@ Future<void> initializeDependencies({
   _registerProductDependencies();
   _registerCartDependencies();
   _registerWishlistDependencies();
+  _registerNotificationsDependencies();
   registerOrderDependencies(getIt);
   registerCheckoutDependencies(getIt, useMockData: useMockData);
   registerPaymentDependencies(getIt, useMockData: useMockData);
@@ -529,6 +533,14 @@ void _registerCartDependencies() {
     'Cart dependencies registered',
     {'datasources': 1, 'usecases': 5, 'cubits': 1},
   );
+}
+
+/// Register notifications feature dependencies
+void _registerNotificationsDependencies() {
+  getIt.registerLazySingleton(() => NotificationsRepository(getIt()));
+  // Lazy singleton: the home bell badge and the notifications page share one
+  // unread count (same reason as WishlistCubit).
+  getIt.registerLazySingleton(() => NotificationsCubit(getIt()));
 }
 
 /// Register wishlist feature dependencies

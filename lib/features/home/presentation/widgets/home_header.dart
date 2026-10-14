@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/address_header_widget.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
@@ -39,7 +43,7 @@ class HomeHeader extends StatefulWidget {
 
 class _HomeHeaderState extends State<HomeHeader>
     with SingleTickerProviderStateMixin {
-  static const String _homeLogoAssetPath = 'assets/images/image.png';
+  static const String _homeLogoAssetPath = 'assets/images/logo/taksh_logo_tight.png';
   static final _log = loggerWithContext({
     'feature': 'home',
     'widget': 'HomeHeader',
@@ -137,6 +141,10 @@ class _HomeHeaderState extends State<HomeHeader>
     const double searchDeliveryGap = 6.0;
     const double deliveryPaddingV = 6.0;
 
+    // Services tab: the address picker is hidden and its spot holds the search
+    // box, so the separate search row below is dropped for this tab only.
+    final isServices = widget.selectedDeliveryType == DeliveryType.services;
+
     final modeTheme = HomeModeTheme.of(widget.selectedDeliveryType);
 
     // Fixed (non-collapsing) header: the festive artwork painted by HomePage
@@ -158,10 +166,15 @@ class _HomeHeaderState extends State<HomeHeader>
                     _buildLogo(),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: AddressHeaderWidget(
-                        selectedAddress: widget.selectedAddress,
-                        onTap: widget.onAddressTap,
-                      ),
+                      child: isServices
+                          ? SizedBox(
+                              height: 44,
+                              child: _buildSearchBar(context, compact: true),
+                            )
+                          : AddressHeaderWidget(
+                              selectedAddress: widget.selectedAddress,
+                              onTap: widget.onAddressTap,
+                            ),
                     ),
                     const SizedBox(width: 8),
                     _buildNotificationButton(),
@@ -169,15 +182,17 @@ class _HomeHeaderState extends State<HomeHeader>
                 ),
               ),
             ),
-            const SizedBox(height: logoSearchGap),
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: SizedBox(
-                height: searchBarHeight,
-                child: _buildSearchBar(context),
+            if (!isServices) ...[
+              const SizedBox(height: logoSearchGap),
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: SizedBox(
+                  height: searchBarHeight,
+                  child: _buildSearchBar(context),
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: searchDeliveryGap),
             // Delivery Type Selector
             Padding(
@@ -207,37 +222,33 @@ class _HomeHeaderState extends State<HomeHeader>
   }
 
   Widget _buildLogo() {
-    // The artwork ships with its own background (aspect ~3:2), so the box
-    // matches that ratio and the image fills it edge to edge: no extra white
-    // padding around the logo.
+    // Same Taksh logo, now a cleaned-up high-resolution copy cropped to the
+    // artwork (the old file was a small image scaled down 8x, which made it
+    // look soft). The box is a little wider so the wordmark is bigger and sharp.
     const double logoHeight = 44.0;
-    const double logoWidth = 66.0;
+    const double logoWidth = 92.0;
     const double logoRadius = 12.0;
 
     return Container(
       height: logoHeight,
       width: logoWidth,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(logoRadius),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(logoRadius),
-        child: Image.asset(
-          _homeLogoAssetPath,
-          fit: BoxFit.cover,
-          width: logoWidth,
-          height: logoHeight,
-          filterQuality: FilterQuality.high,
-          errorBuilder: (context, error, stackTrace) => const Center(
-            child: Text(
-              'Taksh',
-              style: TextStyle(
-                color: AppColors.secondaryGreen,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.4,
-              ),
+      child: Image.asset(
+        _homeLogoAssetPath,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) => const Center(
+          child: Text(
+            'Taksh',
+            style: TextStyle(
+              color: AppColors.secondaryGreen,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
             ),
           ),
         ),
@@ -245,7 +256,33 @@ class _HomeHeaderState extends State<HomeHeader>
     );
   }
 
+  bool _badgeRequested = false;
+
   Widget _buildNotificationButton() {
+    final notifications = getIt<NotificationsCubit>();
+
+    // Sync the badge with the signed-in user: load on login, clear on logout.
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) =>
+          current is Authenticated || current is Unauthenticated,
+      listener: (context, state) {
+        if (state is Authenticated) {
+          notifications.refreshBadge();
+        } else {
+          notifications.clear();
+        }
+      },
+      child: _notificationButtonBody(notifications),
+    );
+  }
+
+  Widget _notificationButtonBody(NotificationsCubit notifications) {
+    // Already signed in when the header is built (listener only sees changes).
+    if (!_badgeRequested && context.read<AuthBloc>().state is Authenticated) {
+      _badgeRequested = true;
+      notifications.refreshBadge();
+    }
+
     return GestureDetector(
       onTap: () {
         _log.infoWithContext('Notification button tapped', {
@@ -269,29 +306,37 @@ class _HomeHeaderState extends State<HomeHeader>
               color: Colors.black87,
               size: 22,
             ),
-            Positioned(
-              top: -4,
-              right: -4,
-              child: Container(
-                width: 18,
-                height: 18,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1),
-                ),
-                // Static count until notifications are API-backed.
-                child: const Text(
-                  '3',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
+            // Unread count from the notification API; hidden when there is none.
+            BlocBuilder<NotificationsCubit, NotificationsState>(
+              bloc: notifications,
+              buildWhen: (a, b) => a.unreadCount != b.unreadCount,
+              builder: (context, state) {
+                if (state.unreadCount <= 0) return const SizedBox.shrink();
+                return Positioned(
+                  top: -4,
+                  right: -4,
+                  child: Container(
+                    constraints: const BoxConstraints(minWidth: 18),
+                    height: 18,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    child: Text(
+                      state.unreadCount > 99 ? '99+' : '${state.unreadCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -299,7 +344,7 @@ class _HomeHeaderState extends State<HomeHeader>
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
+  Widget _buildSearchBar(BuildContext context, {bool compact = false}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -323,7 +368,7 @@ class _HomeHeaderState extends State<HomeHeader>
           },
           borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(horizontal: compact ? 10 : 12),
             child: Row(
               children: [
                 Icon(
@@ -331,10 +376,12 @@ class _HomeHeaderState extends State<HomeHeader>
                   color: HomeModeTheme.of(widget.selectedDeliveryType).accent,
                   size: 22,
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: compact ? 8 : 10),
                 Expanded(
                   child: Text(
                     AppLocalizations.of(context)!.searchHint,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.grey[500],
                       fontSize: 14,
@@ -342,6 +389,7 @@ class _HomeHeaderState extends State<HomeHeader>
                     ),
                   ),
                 ),
+                if (!compact)
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(

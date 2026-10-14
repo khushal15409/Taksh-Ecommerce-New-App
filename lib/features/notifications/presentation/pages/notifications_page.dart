@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:taksh_e_commerce/features/notifications/domain/entities/app_notification.dart';
 import 'package:taksh_e_commerce/features/notifications/presentation/widgets/notification_visuals.dart';
 
 const Color _accent = Color(0xFFFF7A00);
 
-/// Notifications list with All / Unread / Offers / Orders tabs.
-/// Currently backed by static data.
+/// Notifications list with All / Unread / Offers / Orders tabs, backed by the
+/// customer notification API (created from the admin panel).
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
 
@@ -19,122 +24,246 @@ enum _Tab { all, unread, offers, orders }
 
 class _NotificationsPageState extends State<NotificationsPage> {
   _Tab _tab = _Tab.all;
-  final List<AppNotification> _items = AppNotification.sample;
+  final NotificationsCubit _cubit = getIt<NotificationsCubit>();
+  final ScrollController _scroll = ScrollController();
 
-  int get _unreadCount => _items.where((n) => n.isUnread).length;
+  bool get _isLoggedIn => context.read<AuthBloc>().state is Authenticated;
 
-  List<AppNotification> get _filtered {
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+    // Guests have no inbox; the page shows a login prompt instead.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _isLoggedIn) _cubit.refresh();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scroll.hasClients &&
+        _scroll.position.pixels >= _scroll.position.maxScrollExtent - 240) {
+      _cubit.loadMore();
+    }
+  }
+
+  List<AppNotification> _filtered(List<AppNotification> items) {
     switch (_tab) {
       case _Tab.all:
-        return _items;
+        return items;
       case _Tab.unread:
-        return _items.where((n) => n.isUnread).toList();
+        return items.where((n) => n.isUnread).toList();
       case _Tab.offers:
-        return _items.where((n) => n.isOffer).toList();
+        return items.where((n) => n.isOffer).toList();
       case _Tab.orders:
-        return _items.where((n) => n.isOrder).toList();
+        return items.where((n) => n.isOrder).toList();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
-    final list = _filtered;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEFD9),
-      body: Stack(
-        children: [
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: NotificationHeaderBackground(height: 260),
-          ),
-          Column(
+    return BlocBuilder<NotificationsCubit, NotificationsState>(
+      bloc: _cubit,
+      builder: (context, state) {
+        final list = _filtered(state.items);
+        final unread = state.items.where((n) => n.isUnread).length;
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFFFEFD9),
+          body: Stack(
             children: [
-              SizedBox(height: top),
-              SizedBox(
-                height: 64,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => context.pop(),
-                      icon: const Icon(Icons.arrow_back, size: 26),
-                      color: Colors.black87,
-                    ),
-                    const Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(right: 48),
-                        child: Text(
-                          'Notifications',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: NotificationHeaderBackground(height: 260),
+              ),
+              Column(
+                children: [
+                  SizedBox(height: top),
+                  SizedBox(
+                    height: 64,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => context.pop(),
+                          icon: const Icon(Icons.arrow_back, size: 26),
+                          color: Colors.black87,
+                        ),
+                        const Expanded(
+                          child: Text(
+                            'Notifications',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.96),
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(28),
+                        // Same width as the back button so the title stays centred.
+                        SizedBox(
+                          width: 48,
+                          child: unread > 0
+                              ? IconButton(
+                                  tooltip: 'Mark all as read',
+                                  onPressed: _cubit.markAllRead,
+                                  icon: const Icon(Icons.done_all_rounded, size: 24),
+                                  color: Colors.black87,
+                                )
+                              : null,
+                        ),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      _buildTabs(),
-                      Expanded(
-                        child: list.isEmpty
-                            ? const Center(
-                                child: Text(
-                                  'No notifications',
-                                  style: TextStyle(color: Colors.black54),
-                                ),
-                              )
-                            : ListView.separated(
-                                padding: EdgeInsets.fromLTRB(
-                                  12,
-                                  4,
-                                  12,
-                                  MediaQuery.of(context).padding.bottom + 16,
-                                ),
-                                itemCount: list.length,
-                                separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 12),
-                                itemBuilder: (context, i) =>
-                                    _NotificationCard(
-                                  notification: list[i],
-                                  onTap: () => context.push(
-                                    AppRoutes.notificationDetail,
-                                    extra: list[i],
-                                  ),
-                                ),
-                              ),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.96),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(28),
+                        ),
                       ),
-                    ],
+                      child: Column(
+                        children: [
+                          _buildTabs(unread),
+                          Expanded(child: _buildBody(state, list)),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(NotificationsState state, List<AppNotification> list) {
+    if (!_isLoggedIn) {
+      return _message(
+        'Please log in to see your notifications',
+        action: 'Log in',
+        onAction: () => context.push(AppRoutes.login),
+      );
+    }
+    if (state.loading) {
+      return const Center(child: CircularProgressIndicator(color: _accent));
+    }
+    if (state.error != null && state.items.isEmpty) {
+      return _message(
+        state.error!,
+        action: 'Retry',
+        onAction: _cubit.refresh,
+      );
+    }
+
+    return RefreshIndicator(
+      color: _accent,
+      onRefresh: _cubit.refresh,
+      child: list.isEmpty
+          // Scrollable so pull-to-refresh also works on an empty list.
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 140),
+                Center(
+                  child: Text(
+                    'No notifications',
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+              ],
+            )
+          : ListView.separated(
+              controller: _scroll,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                12,
+                4,
+                12,
+                MediaQuery.of(context).padding.bottom + 16,
+              ),
+              itemCount: list.length + (state.loadingMore ? 1 : 0),
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, i) {
+                if (i >= list.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Center(
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: _accent,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                final n = list[i];
+                return _NotificationCard(
+                  notification: n,
+                  onTap: () {
+                    _cubit.markRead(n);
+                    context.push(
+                      AppRoutes.notificationDetail,
+                      extra: n.copyWith(isUnread: false),
+                    );
+                  },
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _message(String text, {String? action, VoidCallback? onAction}) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.black54, fontSize: 14),
+            ),
+            if (action != null) ...[
+              const SizedBox(height: 14),
+              ElevatedButton(
+                onPressed: onAction,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _accent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(action),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildTabs() {
+  Widget _buildTabs(int unreadCount) {
     final labels = {
       _Tab.all: 'All',
-      _Tab.unread: 'Unread ($_unreadCount)',
+      _Tab.unread: 'Unread ($unreadCount)',
       _Tab.offers: 'Offers',
       _Tab.orders: 'Orders',
     };

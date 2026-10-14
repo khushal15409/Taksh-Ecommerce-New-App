@@ -277,3 +277,13 @@ See [features/ORDERS.md](features/ORDERS.md).
 4. Expose via use case.  
 5. Update this document and the feature doc.  
 6. Run `build_runner` if new `@JsonSerializable` models were added.
+
+### Notifications (customer app)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/notifications?page=&per_page=&filter=` | Inbox: `items[]` (`id,type,title,message,is_read,sent_at`), `unread_count`, `pagination`. Auth required. |
+| GET | `/notifications/unread-count` | Bell badge count |
+| POST | `/notifications/{id}/read` | Mark one read → `unread_count` |
+| POST | `/notifications/read-all` | Mark all read |
+
+Created in the admin panel (Notifications → panel **Customer app**, with a type: offer / promotion / order / delivery / payment / review / app). Only *sent* notifications are visible; "All Users" = every customer, "Custom" = chosen customers. `NotificationsCubit` (lazy singleton) feeds the notifications page and the home bell badge. Docs: `docs/features/` has no separate notifications page yet.

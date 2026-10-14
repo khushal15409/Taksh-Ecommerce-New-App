@@ -101,6 +101,7 @@ flutter:
     - assets/images/diwali/
     - assets/images/onboarding/
     - assets/images/redesign/
+    - assets/images/logo/
     # - assets/icons/
 
   # fonts:

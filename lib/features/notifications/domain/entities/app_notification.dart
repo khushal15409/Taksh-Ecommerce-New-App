@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// Category of a notification. Drives icon, tint and the filter tabs.
 enum NotificationType { offer, order, delivery, promotion, review, payment, app }
 
-/// Static (UI-only) notification model. Will be replaced by an API-backed
-/// model once the notifications endpoint is available.
+/// A notification in the customer's inbox. Comes from `GET /notifications`
+/// (created in the admin panel); [sample] is only a fallback for previews.
 class AppNotification {
   final String id;
   final NotificationType type;
@@ -14,6 +14,9 @@ class AppNotification {
   final bool isUnread;
   final Color dotColor;
 
+  /// When it was sent (null for the static [sample] items).
+  final DateTime? sentAt;
+
   const AppNotification({
     required this.id,
     required this.type,
@@ -22,7 +25,55 @@ class AppNotification {
     required this.timeAgo,
     this.isUnread = false,
     this.dotColor = const Color(0xFFFF7A00),
+    this.sentAt,
   });
+
+  /// Parses one item of `GET /notifications`. Unknown types fall back to
+  /// [NotificationType.app] so a newer admin never breaks the list.
+  factory AppNotification.fromJson(Map<String, dynamic> json) {
+    final type = _typeFrom(json['type']?.toString());
+    final sentAt = DateTime.tryParse(json['sent_at']?.toString() ?? '')?.toLocal();
+    return AppNotification(
+      id: json['id'].toString(),
+      type: type,
+      title: json['title']?.toString() ?? '',
+      message: json['message']?.toString() ?? '',
+      timeAgo: sentAt == null ? '' : timeAgoFrom(sentAt),
+      isUnread: json['is_read'] != true,
+      dotColor: type == NotificationType.delivery
+          ? const Color(0xFF3CAE5C)
+          : const Color(0xFFFF7A00),
+      sentAt: sentAt,
+    );
+  }
+
+  AppNotification copyWith({bool? isUnread}) => AppNotification(
+    id: id,
+    type: type,
+    title: title,
+    message: message,
+    timeAgo: timeAgo,
+    isUnread: isUnread ?? this.isUnread,
+    dotColor: dotColor,
+    sentAt: sentAt,
+  );
+
+  static NotificationType _typeFrom(String? value) {
+    for (final t in NotificationType.values) {
+      if (t.name == value) return t;
+    }
+    return NotificationType.app;
+  }
+
+  /// "2m ago", "3h ago", "1d ago", or a date for older ones.
+  static String timeAgoFrom(DateTime time, {DateTime? now}) {
+    final diff = (now ?? DateTime.now()).difference(time);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${time.day.toString().padLeft(2, '0')}/${time.month.toString().padLeft(2, '0')}/${time.year}';
+  }
 
   bool get isOffer =>
       type == NotificationType.offer || type == NotificationType.promotion;

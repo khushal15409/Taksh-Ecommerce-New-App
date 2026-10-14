@@ -184,7 +184,8 @@ class _SplashPageState extends State<SplashPage> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: Image.asset(
-          'docs/splash_logo.jpeg',
+          'assets/images/logo/taksh_logo.png',
+          filterQuality: FilterQuality.high,
           width: double.infinity,
           fit: BoxFit.fitWidth,
         ),

@@ -183,3 +183,5 @@ Avoid `getIt<SomeBloc>()` inside deeply nested widgets if a `BlocProvider` alrea
 4. If mockable, branch on `useMockData`.  
 5. Provide bloc at correct tree level (root / shell / route).  
 6. Update this doc + [FEATURES.md](FEATURES.md).
+
+- `NotificationsCubit` is also a `registerLazySingleton` (home bell badge + notifications page share one unread count), like `WishlistCubit`.
