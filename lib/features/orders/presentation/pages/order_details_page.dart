@@ -248,7 +248,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       padding: const EdgeInsets.fromLTRB(7, 7, 7, 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(13),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -280,8 +280,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.grey900,
                   ),
                 ),
@@ -607,7 +607,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Text(
                     step.title,
                     style: TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: step.isCompleted
                           ? AppColors.grey900
@@ -617,7 +617,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Text(
                     step.subtitle,
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 10.5,
                       color: AppColors.grey600,
                     ),
                   ),
@@ -625,7 +625,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Text(
                       step.timeLabel,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 10.5,
                         color: AppColors.grey600,
                       ),
                     ),
@@ -786,7 +786,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       productName,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 11.5,
+                        fontSize: 12.5,
                         color: AppColors.grey900,
                       ),
                     ),
@@ -795,7 +795,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         variantLabel,
                         style: const TextStyle(
                           color: AppColors.grey700,
-                          fontSize: 10,
+                          fontSize: 10.5,
                         ),
                       )
                     else if (sku.isNotEmpty)
@@ -803,7 +803,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         'SKU: $sku',
                         style: const TextStyle(
                           color: AppColors.grey700,
-                          fontSize: 10,
+                          fontSize: 10.5,
                         ),
                       ),
                     Text(
@@ -812,7 +812,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       )!.qtyPrice(qty, unitPrice.toStringAsFixed(2)),
                       style: const TextStyle(
                         color: AppColors.grey700,
-                        fontSize: 10,
+                        fontSize: 10.5,
                       ),
                     ),
                   ],
@@ -833,7 +833,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   style: const TextStyle(
                     color: AppColors.primaryOrange,
                     fontWeight: FontWeight.w800,
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
               ),
@@ -877,7 +877,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       'returned',
     ].contains(order.orderStatus.toLowerCase());
     const bodyStyle = TextStyle(
-      fontSize: 10.5,
+      fontSize: 11.5,
       color: AppColors.grey800,
       height: 1.3,
     );
@@ -929,7 +929,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   address.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     height: 1.3,
                     color: AppColors.grey900,
                   ),
@@ -1036,7 +1036,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 Text(
                   l10n.totalAmount,
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
@@ -1044,7 +1044,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 Text(
                   '₹${totalAmount.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryOrange,
                   ),
@@ -1150,10 +1150,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 AppLocalizations.of(context)!.orderIssues,
                 style: const TextStyle(
                   color: AppColors.grey700,
-                  fontSize: 10,
+                  fontSize: 10.5,
                 ),
               ),
-              const SizedBox(height: 7),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
@@ -1169,11 +1169,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        minimumSize: const Size(0, 30),
+                        minimumSize: const Size(0, 36),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 11.5,
+                          fontSize: 12.5,
                         ),
                       ),
                     ),
@@ -1194,11 +1194,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        minimumSize: const Size(0, 30),
+                        minimumSize: const Size(0, 36),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 11.5,
+                          fontSize: 12.5,
                         ),
                       ),
                     ),
@@ -1256,7 +1256,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 11.5, color: AppColors.grey800),
+              style: const TextStyle(fontSize: 12, color: AppColors.grey800),
             ),
             if (info) ...[
               const SizedBox(width: 6),
@@ -1276,7 +1276,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           value,
           style: TextStyle(
             color: valueColor ?? AppColors.grey900,
-            fontSize: 11.5,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
         ),
