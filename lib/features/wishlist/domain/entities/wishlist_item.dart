@@ -7,8 +7,8 @@ class WishlistItem extends Equatable {
   final String productName;
   final String? productSlug;
   final String? productImage;
-  final int? originalPrice;
-  final int? salePrice;
+  final double? originalPrice;
+  final double? salePrice;
   final bool inStock;
   final DateTime? createdAt;
 

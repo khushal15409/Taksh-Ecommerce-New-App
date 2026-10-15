@@ -38,6 +38,11 @@ class OrdersCubit extends Cubit<OrdersState> {
   OrderSortBy _sortBy = OrderSortBy.dateDesc;
   PaginatedOrders? _originalOrders;
 
+  /// Bumped by every [fetchOrders] so a page that was still loading for an
+  /// earlier list is never merged into a refreshed one.
+  int _ordersRequestId = 0;
+  bool _loadingMoreOrders = false;
+
   OrdersCubit({
     required this.getOrders,
     required this.getOrderDetails,
@@ -50,12 +55,58 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   /// Fetch orders with pagination
   Future<void> fetchOrders({int page = 1}) async {
+    final requestId = ++_ordersRequestId;
+    _loadingMoreOrders = false;
     emit(const OrdersLoading());
 
     final result = await getOrders(page: page);
 
+    if (isClosed || requestId != _ordersRequestId) return;
+
     result.fold((failure) => emit(OrdersError(failure.message)), (orders) {
       _originalOrders = orders;
+      _applyFiltersAndSort();
+    });
+  }
+
+  /// Load the next page of orders and add it to the list (filters and sort
+  /// are re-applied). No-op while a page is loading or when there is no next
+  /// page; a failed page keeps the orders already shown.
+  Future<void> fetchMoreOrders() async {
+    final loaded = _originalOrders;
+    if (isClosed || _loadingMoreOrders || loaded == null) return;
+    if (loaded.nextPageUrl == null || loaded.currentPage >= loaded.lastPage) {
+      return;
+    }
+
+    _loadingMoreOrders = true;
+    final requestId = _ordersRequestId;
+
+    final result = await getOrders(page: loaded.currentPage + 1);
+
+    _loadingMoreOrders = false;
+    if (isClosed || requestId != _ordersRequestId) return;
+
+    result.fold((_) {}, (next) {
+      final knownIds = loaded.orders.map((order) => order.id).toSet();
+      _originalOrders = PaginatedOrders(
+        orders: [
+          ...loaded.orders,
+          ...next.orders.where((order) => !knownIds.contains(order.id)),
+        ],
+        currentPage: next.currentPage,
+        firstPageUrl: next.firstPageUrl,
+        from: loaded.from,
+        lastPage: next.lastPage,
+        lastPageUrl: next.lastPageUrl,
+        links: next.links,
+        nextPageUrl: next.nextPageUrl,
+        path: next.path,
+        perPage: next.perPage,
+        prevPageUrl: next.prevPageUrl,
+        to: next.to,
+        total: next.total,
+      );
       _applyFiltersAndSort();
     });
   }

@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/recent_view.dart';
 
@@ -14,7 +15,7 @@ class RecentViewModel extends RecentView {
     return RecentViewModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: json['name'] as String? ?? 'Product',
-      price: (json['price'] as num?)?.toInt() ?? 0,
+      price: parseMoney(json['price']) ?? 0.0,
       thumbnail: json['thumbnail'] as String? ?? '',
     );
   }

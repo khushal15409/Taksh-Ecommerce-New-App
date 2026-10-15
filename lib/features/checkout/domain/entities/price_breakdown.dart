@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 
 /// Entity representing price breakdown
 class PriceBreakdown extends Equatable {
-  final int itemTotal;
-  final int deliveryCharges;
-  final int cgst;
-  final int sgst;
-  final int discount;
-  final int grandTotal;
+  final double itemTotal;
+  final double deliveryCharges;
+  final double cgst;
+  final double sgst;
+  final double discount;
+  final double grandTotal;
 
   const PriceBreakdown({
     required this.itemTotal,
@@ -19,7 +19,7 @@ class PriceBreakdown extends Equatable {
   });
 
   /// Total tax amount
-  int get totalTax => cgst + sgst;
+  double get totalTax => cgst + sgst;
 
   /// Get item total in rupees
   double get itemTotalInRupees => itemTotal / 1;

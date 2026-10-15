@@ -29,18 +29,15 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
 
   @override
   Future<void> addAddress(AddressModel address) async {
-    // Convert address to form data format matching the API
-    // Note: The API expects specific IDs for state, city, and area
-    // For now, we're using placeholder values. In production, these should be
-    // obtained from a location service or user selection
+    // State, city and area are NOT sent: the server works them out from the pincode (and
+    // answers 422 for a pincode it does not know) instead of the app inventing ids. The
+    // pincode is the one the customer entered or picked; a missing one is sent empty so
+    // the server rejects it, never replaced by a made-up value.
     final formData = <String, dynamic>{
-      'state_id': '1', // TODO: Get actual state_id from location service
-      'city_id': '1', // TODO: Get actual city_id from location service
-      'area_id': '1', // TODO: Get actual area_id from location service
       'name': address.recipientName,
       'mobile': address.recipientPhone,
       'address_line_1': address.addressLine1,
-      'pincode': address.location.postalCode ?? '000000',
+      'pincode': address.location.postalCode ?? '',
       'address_type': address.type.name, // Send 'home', 'work', or 'other'
       'is_default': address.isDefault ? '1' : '0',
     };
@@ -52,6 +49,7 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
     if (address.landmark != null && address.landmark!.isNotEmpty) {
       formData['landmark'] = address.landmark;
     }
+    _addCoordinates(formData, address);
 
     // API returns 201 with no body on success
     await apiClient.post(
@@ -64,25 +62,36 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
   Future<List<AddressModel>> getAddresses() async {
     final response = await apiClient.get(ApiConstants.addresses);
 
-    // API returns addresses nested under data.addresses
+    // The API returns the default address separately (data.default_address)
+    // and only the other addresses under data.addresses, so both are needed
+    // to get the user's full list (a user with one address has an empty
+    // data.addresses). The default address comes first.
     final dataWrapper = response.data['data'] as Map<String, dynamic>;
-    final addressesList = dataWrapper['addresses'] as List;
-    return addressesList.map((json) => AddressModel.fromJson(json)).toList();
+    final defaultJson = dataWrapper['default_address'];
+    final addressesList = (dataWrapper['addresses'] as List?) ?? const [];
+    return [
+      if (defaultJson is Map<String, dynamic>) AddressModel.fromJson(defaultJson),
+      ...addressesList.map((json) => AddressModel.fromJson(json)),
+    ];
   }
 
   @override
   Future<void> updateAddress(AddressModel address) async {
+    // state_id / city_id / area_id are deliberately not sent: the server keeps
+    // the ones already saved, instead of overwriting them with placeholders.
     final formData = <String, dynamic>{
-      'state_id': '1', // TODO: Get actual state_id from location service
-      'city_id': '1', // TODO: Get actual city_id from location service
-      'area_id': '1', // TODO: Get actual area_id from location service
       'name': address.recipientName,
       'mobile': address.recipientPhone,
       'address_line_1': address.addressLine1,
-      'pincode': address.location.postalCode ?? '000000',
       'address_type': address.type.name, // Send 'home', 'work', or 'other'
       'is_default': address.isDefault ? '1' : '0',
     };
+
+    // An edit without a pincode keeps the one already saved.
+    final pincode = address.location.postalCode;
+    if (pincode != null && pincode.isNotEmpty) {
+      formData['pincode'] = pincode;
+    }
 
     if (address.addressLine2 != null && address.addressLine2!.isNotEmpty) {
       formData['address_line_2'] = address.addressLine2;
@@ -91,10 +100,22 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
       formData['landmark'] = address.landmark;
     }
 
+    _addCoordinates(formData, address);
+
     await apiClient.put(
       ApiConstants.updateAddress(address.id),
       data: formData,
     );
+  }
+
+  /// Sends the picked location when there is one (0,0 means "not set").
+  void _addCoordinates(Map<String, dynamic> formData, AddressModel address) {
+    final latitude = address.location.latitude;
+    final longitude = address.location.longitude;
+    if (latitude != 0.0 || longitude != 0.0) {
+      formData['latitude'] = latitude.toString();
+      formData['longitude'] = longitude.toString();
+    }
   }
 
   @override
@@ -107,6 +128,10 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
 
   @override
   Future<void> setDefaultAddress(String id) async {
-    await apiClient.put(ApiConstants.setDefaultAddress(id));
+    // The backend sets the default through this existing POST route.
+    await apiClient.post(
+      ApiConstants.setDefaultAddress(id),
+      data: FormData.fromMap({'address_id': id}),
+    );
   }
 }

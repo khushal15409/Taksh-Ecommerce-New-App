@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/data/models/cart_model.dart';
@@ -23,6 +24,19 @@ abstract class CartRemoteDataSource {
   Future<CartResponseModel> updateCartItem({
     required int cartItemId,
     required int qty,
+    required String deliveryType,
+    String? guestToken,
+  });
+
+  /// Apply a coupon code to the cart (the server validates it and returns the new cart)
+  Future<CartResponseModel> applyCoupon({
+    required String couponCode,
+    required String deliveryType,
+    String? guestToken,
+  });
+
+  /// Remove the coupon from the cart
+  Future<CartResponseModel> removeCoupon({
     required String deliveryType,
     String? guestToken,
   });
@@ -111,6 +125,42 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
     }
 
     final response = await apiClient.post('/cart/update', data: formData);
+
+    final data = response.data['data'] as DataMap;
+    return CartResponseModel.fromJson(data);
+  }
+
+  @override
+  Future<CartResponseModel> applyCoupon({
+    required String couponCode,
+    required String deliveryType,
+    String? guestToken,
+  }) async {
+    final formData = <String, dynamic>{
+      'coupon_code': couponCode,
+      'delivery_type': deliveryType,
+    };
+    if (guestToken != null) {
+      formData['guest_token'] = guestToken;
+    }
+
+    final response = await apiClient.post(ApiConstants.applyCoupon, data: formData);
+
+    final data = response.data['data'] as DataMap;
+    return CartResponseModel.fromJson(data);
+  }
+
+  @override
+  Future<CartResponseModel> removeCoupon({
+    required String deliveryType,
+    String? guestToken,
+  }) async {
+    final formData = <String, dynamic>{'delivery_type': deliveryType};
+    if (guestToken != null) {
+      formData['guest_token'] = guestToken;
+    }
+
+    final response = await apiClient.post(ApiConstants.removeCoupon, data: formData);
 
     final data = response.data['data'] as DataMap;
     return CartResponseModel.fromJson(data);

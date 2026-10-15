@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -358,7 +359,7 @@ class _WishlistItemCard extends StatelessWidget {
       children: [
         if (item.salePrice != null)
           Text(
-            '₹${item.salePrice}',
+            '₹${formatRupees(item.salePrice!)}',
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
@@ -368,7 +369,7 @@ class _WishlistItemCard extends StatelessWidget {
         if (item.hasDiscount && item.originalPrice != null) ...[
           const SizedBox(width: 8),
           Text(
-            '₹${item.originalPrice}',
+            '₹${formatRupees(item.originalPrice!)}',
             style: const TextStyle(
               fontSize: 13,
               color: AppColors.grey500,

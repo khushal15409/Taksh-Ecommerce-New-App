@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 class ExtraCharge extends Equatable {
   final String type;
   final String label;
-  final int amount;
+  final double amount;
   final bool isDiscount;
   final int? sortOrder;
 
@@ -17,7 +17,7 @@ class ExtraCharge extends Equatable {
   });
 
   /// Static platform fee (₹9) applied to every order.
-  static const int platformFeeAmount = 9;
+  static const double platformFeeAmount = 9;
 
   static const String platformFeeType = 'platform_fee';
 

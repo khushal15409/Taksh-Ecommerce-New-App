@@ -6,7 +6,7 @@ import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart
 class SelectedCheckoutItems extends Equatable {
   final List<CartItem> items;
   final List<int> itemIds;
-  final int subtotal;
+  final double subtotal;
   final int totalQuantity;
   final List<ExtraCharge> extraCharges;
   final String? deliveryType;

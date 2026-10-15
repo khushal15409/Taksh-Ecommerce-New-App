@@ -57,7 +57,13 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     } else {
-      context.go(AppRoutes.checkout);
+      // Nothing to go back to (e.g. the screen was restored): reopen checkout for the same
+      // delivery bucket; it is rebuilt from the server cart.
+      final deliveryType =
+          context.read<CheckoutBloc>().selectedDeliveryOption?.type == '30_min'
+          ? '30_min'
+          : 'normal';
+      context.go('${AppRoutes.checkout}?deliveryType=$deliveryType');
     }
   }
 
@@ -497,7 +503,11 @@ class _PriceBreakdownView extends StatelessWidget {
             priceBreakdown.totalTaxInRupees,
           ),
         ],
-        if (priceBreakdown.discount > 0) ...[
+        // A coupon arrives as a discount line in extraCharges (with its code); the generic
+        // discount row is only for a discount that has no line of its own, so one discount
+        // is never listed twice.
+        if (priceBreakdown.discount > 0 &&
+            !extraCharges.any((charge) => charge.isDiscount)) ...[
           const SizedBox(height: 8),
           _row(
             context,

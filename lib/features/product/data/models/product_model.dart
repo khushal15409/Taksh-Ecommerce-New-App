@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product.dart';
 import 'package:taksh_e_commerce/features/product/data/models/brand_model.dart';
@@ -22,6 +23,9 @@ int _productAsInt(dynamic value, {int fallback = 0}) {
 
   return num.tryParse(normalizedValue)?.toInt() ?? fallback;
 }
+
+/// Money value with its paise (never truncated to whole rupees); null when absent/non-numeric.
+double? _productAsMoney(dynamic value) => parseMoney(value);
 
 bool _productAsBool(dynamic value, {bool fallback = false}) {
   if (value is bool) return value;
@@ -209,9 +213,11 @@ List<Map<String, dynamic>> _normalizeProductVariants(
     );
 
     final explicitInStock = _productAsNullableBool(variant['in_stock']);
-    final stockQuantity = variant['stock_quantity'] ??
-      variant['stock_qty'] ??
-        variant['available_stock'] ??
+    // available_stock (stock minus reserved) wins over the raw stock counts,
+    // so stock that is already reserved by other orders cannot be added.
+    final stockQuantity = variant['available_stock'] ??
+        variant['stock_quantity'] ??
+        variant['stock_qty'] ??
         variant['quantity'];
     final normalizedStockStatus = _productAsString(variant['stock_status'])
         ?.toLowerCase();
@@ -480,10 +486,10 @@ class ProductModel extends Product {
     final currentOriginalPrice = processedJson['original_price'];
     final currentSalePrice = processedJson['sale_price'];
     if (currentOriginalPrice != null) {
-      processedJson['original_price'] = _productAsInt(currentOriginalPrice);
+      processedJson['original_price'] = _productAsMoney(currentOriginalPrice);
     }
     if (currentSalePrice != null) {
-      processedJson['sale_price'] = _productAsInt(currentSalePrice);
+      processedJson['sale_price'] = _productAsMoney(currentSalePrice);
     }
 
     // Express API returns prices only in variants — extract to top level
@@ -494,10 +500,10 @@ class ProductModel extends Product {
         final price = firstVariant['price'];
         final salePrice = firstVariant['sale_price'];
         if (price != null) {
-          processedJson['original_price'] = _productAsInt(price);
+          processedJson['original_price'] = _productAsMoney(price);
         }
         if (salePrice != null) {
-          processedJson['sale_price'] = _productAsInt(salePrice);
+          processedJson['sale_price'] = _productAsMoney(salePrice);
         }
       }
     }

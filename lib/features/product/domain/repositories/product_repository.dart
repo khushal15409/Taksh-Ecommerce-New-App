@@ -26,6 +26,7 @@ abstract class ProductRepository {
   /// Search products by keyword
   ResultFuture<SearchProductsResponse> searchProducts({
     required String keyword,
+    String? deliveryType,
   });
 
   /// Get express products based on nearest fulfillment center

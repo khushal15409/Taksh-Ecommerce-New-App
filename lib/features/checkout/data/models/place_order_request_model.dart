@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
-import 'package:taksh_e_commerce/features/cart/data/models/extra_charge_model.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 
 part 'place_order_request_model.g.dart';
@@ -41,17 +38,13 @@ class PlaceOrderRequestModel {
 
   /// Convert to form data map for API
   DataMap toFormData() {
+    // Only what the server reads. The vendor is taken from the cart, and the
+    // amounts (items, fees, coupon, total) are always recalculated server-side,
+    // so the placeholder warehouse/vendor ids and the client's charges are not sent.
     return {
       'address_id': addressId,
-      'warehouse_id': warehouseId,
       'delivery_type': deliveryType,
       'payment_method': paymentMethod,
-      'vendor_id': vendorId,
-      'extraCharges': jsonEncode(
-        extraCharges
-            .map((charge) => ExtraChargeModel.fromEntity(charge).toOrderJson())
-            .toList(),
-      ),
     };
   }
 }

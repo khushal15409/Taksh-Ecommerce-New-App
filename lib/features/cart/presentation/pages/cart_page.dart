@@ -1,3 +1,5 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
+import 'package:taksh_e_commerce/features/cart/presentation/widgets/coupon_section.dart';
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -124,10 +126,12 @@ class _CartPageState extends State<CartPage>
           listener: (context, state) {
             if (state is CartError) {
               final l10n = AppLocalizations.of(context)!;
+              // Show the server's message (e.g. "Insufficient stock available") when
+              // there is one; only a missing message falls back to the generic text.
               final displayMessage =
-                  (state.message == 'null' || state.message.isEmpty)
+                  (state.message == 'null' || state.message.trim().isEmpty)
                   ? l10n.cartUnexpectedError
-                  : l10n.cartUnexpectedError;
+                  : state.message;
 
               AppToastMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -241,10 +245,11 @@ class _CartPageState extends State<CartPage>
   /// Festive header: lantern / diya artwork background with title + totals.
   Widget _buildHeader(BuildContext context, Cart activeCart) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final total = activeCart.isEmpty
-        ? 0
-        : (activeCart.totalWithDelivery ?? activeCart.total) +
-              ExtraCharge.platformFeeAmount;
+    // The server total already includes every fee (platform, quick delivery,
+    // coupon), so nothing is added on the client.
+    final double total = activeCart.isEmpty
+        ? 0.0
+        : (activeCart.totalWithDelivery ?? activeCart.total);
     final itemsLabel = activeCart.totalItems == 1
         ? '1 item'
         : '${activeCart.totalItems} items';
@@ -276,7 +281,7 @@ class _CartPageState extends State<CartPage>
                   ),
                 ),
                 Text(
-                  '$itemsLabel • ₹$total',
+                  '$itemsLabel • ₹${formatRupees(total)}',
                   style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white,
@@ -712,7 +717,7 @@ class _CartPageState extends State<CartPage>
                               Text(
                                 AppLocalizations.of(
                                   context,
-                                )!.total(item.total.toString()),
+                                )!.total(formatRupees(item.total)),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
@@ -871,8 +876,7 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildBillDetails(BuildContext context, Cart cart) {
-    final displayTotal =
-        (cart.totalWithDelivery ?? cart.total) + ExtraCharge.platformFeeAmount;
+    final displayTotal = cart.totalWithDelivery ?? cart.total;
     final itemsText = cart.totalItems == 1 ? '1 item' : '${cart.totalItems} items';
 
     return Container(
@@ -896,10 +900,12 @@ class _CartPageState extends State<CartPage>
             ],
           ),
           const SizedBox(height: 12),
+          // Coupon: the server validates it; the coupon line and total come back in the cart.
+          CouponSection(cart: cart, deliveryType: _selectedDeliveryType),
           _buildSummaryRow(
             context,
             '${AppLocalizations.of(context)!.subtotal} ($itemsText)',
-            '₹${cart.total}',
+            '₹${formatRupees(cart.total)}',
           ),
           _buildSummaryRow(
             context,
@@ -911,15 +917,10 @@ class _CartPageState extends State<CartPage>
             _buildSummaryRow(
               context,
               charge.label,
-              '${charge.isDiscount ? '- ' : ''}₹${charge.amount}',
+              // a discount (coupon) arrives as a negative amount: show it as "- ₹50"
+              '${charge.isDiscount ? '- ' : ''}₹${formatRupees(charge.amount.abs())}',
               valueColor: charge.isDiscount ? AppColors.secondaryGreen : null,
             ),
-          _buildSummaryRow(
-            context,
-            AppLocalizations.of(context)!.platformFees,
-            '₹${ExtraCharge.platformFeeAmount}',
-            info: true,
-          ),
           const SizedBox(height: 0),
           Divider(height: 1, color: Colors.black.withOpacity(0.08)),
           const SizedBox(height: 10),
@@ -934,7 +935,7 @@ class _CartPageState extends State<CartPage>
                 ),
               ),
               Text(
-                '₹$displayTotal',
+                '₹${formatRupees(displayTotal)}',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,

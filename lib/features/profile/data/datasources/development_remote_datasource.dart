@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/features/profile/data/models/development_request_model.dart';
@@ -24,8 +25,7 @@ class DevelopmentRemoteDataSourceImpl implements DevelopmentRemoteDataSource {
     // Convert request to form data
     final formData = request.toFormData();
     
-    // Debug: Print the data being sent
-    print('Development Request Data: $formData');
+    // The form carries the customer's contact details, so it is not printed.
 
     try {
       // Make API call
@@ -38,13 +38,10 @@ class DevelopmentRemoteDataSourceImpl implements DevelopmentRemoteDataSource {
       final data = response.data['data'] as Map<String, dynamic>;
       return DevelopmentResponseModel.fromJson(data);
     } catch (e) {
-      print('Development Request Error: $e');
-      if (e.toString().contains('DioException')) {
-        // Try to extract error message from response
-        final errorMatch = RegExp(r'Response data: (.+)').firstMatch(e.toString());
-        if (errorMatch != null) {
-          print('Server Error Response: ${errorMatch.group(1)}');
-        }
+      // The error text can echo the submitted form (contact details), so only its type
+      // is printed, and only in debug builds.
+      if (kDebugMode) {
+        debugPrint('Development Request Error: ${e.runtimeType}');
       }
       rethrow;
     }

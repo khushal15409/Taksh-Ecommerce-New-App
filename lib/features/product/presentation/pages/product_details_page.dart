@@ -707,7 +707,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ? <CartItem>[selectedItem]
           : updatedCart.items;
 
-      final subtotal = checkoutItems.fold<int>(
+      final subtotal = checkoutItems.fold<double>(
         0,
         (sum, item) => sum + item.total,
       );

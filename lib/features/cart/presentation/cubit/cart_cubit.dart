@@ -3,13 +3,16 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taksh_e_commerce/core/utils/secure_store.dart';
+import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/data/models/cart_item_model.dart';
 import 'package:taksh_e_commerce/features/cart/data/models/cart_model.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart_item.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/add_to_cart.dart';
+import 'package:taksh_e_commerce/features/cart/domain/usecases/apply_coupon.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/clear_cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/get_cart.dart';
+import 'package:taksh_e_commerce/features/cart/domain/usecases/remove_coupon.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/remove_from_cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/update_cart_item.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
@@ -27,6 +30,8 @@ class CartCubit extends Cubit<CartState> {
   final UpdateCartItem updateCartItem;
   final RemoveFromCart removeFromCart;
   final ClearCart clearCart;
+  final ApplyCoupon _applyCoupon;
+  final RemoveCoupon _removeCoupon;
   final SecureStore secureStore;
   final SharedPreferences sharedPreferences;
 
@@ -52,9 +57,13 @@ class CartCubit extends Cubit<CartState> {
     required this.updateCartItem,
     required this.removeFromCart,
     required this.clearCart,
+    required ApplyCoupon applyCoupon,
+    required RemoveCoupon removeCoupon,
     required this.secureStore,
     required this.sharedPreferences,
-  }) : super(const CartInitial()) {
+  }) : _applyCoupon = applyCoupon,
+       _removeCoupon = removeCoupon,
+       super(const CartInitial()) {
     _loadCachedCart();
   }
 
@@ -288,7 +297,10 @@ class CartCubit extends Cubit<CartState> {
           detailCart.guestToken ??
           quickCart.guestToken ??
           standardCart.guestToken,
-      extraCharges: detailCart.extraCharges,
+      // Each bucket is ordered separately and carries its own fees (platform fee, quick
+      // delivery fee, coupon), and `totalWithDelivery` above already sums both buckets,
+      // so the charges shown must be both buckets' charges too (not just one bucket's).
+      extraCharges: [...quickCart.extraCharges, ...standardCart.extraCharges],
       deliveryChargeCode: detailCart.deliveryChargeCode,
       deliveryEstimatedMinutes: detailCart.deliveryEstimatedMinutes,
       deliveryChargePrice: detailCart.deliveryChargePrice,
@@ -476,7 +488,106 @@ class CartCubit extends Cubit<CartState> {
     });
   }
 
+  /// Forgets everything kept for the previous session: the in-memory carts, the merged
+  /// cart and the cached copies in SharedPreferences, so another account (or a guest)
+  /// never sees them. Called when the user logs out / is unauthenticated. The guest cart
+  /// token is kept: guest carts live on the server under that token.
+  void resetForUserChange() {
+    if (isClosed) return;
+
+    _updatingCartItemIds.clear();
+    for (final deliveryType in _cartsByDeliveryType.keys.toList()) {
+      _cartsByDeliveryType[deliveryType] = Cart.empty();
+    }
+    _activeDeliveryType = deliveryTypeStandard;
+    _clearCartCache();
+    _refreshMergedCart();
+
+    emit(const CartInitial());
+  }
+
+  bool _couponRequestInFlight = false;
+
+  /// Applies [code] to the cart of [deliveryType]. The server validates the coupon and
+  /// returns the cart with its discount; nothing is calculated here. Returns null on
+  /// success, or the message to show the customer (invalid, expired, exhausted,
+  /// minimum cart value not met, no connection...). A second call while one is still
+  /// running is ignored, so repeated taps cannot send the request twice.
+  Future<String?> applyCoupon(String code, {String? deliveryType}) {
+    return _changeCoupon(
+      deliveryType,
+      (type) => _applyCoupon(
+        ApplyCouponParams(
+          couponCode: code.trim(),
+          guestToken: _guestToken,
+          deliveryType: type,
+        ),
+      ),
+    );
+  }
+
+  /// Removes the coupon from the cart of [deliveryType]; same contract as [applyCoupon].
+  Future<String?> removeCoupon({String? deliveryType}) {
+    return _changeCoupon(
+      deliveryType,
+      (type) => _removeCoupon(
+        RemoveCouponParams(guestToken: _guestToken, deliveryType: type),
+      ),
+    );
+  }
+
+  Future<String?> _changeCoupon(
+    String? deliveryType,
+    ResultFuture<Cart> Function(String deliveryType) request,
+  ) async {
+    if (isClosed || _couponRequestInFlight) return null;
+
+    _couponRequestInFlight = true;
+    try {
+      final resolvedDeliveryType = _normalizeDeliveryType(
+        deliveryType ?? _activeDeliveryType,
+      );
+      final result = await request(resolvedDeliveryType);
+      if (isClosed) return null;
+
+      String? message;
+      result.fold((failure) {
+        message = failure.message;
+      }, (cart) {
+        _saveGuestTokenIfPresent(cart.guestToken);
+        _storeCart(resolvedDeliveryType, cart);
+        emit(CartLoaded(_lastKnownCart ?? Cart.empty()));
+      });
+      return message;
+    } finally {
+      _couponRequestInFlight = false;
+    }
+  }
+
+  /// Cart lines whose quantity update is still in flight.
+  final Set<int> _updatingCartItemIds = <int>{};
+
+  /// Changes a line's quantity. A tap on a line whose previous update has not
+  /// finished yet is ignored, so quick repeated taps cannot send overlapping
+  /// updates computed from a stale quantity or interleave their states.
   Future<void> updateItem({
+    required int cartItemId,
+    required int qty,
+    String? deliveryType,
+  }) async {
+    if (isClosed || !_updatingCartItemIds.add(cartItemId)) return;
+    try {
+      await _updateItem(
+        cartItemId: cartItemId,
+        qty: qty,
+        deliveryType: deliveryType,
+      );
+    } finally {
+      _updatingCartItemIds.remove(cartItemId);
+    }
+  }
+
+  Future<void> _updateItem({
     required int cartItemId,
     required int qty,
     String? deliveryType,

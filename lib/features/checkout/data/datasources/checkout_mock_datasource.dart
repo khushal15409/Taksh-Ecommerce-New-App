@@ -107,11 +107,14 @@ class CheckoutMockDataSource implements CheckoutRemoteDataSource {
         .toList();
 
     // Calculate totals
-    final itemTotal = selectedItems.fold(0, (sum, item) => sum + item.total);
-    const deliveryCharges = 0; // Delivery is no longer charged.
-    const cgst = 0; // Taxes are folded into pricing — no separate tax line.
-    const sgst = 0;
-    final discount = couponCode != null ? 1000 : 0; // ₹10 discount if coupon
+    final itemTotal = selectedItems.fold<double>(
+      0,
+      (sum, item) => sum + item.total,
+    );
+    const deliveryCharges = 0.0; // Delivery is no longer charged.
+    const cgst = 0.0; // Taxes are folded into pricing — no separate tax line.
+    const sgst = 0.0;
+    final discount = couponCode != null ? 1000.0 : 0.0; // ₹10 discount if coupon
     final grandTotal =
         itemTotal +
         deliveryCharges +

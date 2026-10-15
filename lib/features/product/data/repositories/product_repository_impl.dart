@@ -80,6 +80,7 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Either<Failure, SearchProductsResponse>> searchProducts({
     required String keyword,
+    String? deliveryType,
   }) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure('No internet connection'));
@@ -88,6 +89,7 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       final response = await remoteDataSource.searchProducts(
         keyword: keyword,
+        deliveryType: deliveryType,
       );
       return Right(response);
     } on ServerException catch (e) {

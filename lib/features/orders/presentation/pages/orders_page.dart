@@ -30,9 +30,34 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
+  final ScrollController _ordersScroll = ScrollController();
+
+  /// Loads the next page of orders when the list is scrolled near its end, or
+  /// when the loaded orders do not fill the screen yet.
+  void _maybeLoadMoreOrders() {
+    if (!mounted) return;
+    // With no list on screen (every loaded order is hidden by the current
+    // filters) there is nothing to scroll, so keep loading pages until a match
+    // appears or the pages run out.
+    if (_ordersScroll.hasClients) {
+      final position = _ordersScroll.position;
+      if (position.maxScrollExtent - position.pixels > 300) return;
+    }
+    context.read<OrdersCubit>().fetchMoreOrders();
+  }
+
+  @override
+  void dispose() {
+    _ordersScroll
+      ..removeListener(_maybeLoadMoreOrders)
+      ..dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    _ordersScroll.addListener(_maybeLoadMoreOrders);
     // Only fetch orders if the user is authenticated
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
@@ -155,6 +180,12 @@ class _OrdersPageState extends State<OrdersPage> {
               final orders = state.orders.orders;
               final cubit = context.read<OrdersCubit>();
 
+              if (state.orders.nextPageUrl != null) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _maybeLoadMoreOrders(),
+                );
+              }
+
               if (orders.isEmpty &&
                   cubit.currentStatusFilter == null &&
                   cubit.currentDeliveryTypeFilter == null &&
@@ -175,6 +206,9 @@ class _OrdersPageState extends State<OrdersPage> {
                       child: orders.isEmpty
                           ? _buildNoResultsFound()
                           : ListView.builder(
+                              controller: _ordersScroll,
+                              // Keeps pull-to-refresh working on short lists
+                              physics: const AlwaysScrollableScrollPhysics(),
                               padding: const EdgeInsets.all(16),
                               itemCount: orders.length,
                               itemBuilder: (context, index) {
@@ -513,6 +547,15 @@ class _OrdersPageState extends State<OrdersPage> {
   }
 
   /// Build individual order card
+  /// Unpaid online order that has not been cancelled or moved on: the server's order and
+  /// payment status decide, the app only reads them.
+  bool _canPayNow(Order order) {
+    const settled = {'paid', 'success', 'refunded'};
+    return order.orderStatus.toLowerCase() == 'pending' &&
+        order.paymentMethod.toLowerCase() == 'online' &&
+        !settled.contains(order.paymentStatus.toLowerCase());
+  }
+
   Widget _buildOrderCard(BuildContext context, Order order) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -631,6 +674,23 @@ class _OrdersPageState extends State<OrdersPage> {
                 ],
               ),
               const SizedBox(height: 12),
+              // An online order that is still unpaid can be paid (again) from here.
+              if (_canPayNow(order)) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => context.push(
+                      AppRoutes.payNowPath(
+                        orderId: order.id,
+                        orderNumber: order.orderNumber,
+                      ),
+                    ),
+                    icon: const Icon(Icons.payment),
+                    label: const Text('Pay now'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
               // Address Section
               if (order.address != null)
                 Container(

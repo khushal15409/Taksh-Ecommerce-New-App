@@ -5,8 +5,8 @@ class SearchProduct extends Equatable {
   final int id;
   final String name;
   final String? brand;
-  final int price;
-  final int? mrp;
+  final double price;
+  final double? mrp;
   final String? imageUrl;
   final bool inStock;
 

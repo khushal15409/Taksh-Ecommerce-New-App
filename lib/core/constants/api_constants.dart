@@ -58,6 +58,8 @@ class ApiConstants {
 
   static String removeCartItem(String itemId) => '/cart/item/$itemId';
   static const String clearCart = '/cart/clear';
+  static const String applyCoupon = '/cart/coupon/apply';
+  static const String removeCoupon = '/cart/coupon/remove';
 
   /// Order endpoints
   static const String orders = '/order/orders';
@@ -111,8 +113,9 @@ class ApiConstants {
   static String deleteAddress(String addressId) =>
       '/address/user/addresses/delete';
 
+  // The id is sent in the request body (address_id), not in the path.
   static String setDefaultAddress(String addressId) =>
-      '/address/$addressId/default';
+      '/address/user/addresses/set-default';
 
   /// Payment endpoints
   static const String paymentMethods = '/payments/methods';

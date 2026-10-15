@@ -25,6 +25,19 @@ abstract class CartRepository {
     String deliveryType = 'normal',
   });
 
+  /// Apply a coupon code (validated by the server) and return the updated cart
+  ResultFuture<Cart> applyCoupon({
+    required String couponCode,
+    String? guestToken,
+    String deliveryType = 'normal',
+  });
+
+  /// Remove the coupon from the cart and return the updated cart
+  ResultFuture<Cart> removeCoupon({
+    String? guestToken,
+    String deliveryType = 'normal',
+  });
+
   /// Remove item from cart
   ResultFuture<Cart> removeFromCart({
     required int itemId,

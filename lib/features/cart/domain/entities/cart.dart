@@ -5,13 +5,13 @@ import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart
 /// Cart entity representing a shopping cart
 class Cart extends Equatable {
   final List<CartItem> items;
-  final int total;
+  final double total;
   final String? guestToken;
   final List<ExtraCharge> extraCharges;
   final String? deliveryChargeCode;
   final int? deliveryEstimatedMinutes;
   final double? deliveryChargePrice;
-  final int? totalWithDelivery;
+  final double? totalWithDelivery;
 
   const Cart({
     required this.items,

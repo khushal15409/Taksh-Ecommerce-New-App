@@ -364,7 +364,18 @@ class _HomeHeaderState extends State<HomeHeader>
             _log.infoWithContext('Search bar tapped', {
               'action': 'user_action',
             });
-            context.push(AppRoutes.search);
+            // Search inside the tab the user is on, so Quick products are
+            // not offered on the Standard tab (and the other way round).
+            final searchDeliveryType = switch (widget.selectedDeliveryType) {
+              DeliveryType.quick => '30_min',
+              DeliveryType.standard => 'normal',
+              DeliveryType.services => null,
+            };
+            context.push(
+              searchDeliveryType == null
+                  ? AppRoutes.search
+                  : '${AppRoutes.search}?delivery_type=$searchDeliveryType',
+            );
           },
           borderRadius: BorderRadius.circular(14),
           child: Padding(

@@ -11,6 +11,10 @@ class SearchCubit extends Cubit<SearchState> {
   final GetRecentSearches getRecentSearches;
   final _log = loggerWithContext({'feature': 'search', 'layer': 'cubit'});
 
+  /// Delivery type the user is searching in (`'30_min'` = Quick, `'normal'` =
+  /// Standard). `null` searches all products, as before.
+  String? deliveryType;
+
   SearchCubit({
     required this.searchProducts,
     required this.getRecentSearches,
@@ -38,9 +42,12 @@ class SearchCubit extends Cubit<SearchState> {
     );
   }
 
+  int _searchId = 0;
+
   Future<void> search(String query) async {
     final keyword = query.trim();
     if (keyword.length < AppConstants.minSearchLength) {
+      _searchId++; // drop any search that is still loading
       // Reload recent searches when query is cleared
       if (keyword.isEmpty) {
         await loadRecentSearches();
@@ -51,9 +58,13 @@ class SearchCubit extends Cubit<SearchState> {
     }
 
     _log.infoWithContext('Searching products', {'keyword': keyword});
+    final searchId = ++_searchId;
     emit(SearchLoading(keyword));
 
-    final result = await searchProducts(keyword);
+    final result = await searchProducts.forDeliveryType(keyword, deliveryType);
+
+    // A slower response for an older keyword must not replace newer results.
+    if (isClosed || searchId != _searchId) return;
 
     result.fold(
       (failure) {

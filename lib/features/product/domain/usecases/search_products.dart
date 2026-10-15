@@ -13,4 +13,16 @@ class SearchProducts extends UseCase<SearchProductsResponse, String> {
   ResultFuture<SearchProductsResponse> call(String params) {
     return repository.searchProducts(keyword: params);
   }
+
+  /// Search limited to one delivery type: `'30_min'` returns only express
+  /// products, any other code (e.g. `'normal'`) only standard products.
+  ResultFuture<SearchProductsResponse> forDeliveryType(
+    String keyword,
+    String? deliveryType,
+  ) {
+    return repository.searchProducts(
+      keyword: keyword,
+      deliveryType: deliveryType,
+    );
+  }
 }

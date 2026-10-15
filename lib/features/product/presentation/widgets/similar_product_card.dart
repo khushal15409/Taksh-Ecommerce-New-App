@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product.dart';
 
 /// Compact product card widget for displaying similar products
@@ -166,7 +167,7 @@ class SimilarProductCard extends StatelessWidget {
       children: [
         // Sale price (or original if no sale)
         Text(
-          '₹${salePrice ?? originalPrice ?? 0}',
+          '₹${formatRupees(salePrice ?? originalPrice ?? 0)}',
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
@@ -178,7 +179,7 @@ class SimilarProductCard extends StatelessWidget {
           const SizedBox(width: 4),
           Flexible(
             child: Text(
-              '₹$originalPrice',
+              '₹${formatRupees(originalPrice)}',
               style: TextStyle(
                 fontSize: 9,
                 color: Colors.grey[500],

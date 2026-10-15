@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
@@ -217,7 +218,7 @@ class _SuggestionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    price == null ? '' : '₹$price',
+                    price == null ? '' : '₹${formatRupees(price)}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

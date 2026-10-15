@@ -411,9 +411,12 @@ class _SearchResultCard extends StatelessWidget {
   }
 
   Widget _buildInfo(BuildContext context, ThemeData theme) {
-    final price = '${AppConstants.currencySymbol}${product.price}';
+    String money(double value) => value == value.truncateToDouble()
+        ? value.toInt().toString()
+        : value.toStringAsFixed(2);
+    final price = '${AppConstants.currencySymbol}${money(product.price)}';
     final mrp = product.mrp != null
-        ? '${AppConstants.currencySymbol}${product.mrp}'
+        ? '${AppConstants.currencySymbol}${money(product.mrp!)}'
         : null;
 
     return Column(

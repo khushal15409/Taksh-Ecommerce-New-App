@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/data/models/extra_charge_model.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart.dart';
@@ -25,15 +26,9 @@ class CartModel extends Cart {
       return CartItemModel.fromJson(itemJson);
     }).toList();
 
-    final totalRaw = json['total'];
-    final total = totalRaw is num
-        ? totalRaw.toInt()
-        : int.tryParse(totalRaw?.toString() ?? '') ?? 0;
-
-    final totalWithDeliveryRaw = json['total_with_delivery'];
-    final totalWithDelivery = totalWithDeliveryRaw is num
-        ? totalWithDeliveryRaw.toInt()
-        : int.tryParse(totalWithDeliveryRaw?.toString() ?? '');
+    // Amounts keep their paise (no truncation to whole rupees).
+    final total = parseMoney(json['total']) ?? 0.0;
+    final totalWithDelivery = parseMoney(json['total_with_delivery']);
 
     final deliveryChargeRaw = json['delivery_charge'];
     final deliveryCharge = deliveryChargeRaw is Map

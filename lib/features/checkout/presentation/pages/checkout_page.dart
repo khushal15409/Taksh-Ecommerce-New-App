@@ -37,6 +37,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   late RazorpayService _razorpayService;
   bool _isProcessingPayment = false;
 
+  /// True once the order has been placed (or its payment is being verified).
+  bool _orderAlreadyPlaced = false;
+
   @override
   void initState() {
     super.initState();
@@ -112,13 +115,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
       _isProcessingPayment = false;
     });
 
-    // Navigate to payment failure page
+    // Navigate to payment failure page. The order already exists (it is unpaid), so its id
+    // goes along: the failure page can then offer to pay it again instead of the cart.
+    // (The route reads these from the query string; an `extra` map was never read.)
     context.push(
-      AppRoutes.paymentFailed,
-      extra: {
-        'errorCode': response.code?.toString(),
-        'errorMessage': response.message,
-      },
+      AppRoutes.paymentFailedPath(
+        orderId: context.read<CheckoutBloc>().lastPlacedOrderId,
+        errorCode: response.code?.toString(),
+        errorMessage: response.message,
+      ),
     );
   }
 
@@ -241,10 +246,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
         listeners: [
           BlocListener<CheckoutBloc, CheckoutState>(
             listener: (context, state) {
+              // Once the order exists (placed, or its payment is being verified) a later
+              // error must not send the user to the cart: the cart was emptied by the order,
+              // and the order itself (and its payment status) is in My Orders.
+              if (state is OrderPlaced || state is PaymentVerifying) {
+                _orderAlreadyPlaced = true;
+              }
+
               if (state is CheckoutError) {
                 setState(() {
                   _isProcessingPayment = false;
                 });
+                final orderAlreadyPlaced = _orderAlreadyPlaced;
+                _orderAlreadyPlaced = false;
 
                 // Show the specific server error message (e.g.
                 // "Insufficient stock available") so the user knows
@@ -260,7 +274,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 // items before retrying.
                 Future.delayed(const Duration(milliseconds: 500), () {
                   if (context.mounted) {
-                    context.go(AppRoutes.cart);
+                    context.go(
+                      orderAlreadyPlaced ? AppRoutes.orders : AppRoutes.cart,
+                    );
                   }
                 });
               } else if (state is OrderCreated) {
@@ -677,9 +693,9 @@ class _CheckoutBottomBar extends StatelessWidget {
           current is PaymentInitiating,
       builder: (context, state) {
         final canPlaceOrder = state is CheckoutCalculated;
-        final grandTotal = canPlaceOrder
+        final double grandTotal = canPlaceOrder
             ? state.summary.priceBreakdown.grandTotal
-            : 0;
+            : 0.0;
         final isProcessing =
             state is OrderCreating ||
             state is PaymentInitiating ||

@@ -27,7 +27,10 @@ abstract class ProductRemoteDataSource {
   });
 
   /// Search products by keyword
-  Future<SearchProductsResponseModel> searchProducts({required String keyword});
+  Future<SearchProductsResponseModel> searchProducts({
+    required String keyword,
+    String? deliveryType,
+  });
 
   /// Get express products based on nearest fulfillment center
   Future<ExpressProductsResponseModel> getExpressProducts({
@@ -129,10 +132,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   @override
   Future<SearchProductsResponseModel> searchProducts({
     required String keyword,
+    String? deliveryType,
   }) async {
     final response = await apiClient.get(
       ApiConstants.productSearch,
-      queryParameters: {'keyword': keyword},
+      queryParameters: {
+        'keyword': keyword,
+        if (deliveryType != null) 'delivery_type': deliveryType,
+      },
     );
 
     final data = response.data as DataMap;
