@@ -124,6 +124,8 @@ class ProductRepositoryImpl implements ProductRepository {
         limit: limit,
       );
       return Right(response);
+    } on CodedApiException catch (e) {
+      return Left(ApiCodeFailure(e.message, e.code));
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {

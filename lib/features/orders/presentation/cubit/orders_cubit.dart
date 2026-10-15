@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/orders/domain/entities/order.dart';
+import 'package:taksh_e_commerce/features/orders/domain/order_delivery_mode.dart';
 import 'package:taksh_e_commerce/features/orders/domain/entities/paginated_orders.dart';
 import 'package:taksh_e_commerce/features/orders/domain/usecases/cancel_order.dart';
 import 'package:taksh_e_commerce/features/orders/domain/usecases/download_invoice.dart';
@@ -59,7 +60,10 @@ class OrdersCubit extends Cubit<OrdersState> {
     _loadingMoreOrders = false;
     emit(const OrdersLoading());
 
-    final result = await getOrders(page: page);
+    final result = await getOrders(
+      page: page,
+      deliveryMode: deliveryModeParam(_selectedDeliveryType),
+    );
 
     if (isClosed || requestId != _ordersRequestId) return;
 
@@ -82,7 +86,10 @@ class OrdersCubit extends Cubit<OrdersState> {
     _loadingMoreOrders = true;
     final requestId = _ordersRequestId;
 
-    final result = await getOrders(page: loaded.currentPage + 1);
+    final result = await getOrders(
+      page: loaded.currentPage + 1,
+      deliveryMode: deliveryModeParam(_selectedDeliveryType),
+    );
 
     _loadingMoreOrders = false;
     if (isClosed || requestId != _ordersRequestId) return;
@@ -117,10 +124,13 @@ class OrdersCubit extends Cubit<OrdersState> {
     _applyFiltersAndSort();
   }
 
-  /// Update filter by delivery type ('normal' or '30_min'); pass null to clear
+  /// Update filter by delivery type ('normal' or '30_min'); pass null to clear.
+  /// The filter is applied by the server (`delivery_mode`) across all pages,
+  /// so the list restarts from page 1.
   void updateDeliveryTypeFilter(String? type) {
+    if (type == _selectedDeliveryType) return;
     _selectedDeliveryType = type;
-    _applyFiltersAndSort();
+    fetchOrders();
   }
 
   /// Update filter by a specific date; pass null to clear the date filter
@@ -183,8 +193,9 @@ class OrdersCubit extends Cubit<OrdersState> {
           _selectedStatus == 'all' ||
           order.orderStatus.toLowerCase() == _selectedStatus!.toLowerCase();
 
-      final deliveryMatch = _selectedDeliveryType == null ||
-          order.deliveryType.toLowerCase() == _selectedDeliveryType!.toLowerCase();
+      final mode = deliveryModeParam(_selectedDeliveryType);
+      final deliveryMatch = mode == null ||
+          (mode == 'quick' ? order.isExpress : !order.isExpress);
 
       final dateMatch = _selectedDate == null ||
           _isSameDay(order.createdAt, _selectedDate!);

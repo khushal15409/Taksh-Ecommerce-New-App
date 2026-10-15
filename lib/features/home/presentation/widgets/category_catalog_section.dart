@@ -6,6 +6,7 @@ import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/theme/app_spacing.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cubit.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_state.dart';
 
@@ -39,6 +40,27 @@ class _CategoryCatalogSectionState extends State<CategoryCatalogSection> {
 
   @override
   Widget build(BuildContext context) {
+    // Quick categories depend on the delivery address: render exactly what the
+    // Quick dashboard returned (no cache, no shared category list fallback).
+    if (widget.deliveryType == 'quick') {
+      if (_hasRenderableCategories(widget.categories)) {
+        return _buildCatalog(context, widget.categories!);
+      }
+      return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.md,
+        ),
+        child: Center(
+          child: Text(
+            AppLocalizations.of(context)!.quickNoCategories,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ),
+      );
+    }
+
     if (_hasRenderableCategories(widget.categories)) {
       _cachedCategories = widget.categories!;
       return _buildCatalog(context, widget.categories!);

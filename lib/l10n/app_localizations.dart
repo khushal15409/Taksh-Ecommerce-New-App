@@ -4339,6 +4339,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Secure Payment'**
   String get trustSecurePayment;
+
+  /// No description provided for @quickNoCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'No Quick delivery categories are available for this address yet.'**
+  String get quickNoCategories;
+
+  /// No description provided for @quickLocationNeededTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a delivery address'**
+  String get quickLocationNeededTitle;
+
+  /// No description provided for @quickLocationNeededBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick delivery needs a delivery address with a map location. Choose or add one to see what is available near you.'**
+  String get quickLocationNeededBody;
+
+  /// No description provided for @quickNotServiceableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick delivery isn\'t available here'**
+  String get quickNotServiceableTitle;
+
+  /// No description provided for @quickNotServiceableDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick delivery is not available at this address right now. You can change the address or use Standard delivery.'**
+  String get quickNotServiceableDefault;
+
+  /// No description provided for @changeAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Change address'**
+  String get changeAddress;
+
+  /// No description provided for @quickCheckoutUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick delivery can\'t be confirmed for this address right now. Please change the address or choose Standard delivery.'**
+  String get quickCheckoutUnavailable;
+
+  /// No description provided for @quickDeliveryNearbyStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick delivery from a nearby store'**
+  String get quickDeliveryNearbyStore;
 }
 
 class _AppLocalizationsDelegate

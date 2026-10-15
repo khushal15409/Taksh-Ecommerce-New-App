@@ -5,6 +5,7 @@ import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_opti
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_state.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Widget for selecting delivery options.
 ///
@@ -119,6 +120,41 @@ class DeliveryOptionsWidget extends StatelessWidget {
                           },
                   );
                 }),
+                // Quick is blocked until the server confirms the address:
+                // explain why (server message when there is one).
+                if ((selectedOption?.isExpress ?? false) &&
+                    context.read<CheckoutBloc>().isQuickBlocked)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      border: Border.all(color: Colors.red.shade200),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: Colors.red.shade700,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            context.read<CheckoutBloc>().quickBlockMessage ??
+                                AppLocalizations.of(
+                                  context,
+                                )!.quickCheckoutUnavailable,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.red.shade800),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -214,7 +250,10 @@ class _DeliveryOptionTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Delivery in ${option.estimatedTime}',
+                        // No real ETA exists for Quick delivery: no promise.
+                        option.isExpress
+                            ? AppLocalizations.of(context)!.quickDeliveryNearbyStore
+                            : 'Delivery in ${option.estimatedTime}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),

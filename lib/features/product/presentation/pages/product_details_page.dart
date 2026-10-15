@@ -441,16 +441,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       // instead of "Add to Cart".
                       child: BlocBuilder<CartCubit, CartState>(
                         builder: (context, _) {
-                          final inCart = context
-                              .read<CartCubit>()
-                              .standardCart
+                          final cartCubit = context.read<CartCubit>();
+                          final inCart =
+                              (product.isExpress30
+                                      ? cartCubit.quickCart
+                                      : cartCubit.standardCart)
                               .items
                               .any(
                                 (item) =>
                                     item.productVariantId == variantId &&
                                     CartCubit.matchesDeliveryType(
                                       item,
-                                      CartCubit.deliveryTypeStandard,
+                                      _deliveryTypeFor(product),
                                     ),
                               );
                           if (inCart) return _buildViewCartButton();
@@ -459,6 +461,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             productId: product.id,
                             size: 'large',
                             outlined: true,
+                            isQuickDelivery: product.isExpress30,
                           );
                         },
                       ),
@@ -645,7 +648,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               item.productVariantId == variantId &&
               CartCubit.matchesDeliveryType(
                 item,
-                CartCubit.deliveryTypeStandard,
+                _deliveryTypeFor(product),
               ),
         )
         .firstOrNull;
@@ -658,7 +661,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       await cartCubit.addItemToCart(
         productVariantId: variantId,
         qty: 1,
-        deliveryType: CartCubit.deliveryTypeStandard,
+        deliveryType: _deliveryTypeFor(product),
       );
     }
 
@@ -671,7 +674,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     });
 
     if (cartState is CartError) {
-      _showCalmErrorToast(context);
+      // Server rules (delivery bucket / vendor conflicts) come with their own
+      // message: show it as is, never convert the product silently.
+      if (cartState.message.trim().isNotEmpty) {
+        _showOutOfStockSnackBar(cartState.message);
+      } else {
+        _showCalmErrorToast(context);
+      }
       return;
     }
 
@@ -698,7 +707,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 item.productVariantId == variantId &&
                 CartCubit.matchesDeliveryType(
                   item,
-                  CartCubit.deliveryTypeStandard,
+                  _deliveryTypeFor(product),
                 ),
           )
           .firstOrNull;
@@ -724,12 +733,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           subtotal: subtotal,
           totalQuantity: totalQuantity,
           extraCharges: updatedCart.extraCharges,
+          deliveryType: _deliveryTypeFor(product),
         ),
       );
     } else {
       _showCalmErrorToast(context);
     }
   }
+
+  /// Delivery bucket of the product: Quick ('30_min') for express products,
+  /// Standard otherwise.
+  String _deliveryTypeFor(Product product) => product.isExpress30
+      ? CartCubit.deliveryTypeExpress
+      : CartCubit.deliveryTypeStandard;
 
   void _showCalmErrorToast(BuildContext context) {
     AppErrorToast.show(context);

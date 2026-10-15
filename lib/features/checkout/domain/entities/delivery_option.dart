@@ -44,7 +44,8 @@ class DeliveryOption extends Equatable {
       type: '30_min',
       displayName: 'Quick Delivery',
       charges: 0,
-      slaMinutes: 30,
+      // No guaranteed/estimated time exists for Quick delivery (0 = none).
+      slaMinutes: 0,
       isAvailable: true,
     );
   }
@@ -62,6 +63,9 @@ class DeliveryOption extends Equatable {
 
   /// Whether this option is express (30-min)
   bool get isExpress => type == '30_min';
+
+  /// Whether a real delivery-time estimate exists (never for Quick delivery).
+  bool get hasEstimate => !isExpress && slaMinutes > 0;
 
   /// Get estimated delivery time as string
   String get estimatedTime {

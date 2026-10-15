@@ -656,7 +656,7 @@ class _OrdersPageState extends State<OrdersPage> {
               Row(
                 children: [
                   Icon(
-                    order.isExpress || order.deliveryType.toLowerCase() == '30_min'
+                    order.isExpress
                         ? Icons.flash_on_outlined
                         : Icons.local_shipping_outlined,
                     size: 14,
@@ -740,7 +740,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
   String _formatDeliveryTypeLabel(BuildContext context, Order order) {
     final l10n = AppLocalizations.of(context)!;
-    if (order.isExpress || order.deliveryType.toLowerCase() == '30_min') {
+    if (order.isExpress) {
       return l10n.quickDelivery;
     }
 

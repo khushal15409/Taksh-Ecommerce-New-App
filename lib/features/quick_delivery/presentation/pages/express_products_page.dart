@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/utils/quick_location.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
+import 'package:taksh_e_commerce/features/address/presentation/widgets/address_selection_bottom_sheet.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_state_views.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/categories/presentation/widgets/category_product_card.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
 import 'package:taksh_e_commerce/features/quick_delivery/presentation/cubit/express_products_cubit.dart';
@@ -57,11 +63,15 @@ class _ExpressProductsContent extends StatefulWidget {
 class _ExpressProductsContentState extends State<_ExpressProductsContent> {
   final ScrollController _scrollController = ScrollController();
   late int _selectedCategoryId;
+  late double _latitude;
+  late double _longitude;
 
   @override
   void initState() {
     super.initState();
     _selectedCategoryId = widget.args.categoryId;
+    _latitude = widget.args.latitude;
+    _longitude = widget.args.longitude;
     _scrollController.addListener(_onScroll);
   }
 
@@ -78,10 +88,31 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
         _scrollController.position.maxScrollExtent - 200) {
       context.read<ExpressProductsCubit>().loadNextPage(
             categoryId: _selectedCategoryId,
-            latitude: widget.args.latitude,
-            longitude: widget.args.longitude,
+            latitude: _latitude,
+            longitude: _longitude,
           );
     }
+  }
+
+  /// "Change address" from the not-serviceable view: pick another address and
+  /// reload with its coordinates (no automatic redirect to Standard).
+  Future<void> _changeAddress() async {
+    final selected = await AddressSelectionBottomSheet.show(context);
+    if (selected == null || !mounted) return;
+
+    context.read<AddressBloc>().add(SelectAddressForDeliveryEvent(selected));
+    final location = quickLocationFromAddress(selected);
+    if (location == null) return;
+
+    setState(() {
+      _latitude = location.latitude;
+      _longitude = location.longitude;
+    });
+    context.read<ExpressProductsCubit>().fetchProducts(
+          categoryId: _selectedCategoryId,
+          latitude: _latitude,
+          longitude: _longitude,
+        );
   }
 
   void _onCategoryTap(int categoryId) {
@@ -89,8 +120,8 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
     setState(() => _selectedCategoryId = categoryId);
     context.read<ExpressProductsCubit>().fetchProducts(
           categoryId: categoryId,
-          latitude: widget.args.latitude,
-          longitude: widget.args.longitude,
+          latitude: _latitude,
+          longitude: _longitude,
         );
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(0);
@@ -189,6 +220,13 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
           );
         }
 
+        if (state.status == ExpressProductsStatus.notServiceable) {
+          return QuickNotServiceableView(
+            message: state.notServiceableMessage,
+            onChangeAddress: _changeAddress,
+          );
+        }
+
         if (state.status == ExpressProductsStatus.error) {
           return Center(
             child: Padding(
@@ -215,8 +253,8 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
                     onPressed: () {
                       context.read<ExpressProductsCubit>().fetchProducts(
                             categoryId: _selectedCategoryId,
-                            latitude: widget.args.latitude,
-                            longitude: widget.args.longitude,
+                            latitude: _latitude,
+                            longitude: _longitude,
                           );
                     },
                     style: ElevatedButton.styleFrom(
@@ -267,9 +305,26 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
             mainAxisSpacing: 10,
           ),
           itemCount: products.length +
-              (state.status == ExpressProductsStatus.loadingMore ? 1 : 0),
+              (state.status == ExpressProductsStatus.loadingMore ||
+                      state.loadMoreFailed
+                  ? 1
+                  : 0),
           itemBuilder: (context, index) {
             if (index >= products.length) {
+              if (state.loadMoreFailed) {
+                return Center(
+                  child: TextButton(
+                    onPressed: () =>
+                        context.read<ExpressProductsCubit>().loadNextPage(
+                              categoryId: _selectedCategoryId,
+                              latitude: _latitude,
+                              longitude: _longitude,
+                              retry: true,
+                            ),
+                    child: Text(AppLocalizations.of(context)!.retry),
+                  ),
+                );
+              }
               return const Center(
                 child: Padding(
                   padding: EdgeInsets.all(16),

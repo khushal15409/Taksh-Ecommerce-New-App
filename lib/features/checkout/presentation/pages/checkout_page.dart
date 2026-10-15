@@ -7,6 +7,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/services/razorpay_service.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/utils/quick_serviceability.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
 import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
@@ -150,6 +151,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return;
     }
 
+    // Quick is only allowed when the server confirmed the address.
+    if (checkoutBloc.isQuickBlocked) {
+      AppErrorToast.show(
+        context,
+        message: checkoutBloc.quickBlockMessage ??
+            AppLocalizations.of(context)!.quickCheckoutUnavailable,
+      );
+      return;
+    }
+
     if (checkoutBloc.selectedAddress == null) {
       AppToastMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -263,11 +274,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 // Show the specific server error message (e.g.
                 // "Insufficient stock available") so the user knows
                 // why the order failed, instead of a generic toast.
-                AppErrorToast.show(context, message: state.message);
+                final isQuickServiceabilityError =
+                    isQuickServiceabilityCode(state.code);
+                AppErrorToast.show(
+                  context,
+                  message: state.message.isEmpty && isQuickServiceabilityError
+                      ? AppLocalizations.of(context)!.quickCheckoutUnavailable
+                      : state.message,
+                );
 
                 // Pop the review page (if it's on the stack) so the
                 // checkout page can be the one to handle the redirect.
                 _popOrderReviewIfPresent();
+
+                // Quick refused for this address: stay on checkout (the user
+                // can change the address or switch to Standard delivery).
+                if (isQuickServiceabilityError) return;
 
                 // Navigate to cart page after showing error so the
                 // user can adjust quantities or remove out-of-stock
@@ -372,7 +394,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
         ],
         child: BlocBuilder<CheckoutBloc, CheckoutState>(
-          buildWhen: (previous, current) => current is OrderCreating,
+          // CheckoutError is included so the spinner is replaced by the page again when
+          // an order is refused and the user stays here (e.g. Quick not serviceable).
+          buildWhen: (previous, current) =>
+              current is OrderCreating || current is CheckoutError,
           builder: (context, state) {
             final header = _CheckoutHeader(
               title: AppLocalizations.of(context)!.checkout,
@@ -778,7 +803,10 @@ class _CheckoutBottomBar extends StatelessWidget {
                       Expanded(
                         child: _PlaceOrderButton(
                           enabled:
-                              canPlaceOrder && !isProcessing && !hasNoAddresses,
+                              canPlaceOrder &&
+                              !isProcessing &&
+                              !hasNoAddresses &&
+                              !context.read<CheckoutBloc>().isQuickBlocked,
                           isProcessing: isProcessing,
                           hasNoAddresses: hasNoAddresses,
                           isCod: paymentMethod.type == PaymentMethodType.cod,

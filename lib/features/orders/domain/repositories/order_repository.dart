@@ -8,7 +8,10 @@ import 'package:taksh_e_commerce/features/orders/domain/entities/order.dart'
 /// Repository interface for order operations
 abstract class OrderRepository {
   /// Get all orders with pagination
-  Future<Either<Failure, PaginatedOrders>> getOrders({int page = 1});
+  Future<Either<Failure, PaginatedOrders>> getOrders({
+    int page = 1,
+    String? deliveryMode,
+  });
 
   /// Get order details by ID
   Future<Either<Failure, order_entity.Order>> getOrderDetails(int orderId);

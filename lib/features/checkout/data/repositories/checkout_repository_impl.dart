@@ -8,6 +8,7 @@ import 'package:taksh_e_commerce/features/checkout/data/datasources/checkout_rem
 import 'package:taksh_e_commerce/features/checkout/data/models/order_request_model.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/checkout_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_option.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_quote.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/order_request.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/place_order_response.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/repositories/checkout_repository.dart';
@@ -144,6 +145,32 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   }
 
   @override
+  ResultFuture<DeliveryQuote> getDeliveryQuote({
+    required String deliveryType,
+    required String addressId,
+  }) async {
+    try {
+      final result = await remoteDataSource.getDeliveryQuote(
+        deliveryType: deliveryType,
+        addressId: addressId,
+      );
+      return Right(result);
+    } on CodedApiException catch (e) {
+      return Left(ApiCodeFailure(e.message, e.code));
+    } on AppException catch (e) {
+      _log.errorWithContext('Error getting delivery quote', {
+        'error': e.message,
+      });
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      _log.errorWithContext('Unexpected error getting delivery quote', {
+        'error': e.toString(),
+      });
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   ResultFuture<PlaceOrderResponse> placeOrder({
     required String addressId,
     required String warehouseId,
@@ -172,6 +199,9 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
       );
 
       return Right(result.toEntity());
+    } on CodedApiException catch (e) {
+      _log.errorWithContext('Order rejected', {'code': e.code});
+      return Left(ApiCodeFailure(e.message, e.code));
     } on ServerException catch (e) {
       _log.errorWithContext('Server error placing order', {'error': e.message});
       return Left(ServerFailure(e.message));

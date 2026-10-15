@@ -53,7 +53,9 @@ class ExpressDashboardRemoteDataSourceImpl
         queryParameters: {
           'latitude': latitude.toString(),
           'longitude': longitude.toString(),
-          'pincode': pincode,
+          // The API validates a pincode field but never uses it to decide
+          // serviceability; a device-location request has none.
+          'pincode': pincode.isEmpty ? '000000' : pincode,
         },
       );
 

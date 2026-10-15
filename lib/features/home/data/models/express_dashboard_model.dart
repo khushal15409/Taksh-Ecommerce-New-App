@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/quick_serviceability.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/home/data/models/dashboard_section_model.dart';
 import 'package:taksh_e_commerce/features/home/data/models/express_fulfillment_center_model.dart';
@@ -14,6 +15,9 @@ class ExpressDashboardModel extends ExpressDashboardEntity {
   const ExpressDashboardModel({
     required this.fulfillmentCenter,
     required this.sections,
+    super.serviceable = true,
+    super.code,
+    super.message,
   }) : super(fulfillmentCenter: fulfillmentCenter, sections: sections);
 
   factory ExpressDashboardModel.fromJson(DataMap json) {
@@ -22,7 +26,12 @@ class ExpressDashboardModel extends ExpressDashboardEntity {
       <String, dynamic>{};
     final sectionsJson = json['sections'] as List<dynamic>? ?? [];
 
+    final serviceability = QuickServiceability.fromData(json);
+
     return ExpressDashboardModel(
+      serviceable: serviceability.serviceable,
+      code: serviceability.code,
+      message: serviceability.message,
       fulfillmentCenter:
           ExpressFulfillmentCenterModel.fromJson(fulfillmentCenterJson),
       sections: sectionsJson

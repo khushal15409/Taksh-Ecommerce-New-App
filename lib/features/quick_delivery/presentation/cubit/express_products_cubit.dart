@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taksh_e_commerce/core/error/failures.dart';
+import 'package:taksh_e_commerce/core/utils/quick_serviceability.dart';
+import 'package:taksh_e_commerce/core/utils/request_guard.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/express_products_response.dart';
 import 'package:taksh_e_commerce/features/product/domain/usecases/get_express_products.dart';
@@ -18,6 +21,12 @@ class ExpressProductsCubit extends Cubit<ExpressProductsState> {
     'class': 'ExpressProductsCubit',
   });
 
+  /// Drops late responses of an older category/page/address.
+  final RequestGuard _guard = RequestGuard();
+
+  /// Query (category + location) the loaded items belong to.
+  String? _loadedQueryKey;
+
   Future<void> fetchProducts({
     required int categoryId,
     required double latitude,
@@ -26,25 +35,55 @@ class ExpressProductsCubit extends Cubit<ExpressProductsState> {
   }) async {
     if (isClosed) return;
 
+    final queryKey = RequestGuard.queryKey(
+      categoryId: categoryId,
+      latitude: latitude,
+      longitude: longitude,
+    );
+    final isNewQuery = queryKey != _loadedQueryKey;
+
+    if (page > 1) {
+      // A next page only makes sense for the query that is on screen, and
+      // never while another request is running (no duplicate page requests).
+      if (isNewQuery) return;
+      if (state.status == ExpressProductsStatus.loading ||
+          state.status == ExpressProductsStatus.loadingMore) {
+        return;
+      }
+    }
+
     _log.infoWithContext(
       'Fetching express products',
       {
         'category_id': categoryId,
-        'latitude': latitude,
-        'longitude': longitude,
         'page': page,
       },
     );
 
+    final token = _guard.begin(
+      RequestGuard.listingKey(
+        categoryId: categoryId,
+        page: page,
+        latitude: latitude,
+        longitude: longitude,
+      ),
+    );
+
     if (page == 1) {
+      // Pagination restarts whenever the query changes.
       emit(state.copyWith(
         status: ExpressProductsStatus.loading,
         clearErrorMessage: true,
+        clearNotServiceable: true,
+        clearResponse: isNewQuery,
+        currentPage: 1,
+        loadMoreFailed: false,
       ));
     } else {
       emit(state.copyWith(
         status: ExpressProductsStatus.loadingMore,
         clearErrorMessage: true,
+        loadMoreFailed: false,
       ));
     }
 
@@ -57,7 +96,7 @@ class ExpressProductsCubit extends Cubit<ExpressProductsState> {
       ),
     );
 
-    if (isClosed) return;
+    if (isClosed || !_guard.isCurrent(token)) return;
 
     result.fold(
       (failure) {
@@ -65,6 +104,29 @@ class ExpressProductsCubit extends Cubit<ExpressProductsState> {
           'Failed to fetch express products',
           {'category_id': categoryId, 'error': failure.message},
         );
+
+        if (page > 1) {
+          // Keep the items already loaded; only the next page failed.
+          emit(state.copyWith(
+            status: ExpressProductsStatus.loaded,
+            errorMessage: failure.message,
+            loadMoreFailed: true,
+          ));
+          return;
+        }
+
+        if (failure is ApiCodeFailure &&
+            isQuickServiceabilityCode(failure.code)) {
+          _loadedQueryKey = null;
+          emit(state.copyWith(
+            status: ExpressProductsStatus.notServiceable,
+            clearResponse: true,
+            notServiceableMessage: failure.message,
+            notServiceableCode: failure.code,
+          ));
+          return;
+        }
+
         emit(state.copyWith(
           status: ExpressProductsStatus.error,
           errorMessage: failure.message,
@@ -81,12 +143,18 @@ class ExpressProductsCubit extends Cubit<ExpressProductsState> {
           },
         );
 
-        // For pagination, append products to existing list
+        _loadedQueryKey = queryKey;
+
+        // For pagination, append products to existing list (skipping repeats)
         if (page > 1 && state.response != null) {
           final existingProducts = state.response!.products;
+          final knownIds = existingProducts.map((p) => p.id).toSet();
           final mergedResponse = ExpressProductsResponse(
             fulfillmentCenter: response.fulfillmentCenter,
-            products: [...existingProducts, ...response.products],
+            products: [
+              ...existingProducts,
+              ...response.products.where((p) => !knownIds.contains(p.id)),
+            ],
             currentPage: response.currentPage,
             perPage: response.perPage,
             total: response.total,
@@ -114,9 +182,15 @@ class ExpressProductsCubit extends Cubit<ExpressProductsState> {
     required int categoryId,
     required double latitude,
     required double longitude,
+    bool retry = false,
   }) async {
     if (!state.hasMorePages) return;
-    if (state.status == ExpressProductsStatus.loadingMore) return;
+    if (state.status == ExpressProductsStatus.loading ||
+        state.status == ExpressProductsStatus.loadingMore) {
+      return;
+    }
+    // After a failed page, only an explicit retry asks again (no loops).
+    if (state.loadMoreFailed && !retry) return;
 
     await fetchProducts(
       categoryId: categoryId,

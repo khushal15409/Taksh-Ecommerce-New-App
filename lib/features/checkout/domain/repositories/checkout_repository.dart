@@ -2,6 +2,7 @@ import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/checkout_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_option.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_quote.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/order_request.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/place_order_response.dart';
 import 'package:taksh_e_commerce/features/orders/domain/entities/order.dart';
@@ -18,6 +19,12 @@ abstract class CheckoutRepository {
 
   /// Get available delivery options for location
   ResultFuture<List<DeliveryOption>> getDeliveryOptions({
+    required String addressId,
+  });
+
+  /// Server-side serviceability quote for a delivery type at a saved address
+  ResultFuture<DeliveryQuote> getDeliveryQuote({
+    required String deliveryType,
     required String addressId,
   });
 

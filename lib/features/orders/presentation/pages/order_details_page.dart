@@ -1394,8 +1394,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     bool isExpress,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    if (isExpress || type.toLowerCase() == '30_min') {
-      return '${l10n.quickDelivery} (30 min)';
+    // No guaranteed time exists for Quick delivery: label only.
+    if (isExpress) {
+      return l10n.quickDelivery;
     }
     switch (type.toLowerCase()) {
       case 'normal':

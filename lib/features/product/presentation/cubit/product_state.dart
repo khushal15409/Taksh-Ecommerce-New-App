@@ -61,6 +61,18 @@ class ProductDetailsLoaded extends ProductState {
   List<Object?> get props => [product];
 }
 
+/// The server says Quick delivery cannot serve the selected location. Carries
+/// the backend message; this is neither an error nor an empty list.
+class ProductNotServiceable extends ProductState {
+  final String? message;
+  final String? code;
+
+  const ProductNotServiceable({this.message, this.code});
+
+  @override
+  List<Object?> get props => [message, code];
+}
+
 /// Error state
 class ProductError extends ProductState {
   final String message;

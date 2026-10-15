@@ -12,10 +12,14 @@ class GetOrders {
   /// Execute the use case
   /// 
   /// [page] - The page number to fetch (default: 1)
+  /// [deliveryMode] - optional server filter: 'quick' or 'standard'
   /// 
   /// Returns [Right(PaginatedOrders)] on success
   /// Returns [Left(Failure)] on error
-  Future<Either<Failure, PaginatedOrders>> call({int page = 1}) async {
-    return await _repository.getOrders(page: page);
+  Future<Either<Failure, PaginatedOrders>> call({
+    int page = 1,
+    String? deliveryMode,
+  }) async {
+    return await _repository.getOrders(page: page, deliveryMode: deliveryMode);
   }
 }

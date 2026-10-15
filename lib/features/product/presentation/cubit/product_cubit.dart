@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taksh_e_commerce/core/error/failures.dart';
+import 'package:taksh_e_commerce/core/utils/quick_serviceability.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/paginated_products.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product_variant.dart';
@@ -168,8 +170,10 @@ class ProductCubit extends Cubit<ProductState> {
     int page = 1,
   }) async {
     if (isClosed) return;
-    // Any standard page still loading must not be appended to this list.
-    _listRequestId++;
+    // Any standard page still loading must not be appended to this list, and a
+    // late response of an older category/page/address must be dropped: every
+    // call takes a new request id and only the latest one may emit.
+    final requestId = ++_listRequestId;
     _loadingMore = false;
     emit(const ProductListLoading());
 
@@ -182,10 +186,20 @@ class ProductCubit extends Cubit<ProductState> {
       ),
     );
 
-    if (isClosed) return;
+    if (isClosed || requestId != _listRequestId) return;
 
     result.fold(
-      (failure) => emit(ProductError(failure.message)),
+      (failure) {
+        if (failure is ApiCodeFailure &&
+            isQuickServiceabilityCode(failure.code)) {
+          emit(ProductNotServiceable(
+            message: failure.message,
+            code: failure.code,
+          ));
+          return;
+        }
+        emit(ProductError(failure.message));
+      },
       (response) {
         final paginatedProducts = PaginatedProducts(
           currentPage: response.currentPage,

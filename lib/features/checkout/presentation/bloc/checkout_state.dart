@@ -208,8 +208,12 @@ class PaymentVerified extends CheckoutState {
 class CheckoutError extends CheckoutState {
   final String message;
 
-  const CheckoutError(this.message);
+  /// Machine readable server code (e.g. `quick_not_serviceable`); null for
+  /// generic errors.
+  final String? code;
+
+  const CheckoutError(this.message, {this.code});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, code];
 }
