@@ -38,6 +38,8 @@ class VerifyOtpPage extends StatefulWidget {
 class _VerifyOtpPageState extends State<VerifyOtpPage> {
   final _formKey = GlobalKey<FormState>();
   final _otpController = TextEditingController();
+  final _otpFocusNode = FocusNode();
+  String? _lastSubmittedOtp;
   bool _isLoading = false;
   int _resendTimer = 30;
   Timer? _timer;
@@ -46,11 +48,28 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   void initState() {
     super.initState();
     _startResendTimer();
+    _otpController.addListener(_onOtpChanged);
+    _otpFocusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  /// Logs in as soon as the last digit is typed; editing the code re-arms it.
+  void _onOtpChanged() {
+    final otp = _otpController.text.trim();
+    if (otp.length < AppConstants.otpLength) {
+      _lastSubmittedOtp = null;
+      return;
+    }
+    if (_isLoading || otp == _lastSubmittedOtp) return;
+    _lastSubmittedOtp = otp;
+    _handleVerifyOtp();
   }
 
   @override
   void dispose() {
     _otpController.dispose();
+    _otpFocusNode.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -307,7 +326,12 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                                           : 1.2,
                                                     ),
                                                   ),
-                                                  child: Text(
+                                                  child: (active &&
+                                                          _otpFocusNode
+                                                              .hasFocus &&
+                                                          !_isLoading)
+                                                      ? const _BlinkingCursor()
+                                                      : Text(
                                                     filled
                                                         ? value.text[i]
                                                         : '',
@@ -333,6 +357,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                 ),
                                 TextFormField(
                                   controller: _otpController,
+                                  focusNode: _otpFocusNode,
                                   keyboardType: TextInputType.number,
                                   maxLength: AppConstants.otpLength,
                                   enabled: !_isLoading,
@@ -486,6 +511,44 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+
+/// Blinking caret shown in the digit box that will receive the next digit.
+class _BlinkingCursor extends StatefulWidget {
+  const _BlinkingCursor();
+
+  @override
+  State<_BlinkingCursor> createState() => _BlinkingCursorState();
+}
+
+class _BlinkingCursorState extends State<_BlinkingCursor>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 600),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _controller,
+      child: Container(
+        width: 2,
+        height: 26,
+        decoration: BoxDecoration(
+          color: AppColors.primaryOrange,
+          borderRadius: BorderRadius.circular(1),
+        ),
       ),
     );
   }

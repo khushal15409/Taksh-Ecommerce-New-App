@@ -84,7 +84,7 @@ class _CartSuggestionsSectionState extends State<CartSuggestionsSection> {
                 child: Text(
                   'You may also like',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: AppColors.grey900,
                   ),
@@ -114,12 +114,12 @@ class _CartSuggestionsSectionState extends State<CartSuggestionsSection> {
           ),
         ),
         SizedBox(
-          height: 168,
+          height: 196,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            clipBehavior: Clip.none,
+            padding: const EdgeInsets.fromLTRB(2, 2, 2, 8),
             itemCount: visible.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) => _SuggestionCard(
               product: visible[index],
               isQuickDelivery: widget.isQuickDelivery,
@@ -167,14 +167,15 @@ class _SuggestionCard extends StatelessWidget {
         ),
       ),
       child: Container(
-        width: 118,
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        width: 132,
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFF0F0F0)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -183,58 +184,65 @@ class _SuggestionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image with the add / quantity control on its corner, so the
+            // price row below never gets squeezed by the quantity stepper.
             SizedBox(
-              height: 78,
+              height: 98,
               width: double.infinity,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(9),
-                child: imageUrl == null || imageUrl.isEmpty
-                    ? placeholder()
-                    : CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => placeholder(),
-                        errorWidget: (context, url, error) => placeholder(),
-                      ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: imageUrl == null || imageUrl.isEmpty
+                          ? placeholder()
+                          : CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => placeholder(),
+                              errorWidget: (context, url, error) =>
+                                  placeholder(),
+                            ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 4,
+                    bottom: 4,
+                    child: AddToCartButton(
+                      productVariantId: variant.id,
+                      productId: product.id,
+                      size: 'icon',
+                      isQuickDelivery: isQuickDelivery,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             SizedBox(
-              height: 30,
+              height: 32,
               child: Text(
                 product.name,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  height: 1.25,
+                  height: 1.3,
                   color: AppColors.grey900,
                 ),
               ),
             ),
             const Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    price == null ? '' : '₹${formatRupees(price)}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryOrange,
-                    ),
-                  ),
-                ),
-                AddToCartButton(
-                  productVariantId: variant.id,
-                  productId: product.id,
-                  size: 'icon',
-                  isQuickDelivery: isQuickDelivery,
-                ),
-              ],
+            Text(
+              price == null ? '' : '₹${formatRupees(price)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryOrange,
+              ),
             ),
           ],
         ),

@@ -84,3 +84,22 @@ in-service filter (`service_id`) and invoice download remain TODO.
 - Keep home embed thin; heavy forms stay in feature pages.  
 - All copy in ARB (en + hi).  
 - Auth: confirm whether bookings require login (likely yes) and align with router guards if exposed as top-level routes.
+
+---
+
+## Current state: Courier booking, payment, history & invoices
+
+**Courier booking** now uses the Shiprocket flow of the admin API:
+
+1. `POST /service/courier/quote` (pickup/delivery pincode + weight + size) → live `couriers[]` with `rate`, `service_charge`, `total_amount`.
+2. `POST /service/courier/bookings` (with `shiprocket_courier_company_id` + `quoted_rate`) → booking + embedded Razorpay `payment` order.
+3. Razorpay checkout (`RazorpayService`, same as the other services). If the order was not created with the booking, `POST /service/courier/payment/create` is called.
+4. `POST /service/courier/payment/verify` → booking confirmed; shipment/AWB is created by the server.
+
+An unpaid booking is reused for "Retry Payment" while the form is unchanged; changing pincodes/weight/size invalidates the rates.
+
+**History / details**: `GET /service/courier/bookings` and `GET /service/courier/bookings/{id}` (timeline from `tracking_timeline`), cancel via `POST /service/courier/bookings/{id}/cancel`. `CourierHistoryPage` mirrors `ServiceHistoryPage`.
+
+**Invoices** (paid bookings only, own bookings only): `GET /service/courier/bookings/{id}/invoice` and `GET /service/book/{id}/invoice` stream a PDF. The app downloads via `downloadServiceInvoice()` (`presentation/utils/service_invoice_downloader.dart`) and opens it.
+
+**Form validation**: `ServiceFormValidators` + `validateFields()` — messages show under each field after the first failed submit and clear as the user types; the view scrolls to the first error.

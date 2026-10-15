@@ -287,3 +287,27 @@ See [features/ORDERS.md](features/ORDERS.md).
 | POST | `/notifications/read-all` | Mark all read |
 
 Created in the admin panel (Notifications → panel **Customer app**, with a type: offer / promotion / order / delivery / payment / review / app). Only *sent* notifications are visible; "All Users" = every customer, "Custom" = chosen customers. `NotificationsCubit` (lazy singleton) feeds the notifications page and the home bell badge. Docs: `docs/features/` has no separate notifications page yet.
+
+### Courier booking & invoices (home services)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/service/courier/quote` | Live courier rates for two pincodes |
+| POST | `/service/courier/bookings` | Create booking + Razorpay order |
+| POST | `/service/courier/payment/create` | (Re)create Razorpay order for an unpaid booking |
+| POST | `/service/courier/payment/verify` | Verify payment signature |
+| GET | `/service/courier/bookings`, `/service/courier/bookings/{id}` | History / detail |
+| POST | `/service/courier/bookings/{id}/cancel` | Cancel |
+| GET | `/service/courier/bookings/{id}/invoice` | Invoice PDF (paid) |
+| GET | `/service/book/{id}/invoice` | Service booking invoice PDF (paid) |
+
+### Quick delivery (serviceability)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/express-30/dashboard` | Auth required. Unserviceable location: HTTP 200 with `data.serviceable=false`, `code`, `message`, `sections=[]` |
+| POST | `/express-30/products` | Auth required. Unserviceable: HTTP 404 (422 without location) with `data.code` (`quick_not_serviceable` / `quick_location_required`) |
+| GET | `/cart/quote?delivery_type=30_min&address_id=` | Server serviceability verdict for the checkout address (app sends only the address id; checkout fails closed) |
+| GET | `/order/orders?delivery_mode=quick\|standard` | Server-side delivery filter; order payloads carry `is_quick` |
+
+`ApiClient` maps 400/404/422 bodies with a `data.code` to `CodedApiException` (a `BadRequestException`), repositories turn it into `ApiCodeFailure(message, code)`. There is no real ETA source: the app never shows "30 minutes".
