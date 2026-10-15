@@ -524,10 +524,18 @@ class HomeServiceRemoteDataSourceImpl implements HomeServiceRemoteDataSource {
           bytes[2] == 0x44 &&
           bytes[3] == 0x46;
       if (response.statusCode != 200 || !isPdf) {
-        var message = fallback;
+        var message = switch (response.statusCode) {
+          401 => 'Please log in again to download the invoice.',
+          404 => 'Invoice is not available for this booking yet. Please try '
+              'again later.',
+          _ => fallback,
+        };
         try {
           final decoded = jsonDecode(utf8.decode(bytes));
-          if (decoded is Map && decoded['message'] is String) {
+          if (decoded is Map &&
+              decoded['message'] is String &&
+              (decoded['message'] as String).trim().isNotEmpty &&
+              response.statusCode != 404) {
             message = decoded['message'] as String;
           }
         } catch (_) {}
