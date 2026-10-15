@@ -106,8 +106,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
               ),
             );
             Navigator.of(context).pop(true);
+          } else if (state is AddressOperationError) {
+            AppErrorToast.show(context, message: state.message);
           } else if (state is AddressError) {
-            AppErrorToast.show(context);
+            AppErrorToast.show(context, message: state.message);
           }
         },
         builder: (context, state) {

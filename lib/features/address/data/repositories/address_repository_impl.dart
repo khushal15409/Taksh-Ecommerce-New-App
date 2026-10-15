@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:geolocator/geolocator.dart';
@@ -289,8 +290,16 @@ class AddressRepositoryImpl implements AddressRepository {
       // Update on remote
       await _remoteDataSource.updateAddress(addressModel);
       
-      // Update in local storage
-      await _localDataSource.updateAddress(addressModel);
+      // Refresh the local cache on a best-effort basis: the server already saved
+      // the change, so a cache miss must not turn this into a failed update.
+      try {
+        await _localDataSource.addAddress(addressModel);
+      } catch (cacheError) {
+        log.warnWithContext(
+          'Could not refresh cached address after update',
+          {'error': cacheError.toString()},
+        );
+      }
       
       log.infoWithContext(
         'Address updated successfully',
@@ -539,9 +548,26 @@ class AddressRepositoryImpl implements AddressRepository {
 
       // Get current position
       log.debugWithContext('Getting current position', {});
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      // Without a time limit a weak GPS fix leaves the map spinner forever, so
+      // fall back to the last known position when no fix arrives in time.
+      Position position;
+      try {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 15),
+        );
+      } on TimeoutException {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown == null) {
+          log.warnWithContext('Timed out getting current position', {});
+          return const Left(
+            GeneralFailure(
+              "Couldn't get your current location. Please try again or pick it on the map.",
+            ),
+          );
+        }
+        position = lastKnown;
+      }
 
       log.infoWithContext(
         'Current position obtained',
@@ -673,7 +699,14 @@ class AddressRepositoryImpl implements AddressRepository {
       log.debugWithContext('Searching for places', {'query': query});
 
       // Search for locations using geocoding
-      final locations = await geocoding.locationFromAddress(query);
+      List<geocoding.Location> locations;
+      try {
+        locations = await geocoding.locationFromAddress(query);
+      } on geocoding.NoResultFoundException {
+        // Typing partial text finds nothing: that is an empty result, not an error.
+        log.debugWithContext('No places found', {'query': query});
+        return const Right([]);
+      }
 
       if (locations.isEmpty) {
         log.debugWithContext('No places found', {'query': query});

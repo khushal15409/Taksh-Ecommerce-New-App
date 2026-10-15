@@ -915,5 +915,7 @@
   "quickNotServiceableDefault": "Quick delivery is not available at this address right now. You can change the address or use Standard delivery.",
   "changeAddress": "Change address",
   "quickCheckoutUnavailable": "Quick delivery can't be confirmed for this address right now. Please change the address or choose Standard delivery.",
-  "quickDeliveryNearbyStore": "Quick delivery from a nearby store"
+  "quickDeliveryNearbyStore": "Quick delivery from a nearby store",
+  "loginRequiredTitle": "Login required",
+  "loginToAddToCart": "Please login to add items to your cart."
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/location.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
@@ -25,6 +27,7 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _showResults = false;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -48,6 +51,7 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -108,8 +112,12 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
               ),
             ),
             onChanged: (value) {
-              if (value.length >= 3) {
-                widget.onSearch(value);
+              _debounce?.cancel();
+              if (value.trim().length >= 3) {
+                _debounce = Timer(
+                  const Duration(milliseconds: 500),
+                  () => widget.onSearch(value.trim()),
+                );
               } else if (value.isEmpty) {
                 setState(() {
                   _showResults = false;

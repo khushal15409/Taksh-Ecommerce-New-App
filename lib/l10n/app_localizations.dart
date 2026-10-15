@@ -4387,6 +4387,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quick delivery from a nearby store'**
   String get quickDeliveryNearbyStore;
+
+  /// No description provided for @loginRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login required'**
+  String get loginRequiredTitle;
+
+  /// No description provided for @loginToAddToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to add items to your cart.'**
+  String get loginToAddToCart;
 }
 
 class _AppLocalizationsDelegate
