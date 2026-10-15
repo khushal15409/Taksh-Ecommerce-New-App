@@ -764,5 +764,7 @@
   "quickNotServiceableDefault": "इस पते पर अभी क्विक डिलीवरी उपलब्ध नहीं है। आप पता बदल सकते हैं या स्टैंडर्ड डिलीवरी चुन सकते हैं।",
   "changeAddress": "पता बदलें",
   "quickCheckoutUnavailable": "इस पते के लिए अभी क्विक डिलीवरी की पुष्टि नहीं हो सकी। कृपया पता बदलें या स्टैंडर्ड डिलीवरी चुनें।",
-  "quickDeliveryNearbyStore": "पास के स्टोर से क्विक डिलीवरी"
+  "quickDeliveryNearbyStore": "पास के स्टोर से क्विक डिलीवरी",
+  "loginRequiredTitle": "लॉगिन ज़रूरी है",
+  "loginToAddToCart": "कार्ट में आइटम जोड़ने के लिए कृपया लॉगिन करें।"
 }

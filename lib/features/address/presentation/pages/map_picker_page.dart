@@ -60,7 +60,7 @@ class _MapPickerViewState extends State<_MapPickerView> {
               _selectedAddress = state.location.formattedAddress;
             });
           } else if (state is MapError) {
-            AppErrorToast.show(context);
+            AppErrorToast.show(context, message: state.message);
           } else if (state is MapPermissionDenied) {
             _showPermissionDialog(context);
           }
@@ -253,7 +253,7 @@ class _MapPickerViewState extends State<_MapPickerView> {
               ),
 
               // Loading overlay
-              if (state is MapLoading)
+              if (state is MapLoading && state.message != 'Searching...')
                 Container(
                   color: Colors.black.withOpacity(0.3),
                   child: const Center(child: CircularProgressIndicator()),

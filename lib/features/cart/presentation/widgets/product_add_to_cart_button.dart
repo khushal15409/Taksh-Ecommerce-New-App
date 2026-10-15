@@ -7,6 +7,7 @@ import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
+import 'package:taksh_e_commerce/features/cart/presentation/utils/guest_cart_guard.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/services/variant_cache_service.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/widgets/variant_selection_bottom_sheet.dart';
 import 'package:taksh_e_commerce/features/home/domain/entities/product_variant_info.dart';
@@ -980,6 +981,8 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
 
   /// Add item to cart - fetches variant ID if not available
   Future<void> _addToCart() async {
+    if (!ensureLoggedInForCart(context)) return;
+
     if (_needsVariantEnrichment && _discoveredVariants == null) {
       final resolved = await _fetchVariantsFromDetails(showErrors: true);
       if (!mounted || !resolved || _hasResolvedNoSellableVariants) {

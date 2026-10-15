@@ -111,8 +111,11 @@ class MapCubit extends Cubit<MapState> {
     );
   }
 
+  int _searchSeq = 0;
+
   /// Search for places
   Future<void> searchPlaces(String query) async {
+    final seq = ++_searchSeq;
     if (query.trim().isEmpty) {
       emit(const MapInitial());
       return;
@@ -127,6 +130,8 @@ class MapCubit extends Cubit<MapState> {
     emit(const MapLoading(message: 'Searching...'));
 
     final result = await _searchPlaces(query);
+    // A newer search started (or the cubit closed) while this one was running.
+    if (isClosed || seq != _searchSeq) return;
 
     result.fold(
       (failure) {
@@ -138,7 +143,8 @@ class MapCubit extends Cubit<MapState> {
             'duration_ms': DateTime.now().difference(startTime).inMilliseconds,
           },
         );
-        emit(MapError(failure.message));
+        // A failed search just shows no suggestions; no error toast while typing.
+        emit(MapSearchResults(places: const [], query: query));
       },
       (places) {
         _log.infoWithContext(

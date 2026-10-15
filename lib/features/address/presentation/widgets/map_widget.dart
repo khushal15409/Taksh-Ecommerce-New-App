@@ -105,6 +105,10 @@ class _MapWidgetState extends State<MapWidget> {
           ),
           onMapCreated: (controller) {
             _mapController = controller;
+            // The location may have arrived before the map was ready.
+            if (_currentPosition != null) {
+              _animateToPosition(_currentPosition!);
+            }
           },
           onCameraMove: _onCameraMove,
           onCameraIdle: _onCameraIdle,

@@ -2346,4 +2346,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get quickDeliveryNearbyStore => 'पास के स्टोर से क्विक डिलीवरी';
+
+  @override
+  String get loginRequiredTitle => 'लॉगिन ज़रूरी है';
+
+  @override
+  String get loginToAddToCart => 'कार्ट में आइटम जोड़ने के लिए कृपया लॉगिन करें।';
 }

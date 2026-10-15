@@ -2335,4 +2335,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickDeliveryNearbyStore => 'Quick delivery from a nearby store';
+
+  @override
+  String get loginRequiredTitle => 'Login required';
+
+  @override
+  String get loginToAddToCart => 'Please login to add items to your cart.';
 }

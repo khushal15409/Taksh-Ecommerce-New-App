@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:taksh_e_commerce/core/routing/app_routes.dart';
-import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
+import 'package:taksh_e_commerce/features/cart/presentation/utils/guest_cart_guard.dart';
 
 /// A reusable add to cart button widget that shows:
 /// - "Add" button when product is not in cart
@@ -415,14 +412,7 @@ class AddToCartButton extends StatelessWidget {
   /// Add item to cart
   /// Checks if item already exists in cart and updates quantity instead of adding duplicate
   void _addToCart(BuildContext context) {
-    // Guest users must log in before adding items to cart.
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! Authenticated) {
-      context.push(
-        '${AppRoutes.login}?redirectAfter=${Uri.encodeComponent(AppRoutes.home)}',
-      );
-      return;
-    }
+    if (!ensureLoggedInForCart(context)) return;
 
     final cartCubit = context.read<CartCubit>();
     final cart = _getCartFromState(cartCubit.state);

@@ -5,6 +5,7 @@ import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
+import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
 import 'package:taksh_e_commerce/core/widgets/festive_confirm_dialog.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/dashboard_bloc.dart';
@@ -169,7 +170,17 @@ class _MainShellState extends State<MainShell> {
       ],
       child: WillPopScope(
         onWillPop: _handleBack,
-        child: Scaffold(
+        child: BlocListener<CartCubit, CartState>(
+          // Tell the user when an add-to-cart attempt failed instead of
+          // leaving the tap looking like it did nothing.
+          listenWhen: (previous, current) =>
+              previous is AddingToCart && current is CartError,
+          listener: (context, state) {
+            if (state is CartError) {
+              AppErrorToast.show(context, message: state.message);
+            }
+          },
+          child: Scaffold(
           body: widget.child,
           bottomNavigationBar: BlocBuilder<CartCubit, CartState>(
             buildWhen: (previous, current) =>
@@ -183,6 +194,7 @@ class _MainShellState extends State<MainShell> {
               );
             },
           ),
+        ),
         ),
       ),
     );
