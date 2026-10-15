@@ -4,6 +4,7 @@ import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
+import 'package:taksh_e_commerce/features/cart/presentation/utils/guest_cart_guard.dart';
 import 'package:taksh_e_commerce/features/home/domain/entities/product_variant_info.dart';
 
 /// Bottom sheet for selecting a product variant before adding to cart.
@@ -471,6 +472,8 @@ class _VariantTile extends StatelessWidget {
   }
 
   void _addToCart(BuildContext context) {
+    if (!ensureLoggedInForCart(context)) return;
+
     final cartCubit = context.read<CartCubit>();
     final cart = _getCartFromState(cartCubit.state);
 

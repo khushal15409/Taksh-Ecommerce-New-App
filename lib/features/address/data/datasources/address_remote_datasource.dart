@@ -49,6 +49,7 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
     if (address.landmark != null && address.landmark!.isNotEmpty) {
       formData['landmark'] = address.landmark;
     }
+    _addLocationNames(formData, address);
     _addCoordinates(formData, address);
 
     // API returns 201 with no body on success
@@ -100,12 +101,25 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
       formData['landmark'] = address.landmark;
     }
 
+    _addLocationNames(formData, address);
     _addCoordinates(formData, address);
 
     await apiClient.put(
       ApiConstants.updateAddress(address.id),
       data: formData,
     );
+  }
+
+  /// Sends the state / city / locality names of the picked place. The server only uses
+  /// them to register a pincode it does not know yet; known pincodes ignore them.
+  void _addLocationNames(Map<String, dynamic> formData, AddressModel address) {
+    void put(String key, String? value) {
+      if (value != null && value.trim().isNotEmpty) formData[key] = value.trim();
+    }
+
+    put('state_name', address.location.state);
+    put('city_name', address.location.city);
+    put('area_name', address.location.street);
   }
 
   /// Sends the picked location when there is one (0,0 means "not set").

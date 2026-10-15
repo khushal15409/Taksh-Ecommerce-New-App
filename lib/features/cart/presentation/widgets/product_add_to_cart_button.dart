@@ -960,6 +960,8 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
 
   /// Show the variant selection bottom sheet
   Future<void> _showVariantSheet() async {
+    if (!ensureLoggedInForCart(context)) return;
+
     if (_needsVariantEnrichment && _discoveredVariants == null) {
       final resolved = await _fetchVariantsFromDetails(showErrors: true);
       if (!mounted || !resolved || _hasResolvedNoSellableVariants) {

@@ -111,3 +111,9 @@ Confirm exact fields in `PlaceOrderRequestModel` / remote DS when changing API.
 3. Wire new fees into price breakdown entity + UI.  
 4. Update RAZORPAY_INTEGRATION + this doc together.  
 5. Ensure delivery check from product feature still gates express checkout when required.
+
+## Current state: Quick serviceability (Quick delivery audit)
+
+- Selecting/keeping the **Quick** option calls `GET /cart/quote` via `GetDeliveryQuote` (only the saved address id is sent). `CheckoutBloc.isQuickBlocked` disables Place Order unless the quote says `serviceable == true` (a failed or missing quote blocks Quick; Standard is unaffected).
+- `POST /order/place` errors `quick_location_required` / `quick_not_serviceable` keep the user on checkout with the server message.
+- Quick shows "Quick delivery" without a delivery-time promise.
