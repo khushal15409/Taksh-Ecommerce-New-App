@@ -907,5 +907,13 @@
   "trustByIndia": "Trusted by India",
   "trustWideSelection": "Wide Selection",
   "trustBestPrices": "Best Prices",
-  "trustSecurePayment": "Secure Payment"
+  "trustSecurePayment": "Secure Payment",
+  "quickNoCategories": "No Quick delivery categories are available for this address yet.",
+  "quickLocationNeededTitle": "Select a delivery address",
+  "quickLocationNeededBody": "Quick delivery needs a delivery address with a map location. Choose or add one to see what is available near you.",
+  "quickNotServiceableTitle": "Quick delivery isn't available here",
+  "quickNotServiceableDefault": "Quick delivery is not available at this address right now. You can change the address or use Standard delivery.",
+  "changeAddress": "Change address",
+  "quickCheckoutUnavailable": "Quick delivery can't be confirmed for this address right now. Please change the address or choose Standard delivery.",
+  "quickDeliveryNearbyStore": "Quick delivery from a nearby store"
 }
