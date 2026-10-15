@@ -8,7 +8,7 @@ class OrderRequest extends Equatable {
   final String deliveryType;
   final bool isExpress;
   final String paymentMethod;
-  final int expectedTotal;
+  final double expectedTotal;
 
   const OrderRequest({
     required this.cartItemIds,

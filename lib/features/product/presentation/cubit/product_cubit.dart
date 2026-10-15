@@ -25,11 +25,19 @@ class ProductCubit extends Cubit<ProductState> {
     required this.getExpressProducts,
   }) : super(const ProductInitial());
 
+  /// Incremented by every [fetchProducts] so a slow response for a previous
+  /// category/search can never overwrite (or be appended to) the current list.
+  int _listRequestId = 0;
+  bool _loadingMore = false;
+
   /// Fetch all categories
   Future<void> fetchCategories({
     String deliveryType = 'standard_delivery',
   }) async {
     if (isClosed) return;
+    // Any page still loading belongs to the previous list; drop it.
+    _listRequestId++;
+    _loadingMore = false;
     emit(const CategoryLoading());
 
     final result = await getCategories(
@@ -55,6 +63,8 @@ class ProductCubit extends Cubit<ProductState> {
       '📦 ProductCubit: Fetching products for category: $categoryId, page: $page, limit: $limit, search: $search',
     );
     if (isClosed) return;
+    final requestId = ++_listRequestId;
+    _loadingMore = false;
     emit(const ProductListLoading());
 
     final result = await getProducts(
@@ -66,7 +76,7 @@ class ProductCubit extends Cubit<ProductState> {
       ),
     );
 
-    if (isClosed) return;
+    if (isClosed || requestId != _listRequestId) return;
 
     result.fold(
       (failure) {
@@ -82,6 +92,74 @@ class ProductCubit extends Cubit<ProductState> {
     );
   }
 
+  /// Load the next page of the current product list (standard listing) and
+  /// append it, skipping products that are already shown. Does nothing while a
+  /// page is loading, when there is no next page, or when the list changed
+  /// (new category/search) while the request was in flight. A failed page
+  /// keeps the products already shown.
+  Future<void> fetchMoreProducts({
+    int? categoryId,
+    String? search,
+    int limit = 10,
+  }) async {
+    if (isClosed || _loadingMore) return;
+
+    final current = state;
+    if (current is! ProductListLoaded) return;
+
+    final loaded = current.paginatedProducts;
+    if (loaded.nextPageUrl == null || loaded.currentPage >= loaded.lastPage) {
+      return;
+    }
+
+    _loadingMore = true;
+    final requestId = _listRequestId;
+
+    final result = await getProducts(
+      GetProductsParams(
+        categoryId: categoryId,
+        search: search,
+        page: loaded.currentPage + 1,
+        limit: limit,
+      ),
+    );
+
+    _loadingMore = false;
+    if (isClosed || requestId != _listRequestId) return;
+
+    result.fold(
+      (failure) {
+        print('❌ ProductCubit: Error loading next page: ${failure.message}');
+      },
+      (next) {
+        final knownIds = loaded.products.map((product) => product.id).toSet();
+        final merged = [
+          ...loaded.products,
+          ...next.products.where((product) => !knownIds.contains(product.id)),
+        ];
+        emit(
+          ProductListLoaded(
+            PaginatedProducts(
+              currentPage: next.currentPage,
+              products: merged,
+              firstPageUrl: next.firstPageUrl,
+              from: loaded.from,
+              lastPage: next.lastPage,
+              lastPageUrl: next.lastPageUrl,
+              links: next.links,
+              nextPageUrl: next.nextPageUrl,
+              path: next.path,
+              perPage: next.perPage,
+              prevPageUrl: next.prevPageUrl,
+              to: next.to,
+              total: next.total,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   /// Fetch express products for a category (uses /express-30/products API)
   Future<void> fetchExpressProducts({
     required int categoryId,
@@ -90,6 +168,9 @@ class ProductCubit extends Cubit<ProductState> {
     int page = 1,
   }) async {
     if (isClosed) return;
+    // Any standard page still loading must not be appended to this list.
+    _listRequestId++;
+    _loadingMore = false;
     emit(const ProductListLoading());
 
     final result = await getExpressProducts(
@@ -180,24 +261,10 @@ class ProductCubit extends Cubit<ProductState> {
       initialOutOfStockMessage: initialOutOfStockMessage,
     );
 
-    if (_needsVariantStockResolution(resolvedProduct)) {
-      final fallbackResult = await getProductDetails(
-        GetProductDetailsParams(productId: productId),
-      );
-
-      if (isClosed) return;
-
-      resolvedProduct = fallbackResult.fold(
-        (_) => resolvedProduct,
-        (fallbackProduct) => _mergeVariantStockInfo(
-          primary: resolvedProduct,
-          fallback: fallbackProduct,
-          initialInStock: initialInStock,
-          initialOutOfStockMessage: initialOutOfStockMessage,
-        ),
-      );
-    }
-
+    // Standard product details already carry per-variant stock, so this
+    // fallback only runs for payloads without it (e.g. express products). The
+    // former GET /products/{id} fallback was removed: that route does not
+    // exist on the backend, so it always failed.
     if (_needsVariantStockResolution(resolvedProduct)) {
       final catalogResult = await getProducts(
         GetProductsParams(search: resolvedProduct.name, limit: 20),

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/error/exceptions.dart';
+import 'package:taksh_e_commerce/core/utils/logger/log_redaction.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/utils/secure_store.dart';
 
@@ -78,13 +80,18 @@ class ApiClient {
                 })
               : options.data;
 
-          print(
-              '🚀 API Request: ${options.method} ${options.baseUrl}${options.path}');
-          if (options.queryParameters.isNotEmpty) {
-            print('❓ Query Parameters: ${options.queryParameters}');
-          }
-          if (requestData != null) {
-            print('📦 Request Body: $requestData');
+          // Console output exists only in debug builds and never contains tokens, OTPs,
+          // payment or personal data (see redactForLog).
+          if (kDebugMode) {
+            debugPrint(
+                '🚀 API Request: ${options.method} ${options.baseUrl}${options.path}');
+            if (options.queryParameters.isNotEmpty) {
+              debugPrint(
+                  '❓ Query Parameters: ${redactForLog(options.queryParameters)}');
+            }
+            if (requestData != null) {
+              debugPrint('📦 Request Body: ${redactForLog(requestData)}');
+            }
           }
 
           log.infoWithContext(
@@ -109,9 +116,11 @@ class ApiClient {
               : 0;
 
           // Log response
-          print(
-              '✅ API Response [${response.statusCode}] ${response.requestOptions.path}');
-          print('📨 Response Body: ${response.data}');
+          if (kDebugMode) {
+            debugPrint(
+                '✅ API Response [${response.statusCode}] ${response.requestOptions.path}');
+            debugPrint('📨 Response Body: ${redactForLog(response.data)}');
+          }
 
           log.infoWithContext(
             'API Response received',
@@ -135,11 +144,14 @@ class ApiClient {
               : 0;
 
           // Log error
-          print(
-              '❌ API Error [${error.response?.statusCode}] ${error.requestOptions.path}');
-          print('⚠️ Error Type: ${error.type}');
-          if (error.response?.data != null) {
-            print('📥 Error Response Data: ${error.response?.data}');
+          if (kDebugMode) {
+            debugPrint(
+                '❌ API Error [${error.response?.statusCode}] ${error.requestOptions.path}');
+            debugPrint('⚠️ Error Type: ${error.type}');
+            if (error.response?.data != null) {
+              debugPrint(
+                  '📥 Error Response Data: ${redactForLog(error.response?.data)}');
+            }
           }
 
           log.errorWithContext(
@@ -150,7 +162,7 @@ class ApiClient {
               'status_code': error.response?.statusCode,
               'error_type': error.type.toString(),
               'duration_ms': duration,
-              'response_data': error.response?.data,
+              'response_data': redactForLog(error.response?.data),
             },
             error,
             error.stackTrace,
@@ -286,8 +298,9 @@ class ApiClient {
             error.response?.statusMessage ??
             'Request failed';
 
-        print(
-            'API error response: ${error.response?.data}'); // Debug log for response data
+        if (kDebugMode) {
+          debugPrint('API error response: ${redactForLog(error.response?.data)}');
+        }
 
         switch (statusCode) {
           case 400:

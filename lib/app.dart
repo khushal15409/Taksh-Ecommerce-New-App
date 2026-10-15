@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
+import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/routing/app_router.dart';
 import 'package:taksh_e_commerce/core/theme/theme.dart';
@@ -146,6 +147,8 @@ class TakshECommerceApp extends material.StatelessWidget {
         listener: (context, state) {
           if (state is Unauthenticated) {
             context.read<AddressBloc>().add(const ResetAddressesEvent());
+            // The cart (in memory and cached) belongs to the previous session.
+            getIt<CartCubit>().resetForUserChange();
           }
         },
         child: BlocBuilder<SplashCubit, SplashState>(

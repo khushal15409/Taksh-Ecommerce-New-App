@@ -18,8 +18,8 @@ class SearchProductModel extends SearchProduct {
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: json['name'] as String? ?? '',
       brand: json['brand'] as String?,
-      price: (json['price'] as num?)?.toInt() ?? 0,
-      mrp: (json['mrp'] as num?)?.toInt(),
+      price: (json['price'] as num?)?.toDouble() ?? 0,
+      mrp: (json['mrp'] as num?)?.toDouble(),
       imageUrl: json['image'] as String?,
       inStock: json['in_stock'] as bool? ?? false,
     );

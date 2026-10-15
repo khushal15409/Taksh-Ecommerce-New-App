@@ -314,7 +314,7 @@ class _CategoryProductCardState extends State<CategoryProductCard>
     );
   }
 
-  Widget _buildPriceRow(int? displayPrice, int? discount) {
+  Widget _buildPriceRow(double? displayPrice, int? discount) {
     if (displayPrice == null) {
       return const Text(
         'View details',

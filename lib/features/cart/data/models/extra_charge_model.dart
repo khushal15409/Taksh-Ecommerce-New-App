@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 
@@ -11,10 +12,7 @@ class ExtraChargeModel extends ExtraCharge {
   });
 
   factory ExtraChargeModel.fromJson(DataMap json) {
-    final rawAmount = json['amount'];
-    final amount = rawAmount is num
-        ? rawAmount.toInt()
-        : int.tryParse(rawAmount?.toString() ?? '') ?? 0;
+    final amount = parseMoney(json['amount']) ?? 0.0;
 
     return ExtraChargeModel(
       type: json['type']?.toString() ?? 'other',

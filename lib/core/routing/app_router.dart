@@ -34,6 +34,7 @@ import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart
 import 'package:taksh_e_commerce/features/checkout/presentation/pages/select_items_page.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/pages/checkout_page.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/pages/order_placed_page.dart';
+import 'package:taksh_e_commerce/features/checkout/presentation/pages/pay_now_page.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/selected_checkout_items.dart';
@@ -250,7 +251,8 @@ class AppRouter {
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: BlocProvider<SearchCubit>(
-          create: (context) => getIt<SearchCubit>(),
+          create: (context) => getIt<SearchCubit>()
+            ..deliveryType = state.uri.queryParameters['delivery_type'],
           child: const SearchPage(),
         ),
         transitionsBuilder: _slideTransition,
@@ -568,8 +570,15 @@ class AppRouter {
     GoRoute(
       path: AppRoutes.checkout,
       name: 'checkout',
+      // The selected items normally travel in memory (route extra). When the page is opened
+      // without them (back from the review page, deep link, wrong extra type) they are
+      // rebuilt from the cart the server holds for the requested delivery bucket
+      // (?deliveryType=normal|30_min); if that cart is empty or no bucket was named there is
+      // nothing to check out and the cart (which reloads from the server) opens instead.
+      redirect: (context, state) =>
+          _checkoutSelection(state) != null ? null : AppRoutes.cart,
       pageBuilder: (context, state) {
-        final selectedItems = state.extra;
+        final selectedItems = _checkoutSelection(state);
         return CustomTransitionPage(
           key: state.pageKey,
           child: BlocProvider<CheckoutBloc>(
@@ -579,7 +588,7 @@ class AppRouter {
               if (selectedItems != null) {
                 bloc.add(
                   SelectCheckoutItemsEvent(
-                    cartItems: (selectedItems as SelectedCheckoutItems).items,
+                    cartItems: selectedItems.items,
                     selectedItemIds: selectedItems.itemIds,
                     extraCharges: selectedItems.extraCharges,
                     deliveryType: selectedItems.deliveryType,
@@ -633,6 +642,30 @@ class AppRouter {
             ),
           ),
           transitionsBuilder: _fadeTransition,
+        );
+      },
+    ),
+
+    GoRoute(
+      path: AppRoutes.payNow,
+      name: 'pay-now',
+      // Needs an order id to pay for; without one there is nothing to do here.
+      redirect: (context, state) =>
+          int.tryParse(state.uri.queryParameters['orderId'] ?? '') == null
+          ? AppRoutes.orders
+          : null,
+      pageBuilder: (context, state) {
+        final orderId = int.parse(state.uri.queryParameters['orderId']!);
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: BlocProvider<CheckoutBloc>(
+            create: (context) => getIt<CheckoutBloc>(),
+            child: PayNowPage(
+              orderId: orderId,
+              orderNumber: state.uri.queryParameters['orderNumber'],
+            ),
+          ),
+          transitionsBuilder: _slideTransition,
         );
       },
     ),
@@ -710,8 +743,35 @@ class AppRouter {
     AppRoutes.addAddress,
     AppRoutes.checkout,
     AppRoutes.checkoutSelectItems,
+    AppRoutes.payNow,
     '/quick-delivery',
   ];
+
+  /// What to check out: the selection passed in memory, otherwise the server-backed cart of
+  /// the delivery bucket named in the URL. Null when there is nothing safe to check out.
+  /// Nothing is invented: items, totals and charges come from that cart as it is.
+  static SelectedCheckoutItems? _checkoutSelection(GoRouterState state) {
+    final extra = state.extra;
+    if (extra is SelectedCheckoutItems) return extra;
+
+    final deliveryType = state.uri.queryParameters['deliveryType'];
+    if (deliveryType != CartCubit.deliveryTypeStandard &&
+        deliveryType != CartCubit.deliveryTypeExpress) {
+      return null;
+    }
+
+    final cart = getIt<CartCubit>().cartForDeliveryType(deliveryType!);
+    if (cart.isEmpty) return null;
+
+    return SelectedCheckoutItems(
+      items: cart.items,
+      itemIds: cart.items.map((item) => item.id).toList(),
+      subtotal: cart.total,
+      totalQuantity: cart.totalItems,
+      extraCharges: cart.extraCharges,
+      deliveryType: deliveryType,
+    );
+  }
 
   /// Global redirect logic (route guards)
   /// Handles authentication checks and redirects based on AuthBloc state

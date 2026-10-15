@@ -27,10 +27,15 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
   int _countdown = 10; // 10 seconds countdown
   Timer? _timer;
 
+  /// The order exists and is unpaid: it can be paid again, so nothing sends the customer to the cart.
+  bool get _hasOrder => widget.orderId != null && widget.orderId!.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
-    _startCountdown();
+    if (!_hasOrder) {
+      _startCountdown();
+    }
   }
 
   void _startCountdown() {
@@ -110,7 +115,8 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
-                  // Countdown timer
+                  // Countdown timer (only when there is no order to pay again)
+                  if (!_hasOrder)
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -169,7 +175,13 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         _timer?.cancel(); // Cancel auto-redirect
-                        context.go(AppRoutes.cart);
+                        final orderId = int.tryParse(widget.orderId ?? '');
+                        if (orderId != null) {
+                          // Pay the SAME order again (no new order, no new stock reservation).
+                          context.go(AppRoutes.payNowPath(orderId: orderId));
+                        } else {
+                          context.go(AppRoutes.cart);
+                        }
                       },
                       icon: const Icon(Icons.refresh),
                       label: Text(AppLocalizations.of(context)!.retry),

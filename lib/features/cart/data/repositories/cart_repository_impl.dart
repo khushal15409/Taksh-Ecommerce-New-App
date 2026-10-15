@@ -3,6 +3,7 @@ import 'package:taksh_e_commerce/core/error/exceptions.dart';
 import 'package:taksh_e_commerce/core/error/failures.dart';
 import 'package:taksh_e_commerce/core/network/network_info.dart';
 import 'package:taksh_e_commerce/features/cart/data/datasources/cart_remote_datasource.dart';
+import 'package:taksh_e_commerce/features/cart/data/models/cart_response_model.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/repositories/cart_repository.dart';
 
@@ -92,6 +93,73 @@ class CartRepositoryImpl implements CartRepository {
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, Cart>> applyCoupon({
+    required String couponCode,
+    String? guestToken,
+    String deliveryType = 'normal',
+  }) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final response = await remoteDataSource.applyCoupon(
+        couponCode: couponCode,
+        guestToken: guestToken,
+        deliveryType: deliveryType,
+      );
+      return Right(_cartFrom(response));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Cart>> removeCoupon({
+    String? guestToken,
+    String deliveryType = 'normal',
+  }) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure('No internet connection'));
+    }
+
+    try {
+      final response = await remoteDataSource.removeCoupon(
+        guestToken: guestToken,
+        deliveryType: deliveryType,
+      );
+      return Right(_cartFrom(response));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  Cart _cartFrom(CartResponseModel response) {
+    return Cart(
+      items: response.cart.items,
+      total: response.cart.total,
+      guestToken: response.guestToken ?? response.cart.guestToken,
+      extraCharges: response.cart.extraCharges,
+      deliveryChargeCode: response.cart.deliveryChargeCode,
+      deliveryEstimatedMinutes: response.cart.deliveryEstimatedMinutes,
+      deliveryChargePrice: response.cart.deliveryChargePrice,
+      totalWithDelivery: response.cart.totalWithDelivery,
+    );
   }
 
   @override

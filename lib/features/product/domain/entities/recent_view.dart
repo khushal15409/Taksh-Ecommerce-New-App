@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 class RecentView extends Equatable {
   final int id;
   final String name;
-  final int price;
+  final double price;
   final String thumbnail;
 
   const RecentView({

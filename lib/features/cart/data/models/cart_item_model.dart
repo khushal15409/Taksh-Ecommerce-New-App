@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart_item.dart';
 
@@ -36,7 +37,7 @@ class CartItemModel extends CartItem {
       price:
           json['price']?.toString() ?? json['final_sell_price']?.toString() ?? '0',
       qty: _toInt(json['qty']) ?? 0,
-      total: _toInt(json['total']) ?? 0,
+      total: parseMoney(json['total']) ?? 0.0,
       image: json['image']?.toString(),
       variantName: json['variant_name']?.toString(),
       productId: _toInt(json['product_id']),

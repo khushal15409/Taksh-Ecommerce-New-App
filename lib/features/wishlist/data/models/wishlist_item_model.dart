@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/features/wishlist/domain/entities/wishlist_item.dart';
 
 /// Model for wishlist item – extends the domain entity with JSON serialization.
@@ -106,13 +107,14 @@ class WishlistItemModel extends WishlistItem {
         _asString(json['slug']);
 
     // ── Extract prices ─────────────────────────────────────────────────
-    final int? parsedOriginalPrice = _parseInt(product?['original_price']) ??
-        _parseInt(json['original_price']) ??
-        _parseInt(product?['price']) ??
-        _parseInt(json['price']);
+    // Prices keep their paise (parseMoney does not truncate).
+    final double? parsedOriginalPrice = parseMoney(product?['original_price']) ??
+        parseMoney(json['original_price']) ??
+        parseMoney(product?['price']) ??
+        parseMoney(json['price']);
 
-    final int? parsedSalePrice = _parseInt(product?['sale_price']) ??
-        _parseInt(json['sale_price']);
+    final double? parsedSalePrice = parseMoney(product?['sale_price']) ??
+        parseMoney(json['sale_price']);
 
     // ── Extract stock status ───────────────────────────────────────────
     final bool parsedInStock = _parseBool(product?['in_stock']) ??

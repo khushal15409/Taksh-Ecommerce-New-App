@@ -142,7 +142,10 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         .where((item) => _selectedItemIds.contains(item.id))
         .toList();
 
-    final subtotal = selectedItems.fold(0, (sum, item) => sum + item.total);
+    final subtotal = selectedItems.fold<double>(
+      0,
+      (sum, item) => sum + item.total,
+    );
     final totalQty = selectedItems.fold(0, (sum, item) => sum + item.qty);
 
     final selection = SelectedCheckoutItems(
@@ -714,7 +717,10 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         .where((item) => _selectedItemIds.contains(item.id))
         .toList();
 
-    final subtotal = selectedItems.fold(0, (sum, item) => sum + item.total);
+    final subtotal = selectedItems.fold<double>(
+      0,
+      (sum, item) => sum + item.total,
+    );
 
     // Create simple price breakdown with no taxes or delivery charges
     final priceBreakdown = PriceBreakdown(
@@ -737,6 +743,9 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     emit(CheckoutCalculated(summary: summary, appliedCoupon: _appliedCoupon));
   }
 
+  /// Id of the order this bloc placed last (null before any order was placed)
+  int? get lastPlacedOrderId => _lastPlacedOrderId;
+
   /// Get selected payment method
   PaymentMethodSelection get selectedPaymentMethod => _selectedPaymentMethod;
 
@@ -746,14 +755,11 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   /// Get selected address
   Address? get selectedAddress => _selectedAddress;
 
-  /// Ensure the static platform fee is present exactly once in the charges
-  /// list (so it is displayed and sent to the backend with every order).
+  /// The charges exactly as the server returned them. The platform fee (set
+  /// in admin) and quick-delivery fee already arrive in `charges[]`; the app
+  /// no longer adds a fixed platform fee of its own, which double-counted it.
   List<ExtraCharge> _withPlatformFee(List<ExtraCharge> charges) {
-    final hasPlatformFee = charges.any(
-      (charge) => charge.type == ExtraCharge.platformFeeType,
-    );
-    if (hasPlatformFee) return List<ExtraCharge>.from(charges);
-    return [...charges, ExtraCharge.platformFee];
+    return List<ExtraCharge>.from(charges);
   }
 
   /// Expose the extra charges captured during item selection so the

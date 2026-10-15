@@ -53,7 +53,9 @@ class PriceBreakdownWidget extends StatelessWidget {
                   isRegular: true,
                   isDiscount: charge.isDiscount,
                 ),
-              if (priceBreakdown.discount > 0)
+              // the coupon line above already is this discount; show the generic row only without it
+              if (priceBreakdown.discount > 0 &&
+                  !extraCharges.any((charge) => charge.isDiscount))
                 _buildPriceRow(
                   context,
                   'Discount',

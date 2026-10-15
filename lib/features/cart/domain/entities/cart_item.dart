@@ -8,7 +8,7 @@ class CartItem extends Equatable {
   final String sku;
   final String price;
   final int qty;
-  final int total;
+  final double total;
   final String? image;
 
   /// Human-readable variant label (e.g. "1kg • Blue"). May be null when the

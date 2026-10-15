@@ -30,8 +30,8 @@ class Product extends Equatable {
   final RatingSummary? ratingSummary;
   final List<Review>? reviews;
   final List<QuestionAnswer>? questionsAnswers;
-  final int? originalPrice;
-  final int? salePrice;
+  final double? originalPrice;
+  final double? salePrice;
   final String? discountLabel;
   final int? saleId;
 

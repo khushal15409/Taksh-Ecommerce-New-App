@@ -65,7 +65,9 @@ import 'package:taksh_e_commerce/features/cart/domain/usecases/get_cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/add_to_cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/update_cart_item.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/remove_from_cart.dart';
+import 'package:taksh_e_commerce/features/cart/domain/usecases/apply_coupon.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/clear_cart.dart';
+import 'package:taksh_e_commerce/features/cart/domain/usecases/remove_coupon.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 
 // Wishlist feature imports
@@ -515,6 +517,8 @@ void _registerCartDependencies() {
   getIt.registerLazySingleton(() => UpdateCartItem(getIt()));
   getIt.registerLazySingleton(() => RemoveFromCart(getIt()));
   getIt.registerLazySingleton(() => ClearCart(getIt()));
+  getIt.registerLazySingleton(() => ApplyCoupon(getIt()));
+  getIt.registerLazySingleton(() => RemoveCoupon(getIt()));
 
   // Cubit - lazy singleton (shared across the app for consistent cart state)
   getIt.registerLazySingleton(
@@ -524,6 +528,8 @@ void _registerCartDependencies() {
       updateCartItem: getIt(),
       removeFromCart: getIt(),
       clearCart: getIt(),
+      applyCoupon: getIt(),
+      removeCoupon: getIt(),
       secureStore: getIt(),
       sharedPreferences: getIt(),
     ),

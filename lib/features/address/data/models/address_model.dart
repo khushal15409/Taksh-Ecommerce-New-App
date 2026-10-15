@@ -102,9 +102,14 @@ class AddressModel extends Address {
   /// Create from JSON (API response)
   factory AddressModel.fromJson(DataMap json) {
     // Construct location from scattered fields
+    // The API returns the coordinates saved with the address (null when none were saved);
+    // 0.0 only stands for "no coordinates", it is never a real location.
+    double coordinate(Object? value) =>
+        value is num ? value.toDouble() : double.tryParse('${value ?? ''}') ?? 0.0;
+
     final location = LocationModel(
-      latitude: 0.0, // API doesn't provide coordinates
-      longitude: 0.0, // API doesn't provide coordinates
+      latitude: coordinate(json['latitude']),
+      longitude: coordinate(json['longitude']),
       city: json['city'] as String?,
       state: json['state'] as String?,
       postalCode: json['pincode'] as String?,

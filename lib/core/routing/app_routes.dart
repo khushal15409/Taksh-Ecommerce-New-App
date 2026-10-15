@@ -101,6 +101,36 @@ class AppRoutes {
   static const String checkout = '/checkout';
   static const String orderReview = '/checkout/review';
   static const String orderPlaced = '/order/placed';
+  static const String payNow = '/order/pay';
+
+  /// Pay (or retry paying) an existing unpaid order.
+  static String payNowPath({required int orderId, String? orderNumber}) {
+    return Uri(
+      path: payNow,
+      queryParameters: {
+        'orderId': orderId.toString(),
+        if (orderNumber != null && orderNumber.isNotEmpty)
+          'orderNumber': orderNumber,
+      },
+    ).toString();
+  }
+
+  /// The payment-failed page for an order, with the failure details.
+  static String paymentFailedPath({
+    int? orderId,
+    String? errorCode,
+    String? errorMessage,
+  }) {
+    return Uri(
+      path: paymentFailed,
+      queryParameters: {
+        if (orderId != null) 'orderId': orderId.toString(),
+        if (errorCode != null && errorCode.isNotEmpty) 'errorCode': errorCode,
+        if (errorMessage != null && errorMessage.isNotEmpty)
+          'errorMessage': errorMessage,
+      },
+    ).toString();
+  }
 
   /// Build query string for the order-placed page
   static String orderPlacedPath({

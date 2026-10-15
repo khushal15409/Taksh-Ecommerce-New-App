@@ -74,14 +74,15 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
     final deliveryChargeRupees = _toDouble(deliveryCharge?['price']) ?? 0.0;
 
     final chargesRaw = (cart['charges'] as List?)?.whereType<Map>() ?? const [];
-    var cgstRupees = 0;
-    var sgstRupees = 0;
-    var discountRupees = 0;
+    // Amounts stay exact (paise are not rounded away).
+    var cgstRupees = 0.0;
+    var sgstRupees = 0.0;
+    var discountRupees = 0.0;
 
     for (final raw in chargesRaw) {
       final charge = raw.cast<String, dynamic>();
       final type = (charge['type']?.toString() ?? '').trim().toLowerCase();
-      final amount = (_toDouble(charge['amount']) ?? 0).round();
+      final amount = _toDouble(charge['amount']) ?? 0.0;
       final isDiscount = _toBool(charge['is_discount']) ?? amount < 0;
 
       if (isDiscount || type == 'discount') {
@@ -103,26 +104,27 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
     // Delivery is no longer charged — the Taksh charge already covers it.
     // Other fees (platform, quick delivery) arrive in `charges[]` and are
     // rendered separately, so they must not be folded into the delivery line.
-    final deliveryChargesRupees = deliveryChargeRupees.round();
+    final deliveryChargesRupees = deliveryChargeRupees;
 
+    // Only used when the server did not send a total: the server's
+    // total_with_delivery is the authoritative payable amount.
     final computedGrandTotal =
-        itemTotalRupees.round() +
+        itemTotalRupees +
         deliveryChargesRupees +
         cgstRupees +
         sgstRupees -
         discountRupees;
 
     final grandTotalRupees =
-        (_toDouble(cart['total_with_delivery']) ?? computedGrandTotal.toDouble()) +
-        ExtraCharge.platformFeeAmount;
+        _toDouble(cart['total_with_delivery']) ?? computedGrandTotal;
 
     final priceBreakdown = PriceBreakdownModel(
-      itemTotal: itemTotalRupees.round(),
+      itemTotal: itemTotalRupees,
       deliveryCharges: deliveryChargesRupees,
       cgst: cgstRupees,
       sgst: sgstRupees,
       discount: discountRupees,
-      grandTotal: grandTotalRupees.round(),
+      grandTotal: grandTotalRupees,
     );
 
     final deliveryOption = _mapDeliveryOption(

@@ -40,6 +40,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
   DeliveryType _homeDeliveryType = DeliveryType.standard;
   Address? _selectedAddress;
   bool _hasLoadedInitialProducts = false;
+
+  /// Drives "load next page" for the standard product grid.
+  final ScrollController _gridScroll = ScrollController();
+
+  /// Category id the standard grid is currently showing (parent or sub).
+  int? _activeCategoryId;
   static const double _defaultLatitude = 23.0695;
   static const double _defaultLongitude = 72.6738;
 
@@ -59,8 +65,34 @@ class _CategoriesPageState extends State<CategoriesPage> {
   void initState() {
     super.initState();
     _homeDeliveryType = widget.initialDeliveryType ?? DeliveryType.standard;
+    _gridScroll.addListener(_maybeLoadMoreProducts);
     context.read<ProductCubit>().fetchCategories(
       deliveryType: _mapApiDeliveryType(_homeDeliveryType),
+    );
+  }
+
+  @override
+  void dispose() {
+    _gridScroll
+      ..removeListener(_maybeLoadMoreProducts)
+      ..dispose();
+    super.dispose();
+  }
+
+  /// Loads the next page of the standard listing when the grid is scrolled
+  /// near its end (or does not fill the screen yet). Quick delivery keeps its
+  /// own single-page listing.
+  void _maybeLoadMoreProducts() {
+    if (!mounted || _isQuickDelivery || !_gridScroll.hasClients) return;
+    final categoryId = _activeCategoryId;
+    if (categoryId == null) return;
+
+    final position = _gridScroll.position;
+    if (position.maxScrollExtent - position.pixels > 300) return;
+
+    context.read<ProductCubit>().fetchMoreProducts(
+      categoryId: categoryId,
+      limit: AppConstants.defaultPageSize,
     );
   }
 
@@ -72,6 +104,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         longitude: _longitude,
       );
     } else {
+      _activeCategoryId = categoryId;
       context.read<ProductCubit>().fetchProducts(
         categoryId: categoryId,
         page: 1,
@@ -96,31 +129,21 @@ class _CategoriesPageState extends State<CategoriesPage> {
     print('🏷️ Has children: ${category.hasChildren}');
     print('🏷️ Children count: ${category.children?.length ?? 0}');
 
-    // Auto-select first subcategory if available
-    if (category.hasChildren && category.children!.isNotEmpty) {
+    // Quick delivery keeps its previous behaviour: first subcategory shown as
+    // selected while the parent's products are listed.
+    if (_isQuickDelivery && category.hasChildren && category.children!.isNotEmpty) {
       setState(() {
         _selectedSubcategory = category.children!.first;
       });
-
-      // Debug logging
-      print(
-        '🏷️ Auto-selected subcategory: ${_selectedSubcategory!.name} (id: ${_selectedSubcategory!.id})',
-      );
-      print(
-        '🏷️ Fetching products for PARENT category: ${category.name} (id: ${category.id})',
-      );
-
-      // Fetch products for the PARENT category (products are assigned to parent categories in backend)
-      _fetchProductsForCategory(category.id);
-    } else {
-      // Debug logging
-      print(
-        '🏷️ No subcategories, fetching products for category: ${category.name} (id: ${category.id})',
-      );
-
-      // Fetch products for this category if no subcategories
-      _fetchProductsForCategory(category.id);
     }
+
+    // Standard: no subcategory is pre-selected. Choosing a parent lists the
+    // products of the parent and all of its subcategories; picking a
+    // subcategory in the dropdown narrows the list to that subcategory.
+    print(
+      '🏷️ Fetching products for category: ${category.name} (id: ${category.id})',
+    );
+    _fetchProductsForCategory(category.id);
   }
 
   void _handleSubcategoryChanged(Category? subcategory) {
@@ -134,12 +157,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
       print(
         '🏷️ Subcategory changed to: ${subcategory.name} (id: ${subcategory.id})',
       );
-      print(
-        '🏷️ Fetching products for PARENT category: ${parentCategory.name} (id: ${parentCategory.id})',
-      );
 
-      // Fetch products for the PARENT category (products are assigned to parent categories in backend)
-      _fetchProductsForCategory(parentCategory.id);
+      // Standard: list only the chosen subcategory. Quick delivery keeps
+      // requesting the parent category, as its API expects.
+      _fetchProductsForCategory(
+        _isQuickDelivery ? parentCategory.id : subcategory.id,
+      );
     }
   }
 
@@ -150,7 +173,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void _retryFetchProducts() {
-    _fetchProductsForCategory(_categories[_selectedIndex].id);
+    _fetchProductsForCategory(
+      (_isQuickDelivery ? null : _activeCategoryId) ??
+          _categories[_selectedIndex].id,
+    );
   }
 
   void _navigateToHome() {
@@ -419,6 +445,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
           if (subcategoryMatch != null) {
             _selectCategory(subcategoryMatch.parentIndex);
             setState(() => _selectedSubcategory = subcategoryMatch.subcategory);
+            if (!_isQuickDelivery) {
+              // Show just the requested subcategory (replaces the parent list).
+              _fetchProductsForCategory(subcategoryMatch.subcategory.id);
+            }
             return;
           }
         }
@@ -471,7 +501,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            context.push(AppRoutes.search);
+            context.push(
+              '${AppRoutes.search}?delivery_type=${_isQuickDelivery ? '30_min' : 'normal'}',
+            );
           },
           borderRadius: BorderRadius.circular(14),
           child: Padding(
@@ -522,6 +554,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
       children: [
         if (selectedCategory.hasChildren) ...[
           SubcategoriesSection(
+            key: ValueKey(selectedCategory.id),
             category: selectedCategory,
             selectedSubcategory: _selectedSubcategory,
             onSubcategoryChanged: _handleSubcategoryChanged,
@@ -547,6 +580,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
       return Center(child: Text(AppLocalizations.of(context)!.noProductsFound));
     }
 
+    // A short list may not fill the screen; keep loading pages until it does.
+    if (!_isQuickDelivery && state.paginatedProducts.hasNextPage) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _maybeLoadMoreProducts(),
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrowWidth = constraints.maxWidth < 300;
@@ -568,6 +608,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   : 206.0);
 
         return GridView.builder(
+          controller: _gridScroll,
           padding: EdgeInsets.fromLTRB(
             isNarrowWidth ? 8 : 12,
             8,
