@@ -10,6 +10,9 @@ class SearchProduct extends Equatable {
   final String? imageUrl;
   final bool inStock;
 
+  /// Server flag: the product is sold in the Quick (30_min) bucket.
+  final bool isExpress30;
+
   const SearchProduct({
     required this.id,
     required this.name,
@@ -18,6 +21,7 @@ class SearchProduct extends Equatable {
     this.mrp,
     this.imageUrl,
     required this.inStock,
+    this.isExpress30 = false,
   });
 
   bool get hasDiscount => mrp != null && mrp! > price;
@@ -31,5 +35,6 @@ class SearchProduct extends Equatable {
         mrp,
         imageUrl,
         inStock,
+        isExpress30,
       ];
 }

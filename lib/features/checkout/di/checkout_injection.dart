@@ -7,6 +7,7 @@ import 'package:taksh_e_commerce/features/checkout/domain/repositories/checkout_
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/calculate_checkout.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/create_order.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/get_delivery_options.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/usecases/get_delivery_quote.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/place_order.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/validate_checkout.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
@@ -38,6 +39,7 @@ void registerCheckoutDependencies(GetIt getIt, {bool useMockData = false}) {
   // Use cases
   getIt.registerLazySingleton(() => CalculateCheckout(getIt()));
   getIt.registerLazySingleton(() => GetDeliveryOptions(getIt()));
+  getIt.registerLazySingleton(() => GetDeliveryQuote(getIt()));
   getIt.registerLazySingleton(() => ValidateCheckout(getIt()));
   getIt.registerLazySingleton(() => CreateOrder(getIt()));
   getIt.registerLazySingleton(() => PlaceOrder(getIt()));
@@ -50,6 +52,7 @@ void registerCheckoutDependencies(GetIt getIt, {bool useMockData = false}) {
     () => CheckoutBloc(
       calculateCheckout: getIt<CalculateCheckout>(),
       getDeliveryOptions: getIt<GetDeliveryOptions>(),
+      getDeliveryQuote: getIt<GetDeliveryQuote>(),
       validateCheckout: getIt<ValidateCheckout>(),
       createOrder: getIt<CreateOrder>(),
       placeOrder: getIt<PlaceOrder>(),

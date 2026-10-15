@@ -8,6 +8,7 @@ import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart
 import 'package:taksh_e_commerce/features/checkout/data/datasources/checkout_remote_datasource.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/checkout_summary_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/delivery_option_model.dart';
+import 'package:taksh_e_commerce/features/checkout/data/models/delivery_quote_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/place_order_response_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/price_breakdown_model.dart';
 import 'package:taksh_e_commerce/features/orders/data/models/order_address_model.dart';
@@ -135,9 +136,9 @@ class CheckoutMockDataSource implements CheckoutRemoteDataSource {
     final deliveryOption = deliveryType == '30_min'
         ? const DeliveryOptionModel(
             type: '30_min',
-            displayName: 'Express Delivery',
+            displayName: 'Quick Delivery',
             charges: 0,
-            slaMinutes: 30,
+            slaMinutes: 0,
             isAvailable: true,
           )
         : const DeliveryOptionModel(
@@ -175,12 +176,25 @@ class CheckoutMockDataSource implements CheckoutRemoteDataSource {
       ),
       DeliveryOptionModel(
         type: '30_min',
-        displayName: 'Express Delivery',
+        displayName: 'Quick Delivery',
         charges: 0,
-        slaMinutes: 30,
+        slaMinutes: 0,
         isAvailable: true,
       ),
     ];
+  }
+
+  @override
+  Future<DeliveryQuoteModel> getDeliveryQuote({
+    required String deliveryType,
+    required String addressId,
+  }) async {
+    // Mock mode only: everything is serviceable.
+    return DeliveryQuoteModel(
+      deliveryType: deliveryType,
+      checked: false,
+      serviceable: true,
+    );
   }
 
   @override

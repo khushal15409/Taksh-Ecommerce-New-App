@@ -2,6 +2,7 @@ import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/checkout_summary_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/delivery_option_model.dart';
+import 'package:taksh_e_commerce/features/checkout/data/models/delivery_quote_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/place_order_response_model.dart';
 import 'package:taksh_e_commerce/features/orders/data/models/order_model.dart';
 
@@ -17,6 +18,12 @@ abstract class CheckoutRemoteDataSource {
 
   /// Get delivery options
   Future<List<DeliveryOptionModel>> getDeliveryOptions({
+    required String addressId,
+  });
+
+  /// GET /cart/quote: serviceability of [deliveryType] for the saved address
+  Future<DeliveryQuoteModel> getDeliveryQuote({
+    required String deliveryType,
     required String addressId,
   });
 

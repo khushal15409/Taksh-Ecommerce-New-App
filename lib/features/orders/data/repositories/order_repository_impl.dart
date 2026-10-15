@@ -19,7 +19,10 @@ class OrderRepositoryImpl implements OrderRepository {
   OrderRepositoryImpl(this._remoteDatasource);
 
   @override
-  Future<Either<Failure, PaginatedOrders>> getOrders({int page = 1}) async {
+  Future<Either<Failure, PaginatedOrders>> getOrders({
+    int page = 1,
+    String? deliveryMode,
+  }) async {
     final log = loggerWithContext({
       'feature': 'orders',
       'class': 'OrderRepositoryImpl',
@@ -29,7 +32,10 @@ class OrderRepositoryImpl implements OrderRepository {
     try {
       log.infoWithContext('Getting orders', {'page': page});
 
-      final response = await _remoteDatasource.getOrders(page: page);
+      final response = await _remoteDatasource.getOrders(
+        page: page,
+        deliveryMode: deliveryMode,
+      );
 
       if (response.success && response.data != null) {
         log.infoWithContext('Orders retrieved successfully', {

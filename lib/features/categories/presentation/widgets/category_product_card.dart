@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -260,9 +261,10 @@ class _CategoryProductCardState extends State<CategoryProductCard>
         color: const Color(0xFFE6F6EC),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Text(
-        '30 minutes',
-        style: TextStyle(
+      child: Text(
+        // No guaranteed delivery time exists: never promise "30 minutes".
+        AppLocalizations.of(context)!.quickDelivery,
+        style: const TextStyle(
           color: Color(0xFF0B6B38),
           fontSize: 12,
           fontWeight: FontWeight.w700,

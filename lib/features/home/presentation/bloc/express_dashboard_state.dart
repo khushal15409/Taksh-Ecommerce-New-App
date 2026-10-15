@@ -43,3 +43,14 @@ class ExpressDashboardError extends ExpressDashboardState {
   @override
   List<Object?> get props => [message];
 }
+
+/// The server says Quick delivery cannot serve the selected location.
+class ExpressDashboardNotServiceable extends ExpressDashboardState {
+  final String? message;
+  final String? code;
+
+  const ExpressDashboardNotServiceable({this.message, this.code});
+
+  @override
+  List<Object?> get props => [message, code];
+}

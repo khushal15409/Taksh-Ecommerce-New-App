@@ -29,12 +29,17 @@ class HomeHeader extends StatefulWidget {
   final Address? selectedAddress;
   final VoidCallback onAddressTap;
 
+  /// Categories of the Quick dashboard (already filtered by the server for the
+  /// selected address). The Quick tab never falls back to the global list.
+  final List<Category>? quickCategories;
+
   const HomeHeader({
     super.key,
     required this.selectedDeliveryType,
     required this.onDeliveryTypeChanged,
     this.selectedAddress,
     required this.onAddressTap,
+    this.quickCategories,
   });
 
   @override
@@ -55,7 +60,16 @@ class _HomeHeaderState extends State<HomeHeader>
   late final List<_PetalConfig> _petals;
 
   bool _shouldShowProductCategories(DeliveryType type) {
+    if (type == DeliveryType.quick) {
+      return widget.quickCategories?.isNotEmpty ?? false;
+    }
     return type != DeliveryType.services;
+  }
+
+  /// Only the Standard tab uses the shared category list; Quick categories
+  /// come from the Quick dashboard.
+  bool _shouldFetchProductCategories(DeliveryType type) {
+    return type == DeliveryType.standard;
   }
 
   void _fetchCategoriesForSelectedDeliveryType() {
@@ -67,7 +81,7 @@ class _HomeHeaderState extends State<HomeHeader>
   @override
   void initState() {
     super.initState();
-    if (_shouldShowProductCategories(widget.selectedDeliveryType)) {
+    if (_shouldFetchProductCategories(widget.selectedDeliveryType)) {
       _fetchCategoriesForSelectedDeliveryType();
     }
     _petalController = AnimationController(
@@ -106,7 +120,7 @@ class _HomeHeaderState extends State<HomeHeader>
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.selectedDeliveryType != widget.selectedDeliveryType) {
-      if (_shouldShowProductCategories(widget.selectedDeliveryType)) {
+      if (_shouldFetchProductCategories(widget.selectedDeliveryType)) {
         _fetchCategoriesForSelectedDeliveryType();
       } else if (_categories.isNotEmpty || _isLoading) {
         setState(() {
@@ -523,21 +537,28 @@ class _HomeHeaderState extends State<HomeHeader>
         }
       },
       builder: (context, state) {
-        if (_isLoading && _categories.isEmpty) {
+        final isQuick = widget.selectedDeliveryType == DeliveryType.quick;
+        final categories = isQuick
+            ? (widget.quickCategories ?? const <Category>[])
+                .where((category) => category.parentId == null)
+                .toList()
+            : _categories;
+
+        if (!isQuick && _isLoading && categories.isEmpty) {
           return const SizedBox.shrink();
         }
 
-        if (_categories.isEmpty) {
+        if (categories.isEmpty) {
           return const SizedBox.shrink();
         }
 
         return ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 14),
-          itemCount: _categories.length,
+          itemCount: categories.length,
           separatorBuilder: (context, index) => const SizedBox(width: 14),
           itemBuilder: (context, index) {
-            final category = _categories[index];
+            final category = categories[index];
             return InkWell(
               onTap: () {
                 final delivery =

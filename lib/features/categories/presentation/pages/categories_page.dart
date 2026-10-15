@@ -7,7 +7,12 @@ import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/core/utils/quick_location.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_state.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_state_views.dart';
 import 'package:taksh_e_commerce/features/address/presentation/widgets/address_selection_bottom_sheet.dart';
 import 'package:taksh_e_commerce/features/categories/presentation/widgets/widgets.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
@@ -46,19 +51,32 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   /// Category id the standard grid is currently showing (parent or sub).
   int? _activeCategoryId;
-  static const double _defaultLatitude = 23.0695;
-  static const double _defaultLongitude = 72.6738;
 
   bool get _isQuickDelivery => _homeDeliveryType == DeliveryType.quick;
 
-  double get _latitude {
-    final lat = _selectedAddress?.location.latitude;
-    return (lat != null && lat != 0.0) ? lat : _defaultLatitude;
+  /// Address chosen on this page, else the delivery address selected app-wide.
+  Address? get _effectiveAddress {
+    if (_selectedAddress != null) return _selectedAddress;
+    final state = context.read<AddressBloc>().state;
+    return state is AddressesLoaded ? state.selectedAddress : null;
   }
 
-  double get _longitude {
-    final lng = _selectedAddress?.location.longitude;
-    return (lng != null && lng != 0.0) ? lng : _defaultLongitude;
+  /// Quick location of the effective address; null when it has no valid
+  /// coordinates (the Quick API is then never called).
+  QuickLocation? get _quickLocation =>
+      quickLocationFromAddress(_effectiveAddress);
+
+  Future<void> _pickQuickAddress() async {
+    final selected = await AddressSelectionBottomSheet.show(
+      context,
+      currentAddress: _effectiveAddress,
+    );
+    if (selected == null || !mounted) return;
+    context.read<AddressBloc>().add(SelectAddressForDeliveryEvent(selected));
+    setState(() => _selectedAddress = selected);
+    if (_categories.isNotEmpty && _selectedIndex < _categories.length) {
+      _fetchProductsForCategory(_categories[_selectedIndex].id);
+    }
   }
 
   @override
@@ -98,10 +116,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   void _fetchProductsForCategory(int categoryId) {
     if (_isQuickDelivery) {
+      final location = _quickLocation;
+      if (location == null) return;
       context.read<ProductCubit>().fetchExpressProducts(
         categoryId: categoryId,
-        latitude: _latitude,
-        longitude: _longitude,
+        latitude: location.latitude,
+        longitude: location.longitude,
       );
     } else {
       _activeCategoryId = categoryId;
@@ -567,6 +587,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Widget _buildProductsGrid(ProductState state) {
+    if (_isQuickDelivery && _quickLocation == null) {
+      return QuickLocationNeededView(onSelectAddress: _pickQuickAddress);
+    }
+
+    if (_isQuickDelivery && state is ProductNotServiceable) {
+      return QuickNotServiceableView(
+        message: state.message,
+        onChangeAddress: _pickQuickAddress,
+      );
+    }
+
     if (state is ProductListLoading) {
       return const Center(child: CircularProgressIndicator());
     }

@@ -53,6 +53,16 @@ class BadRequestException extends AppException {
   const BadRequestException([super.message = 'Bad request', super.statusCode]);
 }
 
+/// A 400/404/422 API error whose body carries a machine readable `data.code`
+/// (e.g. `quick_not_serviceable`, `delivery_bucket_mismatch`). It extends
+/// [BadRequestException] so existing handlers keep working.
+class CodedApiException extends BadRequestException {
+  final String code;
+
+  const CodedApiException(String message, int? statusCode, this.code)
+      : super(message, statusCode);
+}
+
 /// General/unknown exceptions
 class GeneralException extends AppException {
   const GeneralException(

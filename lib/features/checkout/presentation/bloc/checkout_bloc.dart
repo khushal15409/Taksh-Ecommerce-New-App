@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taksh_e_commerce/core/error/failures.dart';
+import 'package:taksh_e_commerce/core/utils/quick_serviceability.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart_item.dart';
@@ -8,6 +10,9 @@ import 'package:taksh_e_commerce/features/checkout/data/datasources/checkout_moc
 import 'package:taksh_e_commerce/features/checkout/data/datasources/checkout_remote_datasource_impl.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/checkout_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_option.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_quote.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/quick_checkout_gate.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/usecases/get_delivery_quote.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/order_request.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/price_breakdown.dart';
@@ -28,6 +33,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   final CalculateCheckout _calculateCheckout;
   // ignore: unused_field
   final GetDeliveryOptions _getDeliveryOptions;
+  final GetDeliveryQuote _getDeliveryQuote;
   final ValidateCheckout _validateCheckout;
   final CreateOrder _createOrder;
   final PlaceOrder _placeOrder;
@@ -48,6 +54,14 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   String? _lastPlacedOrderNumber;
   bool _lastPlacedWasQuickDelivery = false;
 
+  /// Server quote of Quick delivery for [_quickQuoteAddressId] (null = not
+  /// established yet or the request failed: Quick stays blocked).
+  DeliveryQuote? _quickQuote;
+  String? _quickQuoteAddressId;
+
+  /// The last quote request failed (network/server); it is retried, not cached.
+  bool _quickQuoteFailed = false;
+
   /// Cached delivery mode for the current item selection (set when address is selected)
   CartDeliveryMode _cartDeliveryMode = CartDeliveryMode.standardOnly;
   List<DeliveryOption> _currentDeliveryOptions = [
@@ -59,6 +73,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   CheckoutBloc({
     required CalculateCheckout calculateCheckout,
     required GetDeliveryOptions getDeliveryOptions,
+    required GetDeliveryQuote getDeliveryQuote,
     required ValidateCheckout validateCheckout,
     required CreateOrder createOrder,
     required PlaceOrder placeOrder,
@@ -67,6 +82,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     required CheckDeliveryAvailability checkDeliveryAvailability,
   }) : _calculateCheckout = calculateCheckout,
        _getDeliveryOptions = getDeliveryOptions,
+       _getDeliveryQuote = getDeliveryQuote,
        _validateCheckout = validateCheckout,
        _createOrder = createOrder,
        _placeOrder = placeOrder,
@@ -227,6 +243,11 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   ) async {
     _log.infoWithContext('Address selected', {'addressId': event.address.id});
 
+    if (_quickQuoteAddressId != event.address.id) {
+      // The quote belongs to one address: forget it when the address changes.
+      _quickQuote = null;
+      _quickQuoteAddressId = null;
+    }
     _selectedAddress = event.address;
     emit(AddressSelected(event.address));
 
@@ -260,6 +281,9 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   ) async {
     emit(DeliveryOptionsLoading(selectedAddress: _selectedAddress));
 
+    // Standard is always offered. Quick is offered but only usable once the
+    // server quote for this address says it is serviceable (see
+    // [isQuickCheckoutBlocked]); nothing is enabled by default.
     final options = [
       DeliveryOption.normal().copyWith(isAvailable: true),
       // DeliveryOption.oneDay().copyWith(isAvailable: true),
@@ -269,6 +293,9 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     _cartDeliveryMode = CartDeliveryMode.standardOnly;
 
     _selectedDeliveryOption ??= DeliveryOption.normal();
+    if (_selectedDeliveryOption!.isExpress) {
+      await _refreshQuickQuote();
+    }
     final selectedType = _selectedDeliveryOption!.type;
     _selectedDeliveryOption = options.firstWhere(
       (option) => option.type == selectedType,
@@ -300,6 +327,9 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     });
 
     _selectedDeliveryOption = event.option;
+    if (event.option.isExpress) {
+      await _refreshQuickQuote();
+    }
 
     // Recalculate checkout with selected delivery option.
     if (_selectedItemIds.isNotEmpty) {
@@ -332,6 +362,12 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     if (_selectedDeliveryOption == null) {
       emit(const CheckoutError('No delivery option selected'));
       return;
+    }
+
+    // A Quick selection needs its server quote before the totals are shown.
+    if (_selectedDeliveryOption!.isExpress &&
+        (_quickQuote == null || _quickQuoteFailed)) {
+      await _refreshQuickQuote();
     }
 
     emit(const CheckoutCalculating());
@@ -520,6 +556,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     _lastPlacedOrderId = null;
     _lastPlacedOrderNumber = null;
     _lastPlacedWasQuickDelivery = false;
+    _quickQuote = null;
+    _quickQuoteAddressId = null;
     _currentDeliveryOptions = [
       DeliveryOption.normal().copyWith(isAvailable: true),
       // DeliveryOption.oneDay().copyWith(isAvailable: true),
@@ -544,6 +582,20 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       return;
     }
 
+    // Fail closed: Quick needs a serviceable server quote for this address.
+    if (isQuickCheckoutBlocked(
+      quickSelected: _selectedDeliveryOption!.isExpress,
+      quote: _quickQuote,
+    )) {
+      emit(
+        CheckoutError(
+          quickBlockMessage ?? '',
+          code: quickNotServiceableCode,
+        ),
+      );
+      return;
+    }
+
     emit(const OrderCreating());
 
     final params = PlaceOrderParams(
@@ -562,7 +614,25 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         _log.errorWithContext('Failed to place order', {
           'error': failure.message,
         });
-        emit(CheckoutError(failure.message));
+        if (failure is ApiCodeFailure &&
+            isQuickServiceabilityCode(failure.code)) {
+          // The server refused Quick for this address: keep the user on
+          // checkout, block Quick until the address changes.
+          _quickQuote = DeliveryQuote(
+            deliveryType: '30_min',
+            checked: true,
+            serviceable: false,
+            code: failure.code,
+            message: failure.message,
+          );
+          _quickQuoteAddressId = _selectedAddress?.id;
+        }
+        emit(
+          CheckoutError(
+            failure.message,
+            code: failure is ApiCodeFailure ? failure.code : null,
+          ),
+        );
       },
       (response) {
         _log.infoWithContext('Order placed successfully', {
@@ -742,6 +812,57 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
     emit(CheckoutCalculated(summary: summary, appliedCoupon: _appliedCoupon));
   }
+
+  /// Requests the Quick quote for the selected address (fails closed).
+  Future<void> _refreshQuickQuote() async {
+    final address = _selectedAddress;
+    if (address == null) {
+      _quickQuote = null;
+      _quickQuoteAddressId = null;
+      return;
+    }
+    // A failed quote is never reused: the next attempt asks the server again.
+    if (_quickQuoteAddressId == address.id &&
+        _quickQuote != null &&
+        !_quickQuoteFailed) {
+      return;
+    }
+
+    _quickQuote = null;
+    _quickQuoteFailed = false;
+    _quickQuoteAddressId = address.id;
+
+    final result = await _getDeliveryQuote(
+      GetDeliveryQuoteParams(deliveryType: '30_min', addressId: address.id),
+    );
+
+    // The address changed while the request was running: drop the answer.
+    if (isClosed || _selectedAddress?.id != address.id) return;
+
+    result.fold(
+      (failure) {
+        _log.errorWithContext('Quick quote failed', {'error': failure.message});
+        _quickQuoteFailed = true;
+        _quickQuote = failedQuote(
+          message: failure is ApiCodeFailure ? failure.message : null,
+        );
+      },
+      (quote) {
+        _quickQuote = quote;
+      },
+    );
+  }
+
+  /// Whether the selected delivery option is Quick but not (yet) confirmed
+  /// serviceable by the server: Place Order must stay disabled.
+  bool get isQuickBlocked => isQuickCheckoutBlocked(
+    quickSelected: _selectedDeliveryOption?.isExpress ?? false,
+    quote: _quickQuote,
+  );
+
+  /// Server message explaining why Quick is blocked (null = use the generic
+  /// localized text).
+  String? get quickBlockMessage => _quickQuote?.message;
 
   /// Id of the order this bloc placed last (null before any order was placed)
   int? get lastPlacedOrderId => _lastPlacedOrderId;

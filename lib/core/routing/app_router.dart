@@ -43,6 +43,7 @@ import 'package:taksh_e_commerce/features/payment/presentation/pages/payment_fai
 import 'package:taksh_e_commerce/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:taksh_e_commerce/features/quick_delivery/presentation/cubit/quick_delivery_tracking_cubit.dart';
 import 'package:taksh_e_commerce/features/quick_delivery/presentation/pages/express_products_page.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_state_views.dart';
 import 'package:taksh_e_commerce/features/quick_delivery/presentation/pages/quick_delivery_tracking_page.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/pages/wishlist_page.dart';
@@ -434,16 +435,17 @@ class AppRouter {
         final args = state.extra as ExpressProductsArgs?;
         return CustomTransitionPage(
           key: state.pageKey,
-          child: ExpressProductsPage(
-            args:
-                args ??
-                const ExpressProductsArgs(
-                  categoryId: 0,
-                  categoryName: 'Express Products',
-                  latitude: 23.0225,
-                  longitude: 72.5714,
+          // Without arguments there is no delivery location: never invent one.
+          child: args != null
+              ? ExpressProductsPage(args: args)
+              : Builder(
+                  builder: (ctx) => Scaffold(
+                    appBar: AppBar(),
+                    body: QuickLocationNeededView(
+                      onSelectAddress: () => ctx.go(AppRoutes.home),
+                    ),
+                  ),
                 ),
-          ),
           transitionsBuilder: _slideTransition,
         );
       },

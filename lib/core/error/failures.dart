@@ -54,3 +54,13 @@ class TimeoutFailure extends Failure {
 class BadRequestFailure extends Failure {
   const BadRequestFailure([super.message = 'Bad request']);
 }
+
+/// Failure carrying a machine readable API error code (`data.code`).
+class ApiCodeFailure extends Failure {
+  final String code;
+
+  const ApiCodeFailure(super.message, this.code);
+
+  @override
+  List<Object?> get props => [message, code];
+}

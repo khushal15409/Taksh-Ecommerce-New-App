@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/features/orders/domain/order_delivery_mode.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/orders/domain/entities/order.dart';
 import 'package:taksh_e_commerce/features/orders/domain/entities/order_charge.dart';
@@ -315,7 +316,12 @@ class OrderModel extends Order {
       addressId: parseRequiredInt(json['address_id']),
       orderNumber: parseString(json['order_number'], fallback: 'N/A'),
       deliveryType: deliveryTypeRaw,
-      isExpress: parseBool(json['is_express']) || deliveryTypeRaw == '30_min',
+      // Single rule shared with the order list/detail screens.
+      isExpress: resolveIsQuickOrder(
+        isQuick: json['is_quick'],
+        deliveryType: deliveryTypeRaw,
+        isExpress: json['is_express'],
+      ),
       slaMinutes: parseRequiredInt(json['sla_minutes']),
       estimatedDeliveryTime: parseOptionalDate(json['estimated_delivery_time']),
       confirmedAt: parseOptionalDate(json['confirmed_at']),

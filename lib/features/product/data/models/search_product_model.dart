@@ -11,6 +11,7 @@ class SearchProductModel extends SearchProduct {
     super.mrp,
     super.imageUrl,
     required super.inStock,
+    super.isExpress30,
   });
 
   factory SearchProductModel.fromJson(DataMap json) {
@@ -22,6 +23,17 @@ class SearchProductModel extends SearchProduct {
       mrp: (json['mrp'] as num?)?.toDouble(),
       imageUrl: json['image'] as String?,
       inStock: json['in_stock'] as bool? ?? false,
+      isExpress30: _asFlag(json['is_express_30']),
     );
   }
+}
+
+bool _asFlag(Object? value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final v = value.trim().toLowerCase();
+    return v == '1' || v == 'true';
+  }
+  return false;
 }

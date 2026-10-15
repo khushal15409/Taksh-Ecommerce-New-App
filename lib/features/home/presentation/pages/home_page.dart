@@ -5,6 +5,11 @@ import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
+import 'package:taksh_e_commerce/core/utils/quick_location.dart';
+import 'package:taksh_e_commerce/features/splash/presentation/cubit/splash_cubit.dart';
+import 'package:taksh_e_commerce/features/home/domain/entities/express_dashboard_entity.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_state_views.dart';
+import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
@@ -54,14 +59,17 @@ class _HomePageContent extends StatefulWidget {
 
 class _HomePageState extends State<_HomePageContent> {
   final _log = loggerWithContext({'feature': 'home', 'page': 'HomePage'});
-  static const double _defaultLatitude = 23.0695;
-  static const double _defaultLongitude = 72.6738;
-  static const String _defaultPincode = '382330';
+  // Standard dashboard only: used when no usable location exists. The Quick
+  // dashboard never uses made-up coordinates.
+  static const double _standardFallbackLatitude = 23.0695;
+  static const double _standardFallbackLongitude = 72.6738;
   final ScrollController _scrollController = ScrollController();
 
   // Tab selection state - default to standard delivery where products are displayed
   DeliveryType _selectedDeliveryType = DeliveryType.standard;
-  bool _expressLoaded = false;
+  /// Location of the last Quick dashboard request (null = none yet). Used to
+  /// reload only when the selected address/coordinates really change.
+  QuickLocation? _lastQuickRequest;
   int _servicesReloadCount = 0;
 
   @override
@@ -69,9 +77,83 @@ class _HomePageState extends State<_HomePageContent> {
     super.initState();
     _log.infoWithContext('Home page displayed', {'action': 'init'});
     _ensureAddressesLoaded();
-    _selectedDeliveryType = widget.initialDeliveryType;
+    // Quick delivery needs a signed-in user (the API rejects guests).
+    final isAuthenticated = context.read<AuthBloc>().state is Authenticated;
+    _selectedDeliveryType =
+        widget.initialDeliveryType == DeliveryType.quick && !isAuthenticated
+        ? DeliveryType.standard
+        : widget.initialDeliveryType;
     _loadDashboard();
-    _loadExpressDashboard();
+    // The Quick dashboard is requested lazily, when the Quick tab is used.
+    _loadQuickIfNeeded();
+  }
+
+  /// Addresses currently known to the AddressBloc, or null while they are
+  /// still loading (no Quick request must be made with a partial picture).
+  ({Address? selected, List<Address> saved})? _addressSnapshot() {
+    final state = context.read<AddressBloc>().state;
+    if (state is AddressesLoaded) {
+      return (selected: state.selectedAddress, saved: state.addresses);
+    }
+    if (state is AddressOperationSuccess) {
+      return (selected: state.selectedAddress, saved: state.addresses);
+    }
+    if (state is AddressOperationError) {
+      return (selected: state.selectedAddress, saved: state.addresses);
+    }
+    if (state is AddressError) {
+      return (selected: null, saved: const <Address>[]);
+    }
+    return null; // AddressInitial / AddressLoading
+  }
+
+  /// Selected/saved address first, device location only when there is no
+  /// saved address at all; never invented coordinates.
+  QuickLocation? _resolveQuickLocation({Address? selectedOverride}) {
+    final snapshot = _addressSnapshot();
+    if (snapshot == null && selectedOverride == null) return null;
+    final splash = context.read<SplashCubit>();
+    final device = splash.currentLocation;
+    return resolveQuickLocation(
+      selected: selectedOverride ?? snapshot?.selected,
+      saved: snapshot?.saved ?? const <Address>[],
+      deviceLatitude: device?.latitude,
+      deviceLongitude: device?.longitude,
+      deviceAllowed: splash.hasLocationPermission,
+    );
+  }
+
+  /// Requests the Quick dashboard when the Quick tab is in use, the user is
+  /// signed in and the location differs from the last request. Called on
+  /// address / auth / tab changes; it never loops because the last requested
+  /// location is compared first.
+  void _loadQuickIfNeeded({bool force = false, Address? selectedOverride}) {
+    if (!mounted || _selectedDeliveryType != DeliveryType.quick) return;
+    if (context.read<AuthBloc>().state is! Authenticated) return;
+
+    // Addresses still loading: wait, a partial picture must not trigger a
+    // request (nor reset the last requested location).
+    if (_addressSnapshot() == null && selectedOverride == null) return;
+
+    final location = _resolveQuickLocation(selectedOverride: selectedOverride);
+    if (location == null) {
+      _lastQuickRequest = null;
+      return;
+    }
+    if (!force && !shouldReloadQuick(_lastQuickRequest, location)) return;
+
+    _lastQuickRequest = location;
+    _log.infoWithContext('Loading express dashboard', {
+      'address_id': location.addressId,
+      'source': location.source.name,
+    });
+    context.read<ExpressDashboardBloc>().add(
+      ExpressDashboardLoadRequested(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        pincode: location.pincode,
+      ),
+    );
   }
 
   void _ensureAddressesLoaded() {
@@ -129,63 +211,50 @@ class _HomePageState extends State<_HomePageContent> {
   }
 
   void _loadDashboard() {
+    final location = _resolveQuickLocation();
+    final latitude = location?.latitude ?? _standardFallbackLatitude;
+    final longitude = location?.longitude ?? _standardFallbackLongitude;
     _log.infoWithContext('Loading dashboard', {
-      'latitude': _defaultLatitude,
-      'longitude': _defaultLongitude,
+      'latitude': latitude,
+      'longitude': longitude,
     });
     context.read<DashboardBloc>().add(
-      const DashboardLoadRequested(
-        latitude: _defaultLatitude,
-        longitude: _defaultLongitude,
-      ),
+      DashboardLoadRequested(latitude: latitude, longitude: longitude),
     );
   }
 
   void _refreshDashboard() {
+    final location = _resolveQuickLocation();
+    final latitude = location?.latitude ?? _standardFallbackLatitude;
+    final longitude = location?.longitude ?? _standardFallbackLongitude;
     _log.infoWithContext('Refreshing dashboard', {
-      'latitude': _defaultLatitude,
-      'longitude': _defaultLongitude,
+      'latitude': latitude,
+      'longitude': longitude,
     });
     context.read<DashboardBloc>().add(
-      const DashboardRefreshRequested(
-        latitude: _defaultLatitude,
-        longitude: _defaultLongitude,
-      ),
+      DashboardRefreshRequested(latitude: latitude, longitude: longitude),
     );
-  }
-
-  void _loadExpressDashboard() {
-    _log.infoWithContext('Loading express dashboard', {
-      'latitude': _defaultLatitude,
-      'longitude': _defaultLongitude,
-      'pincode': _defaultPincode,
-    });
-    context.read<ExpressDashboardBloc>().add(
-      const ExpressDashboardLoadRequested(
-        latitude: _defaultLatitude,
-        longitude: _defaultLongitude,
-        pincode: _defaultPincode,
-      ),
-    );
-    _expressLoaded = true;
   }
 
   void _refreshExpressDashboard() {
+    final location = _resolveQuickLocation();
+    if (location == null) return;
+    _lastQuickRequest = location;
     _log.infoWithContext('Refreshing express dashboard', {
-      'latitude': _defaultLatitude,
-      'longitude': _defaultLongitude,
-      'pincode': _defaultPincode,
+      'address_id': location.addressId,
+      'source': location.source.name,
     });
     context.read<ExpressDashboardBloc>().add(
-      const ExpressDashboardRefreshRequested(
-        latitude: _defaultLatitude,
-        longitude: _defaultLongitude,
-        pincode: _defaultPincode,
+      ExpressDashboardRefreshRequested(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        pincode: location.pincode,
       ),
     );
   }
 
   Future<void> _onDeliveryTypeChanged(DeliveryType type) async {
+    Address? pickedAddress;
     if (type == DeliveryType.quick) {
       // Guest users must log in before using quick delivery.
       final authState = context.read<AuthBloc>().state;
@@ -213,6 +282,7 @@ class _HomePageState extends State<_HomePageContent> {
       }
 
       if (!mounted) return;
+      pickedAddress = selectedAddress;
       // Dispatch event to update selected address in bloc
       context.read<AddressBloc>().add(
         SelectAddressForDeliveryEvent(selectedAddress),
@@ -223,8 +293,10 @@ class _HomePageState extends State<_HomePageContent> {
       _selectedDeliveryType = type;
     });
 
-    if (type == DeliveryType.quick && !_expressLoaded) {
-      _loadExpressDashboard();
+    if (type == DeliveryType.quick) {
+      // The picked address is passed explicitly: the bloc has not applied the
+      // selection yet, and the address listener would otherwise reload again.
+      _loadQuickIfNeeded(selectedOverride: pickedAddress);
     }
   }
 
@@ -246,14 +318,18 @@ class _HomePageState extends State<_HomePageContent> {
         break;
       case DeliveryType.quick:
         final bloc = context.read<ExpressDashboardBloc>();
+        if (_resolveQuickLocation() == null) break;
         if (bloc.state is ExpressDashboardLoaded) {
           _refreshExpressDashboard();
         } else {
-          _loadExpressDashboard();
+          _loadQuickIfNeeded(force: true);
         }
         await _waitFor(
           bloc.stream,
-          (s) => s is ExpressDashboardLoaded || s is ExpressDashboardError,
+          (s) =>
+              s is ExpressDashboardLoaded ||
+              s is ExpressDashboardError ||
+              s is ExpressDashboardNotServiceable,
         );
         break;
       case DeliveryType.services:
@@ -280,14 +356,26 @@ class _HomePageState extends State<_HomePageContent> {
     return MultiBlocListener(
       listeners: [
         BlocListener<AuthBloc, AuthState>(
-          listenWhen: (previous, current) => current is Authenticated,
+          listenWhen: (previous, current) =>
+              current is Authenticated || current is Unauthenticated,
           listener: (context, state) {
+            if (state is Unauthenticated) {
+              // Quick is for signed-in users only.
+              if (_selectedDeliveryType == DeliveryType.quick) {
+                setState(() => _selectedDeliveryType = DeliveryType.standard);
+              }
+              _lastQuickRequest = null;
+              return;
+            }
             _ensureAddressesLoaded();
+            _loadQuickIfNeeded();
           },
         ),
         BlocListener<AddressBloc, AddressState>(
           listener: (context, state) {
             // The selected delivery address is maintained in AddressBloc.
+            // Reload Quick only when the selected address/coordinates changed.
+            _loadQuickIfNeeded();
           },
         ),
       ],
@@ -327,11 +415,14 @@ class _HomePageState extends State<_HomePageContent> {
                 ),
                 Column(
                   children: [
-                    HomeHeader(
-                      selectedDeliveryType: _selectedDeliveryType,
-                      onDeliveryTypeChanged: _onDeliveryTypeChanged,
-                      selectedAddress: selectedAddress,
-                      onAddressTap: _showAddressSelectionBottomSheet,
+                    BlocBuilder<ExpressDashboardBloc, ExpressDashboardState>(
+                      builder: (context, quickState) => HomeHeader(
+                        selectedDeliveryType: _selectedDeliveryType,
+                        onDeliveryTypeChanged: _onDeliveryTypeChanged,
+                        selectedAddress: selectedAddress,
+                        onAddressTap: _showAddressSelectionBottomSheet,
+                        quickCategories: _quickCategoriesOf(quickState),
+                      ),
                     ),
                     // Only this area scrolls: it starts at the promo banner.
                     Expanded(
@@ -370,7 +461,7 @@ class _HomePageState extends State<_HomePageContent> {
                 }
 
                 if (state is DashboardError) {
-                  return _buildErrorState(state.message);
+                  return _buildErrorState(state.message, onRetry: _loadDashboard);
                 }
 
                 if (state is DashboardLoaded || state is DashboardRefreshing) {
@@ -391,12 +482,34 @@ class _HomePageState extends State<_HomePageContent> {
           children: [
             BlocBuilder<ExpressDashboardBloc, ExpressDashboardState>(
               builder: (context, state) {
+                final location = _resolveQuickLocation();
+                final addressesLoading = _addressSnapshot() == null;
+
+                if (location == null) {
+                  if (addressesLoading) return const DashboardShimmer();
+                  // No address with a valid map location: never call the
+                  // Quick API with made-up coordinates.
+                  return QuickLocationNeededView(
+                    onSelectAddress: _showAddressSelectionBottomSheet,
+                  );
+                }
+
                 if (state is ExpressDashboardLoading) {
                   return const DashboardShimmer();
                 }
 
+                if (state is ExpressDashboardNotServiceable) {
+                  return QuickNotServiceableView(
+                    message: state.message,
+                    onChangeAddress: _showAddressSelectionBottomSheet,
+                  );
+                }
+
                 if (state is ExpressDashboardError) {
-                  return _buildErrorState(state.message);
+                  return _buildErrorState(
+                    state.message,
+                    onRetry: () => _loadQuickIfNeeded(force: true),
+                  );
                 }
 
                 if (state is ExpressDashboardLoaded ||
@@ -407,8 +520,8 @@ class _HomePageState extends State<_HomePageContent> {
 
                   return ExpressDashboardContent(
                     dashboard: dashboard,
-                    latitude: _defaultLatitude,
-                    longitude: _defaultLongitude,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
                     onProductTap: (product) {
                       context.push(
                         AppRoutes.productDetails(product.id),
@@ -431,7 +544,22 @@ class _HomePageState extends State<_HomePageContent> {
     }
   }
 
-  Widget _buildErrorState(String message) {
+  List<Category>? _quickCategoriesOf(ExpressDashboardState state) {
+    final ExpressDashboardEntity? dashboard = state is ExpressDashboardLoaded
+        ? state.dashboard
+        : state is ExpressDashboardRefreshing
+        ? state.dashboard
+        : null;
+    if (dashboard == null) return null;
+    for (final section in dashboard.sections) {
+      if (section.key == 'Categories') {
+        return section.data.whereType<Category>().toList();
+      }
+    }
+    return null;
+  }
+
+  Widget _buildErrorState(String message, {required VoidCallback onRetry}) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -465,7 +593,7 @@ class _HomePageState extends State<_HomePageContent> {
                 ],
               ),
               child: ElevatedButton.icon(
-                onPressed: _loadDashboard,
+                onPressed: onRetry,
                 icon: const Icon(Icons.refresh, color: Colors.white),
                 label: const Text(
                   'Try Again',

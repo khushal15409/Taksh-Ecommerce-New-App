@@ -25,8 +25,8 @@ class ExpressDashboardContent extends StatelessWidget {
     super.key,
     required this.dashboard,
     this.onProductTap,
-    this.latitude = 23.0225,
-    this.longitude = 72.5714,
+    required this.latitude,
+    required this.longitude,
   });
 
   static final _log = loggerWithContext({

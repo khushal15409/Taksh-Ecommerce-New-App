@@ -9,6 +9,7 @@ import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart
 import 'package:taksh_e_commerce/features/checkout/data/datasources/checkout_remote_datasource.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/checkout_summary_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/delivery_option_model.dart';
+import 'package:taksh_e_commerce/features/checkout/data/models/delivery_quote_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/place_order_request_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/place_order_response_model.dart';
 import 'package:taksh_e_commerce/features/checkout/data/models/price_breakdown_model.dart';
@@ -68,9 +69,12 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
         ?.cast<String, dynamic>();
     final deliveryCode = (deliveryCharge?['code']?.toString() ?? deliveryType)
         .trim();
-    final estimatedMinutes =
-        _toInt(deliveryCharge?['estimated_minutes']) ??
-        _defaultSlaFor(deliveryCode);
+    // Quick delivery has no real ETA source: the server value is a static
+    // placeholder, so it is never shown as a promise (0 = no estimate).
+    final estimatedMinutes = deliveryCode == '30_min'
+        ? 0
+        : (_toInt(deliveryCharge?['estimated_minutes']) ??
+              _defaultSlaFor(deliveryCode));
     final deliveryChargeRupees = _toDouble(deliveryCharge?['price']) ?? 0.0;
 
     final chargesRaw = (cart['charges'] as List?)?.whereType<Map>() ?? const [];
@@ -173,12 +177,43 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
       ),
       DeliveryOptionModel(
         type: '30_min',
-        displayName: 'Express Delivery',
+        displayName: 'Quick Delivery',
         charges: 0,
-        slaMinutes: 30,
+        slaMinutes: 0,
         isAvailable: true,
       ),
     ];
+  }
+
+  @override
+  Future<DeliveryQuoteModel> getDeliveryQuote({
+    required String deliveryType,
+    required String addressId,
+  }) async {
+    _log.infoWithContext('Requesting delivery quote', {
+      'deliveryType': deliveryType,
+      'addressId': addressId,
+    });
+
+    // Only the delivery type and the saved address id are sent: the server
+    // owns the serviceability decision (no coordinates, no radius).
+    final response = await apiClient.get(
+      ApiConstants.cartQuote,
+      queryParameters: {
+        'delivery_type': deliveryType,
+        'address_id': addressId,
+      },
+    );
+
+    final root = response.data;
+    final data = root is Map ? root['data'] : null;
+    if (data is! Map) {
+      throw const ServerException('Delivery quote not received');
+    }
+    return DeliveryQuoteModel.fromJson(
+      data.cast<String, dynamic>(),
+      deliveryType: deliveryType,
+    );
   }
 
   DeliveryOptionModel _mapDeliveryOption({
@@ -188,7 +223,7 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
   }) {
     final normalized = code.trim();
     final displayName = switch (normalized) {
-      '30_min' => 'Express Delivery',
+      '30_min' => 'Quick Delivery',
       '1_day' => '1-Day Delivery',
       _ => 'Standard Delivery',
     };
@@ -204,7 +239,7 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
 
   int _defaultSlaFor(String code) {
     return switch (code.trim()) {
-      '30_min' => 30,
+      '30_min' => 0,
       '1_day' => 1440,
       _ => 2880,
     };
@@ -340,6 +375,9 @@ class CheckoutRemoteDataSourceImpl implements CheckoutRemoteDataSource {
         'error': e.message,
       });
       throw ServerException(e.message);
+    } on CodedApiException {
+      // quick_location_required / quick_not_serviceable keep their code.
+      rethrow;
     } on BadRequestException catch (e) {
       _log.errorWithContext('Bad request error placing order', {
         'error': e.message,

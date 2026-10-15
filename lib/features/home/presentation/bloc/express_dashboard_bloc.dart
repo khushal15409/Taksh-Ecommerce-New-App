@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
+import 'package:taksh_e_commerce/core/utils/request_guard.dart';
+import 'package:taksh_e_commerce/features/home/domain/entities/express_dashboard_entity.dart';
 import 'package:taksh_e_commerce/features/home/domain/usecases/get_express_dashboard_usecase.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/express_dashboard_event.dart';
 import 'package:taksh_e_commerce/features/home/presentation/bloc/express_dashboard_state.dart';
@@ -8,6 +10,22 @@ import 'package:taksh_e_commerce/features/home/presentation/bloc/express_dashboa
 class ExpressDashboardBloc
     extends Bloc<ExpressDashboardEvent, ExpressDashboardState> {
   final GetExpressDashboardUseCase _getExpressDashboardUseCase;
+
+  /// Drops responses of an older location when requests overlap.
+  final RequestGuard _guard = RequestGuard();
+
+  static String _key(double lat, double lng, String pincode) =>
+      '${lat.toStringAsFixed(5)}|${lng.toStringAsFixed(5)}|$pincode';
+
+  ExpressDashboardState _stateFor(ExpressDashboardEntity dashboard) {
+    if (!dashboard.serviceable) {
+      return ExpressDashboardNotServiceable(
+        message: dashboard.message,
+        code: dashboard.code,
+      );
+    }
+    return ExpressDashboardLoaded(dashboard);
+  }
 
   ExpressDashboardBloc({
     required GetExpressDashboardUseCase getExpressDashboardUseCase,
@@ -36,6 +54,8 @@ class ExpressDashboardBloc
       },
     );
 
+    final token =
+        _guard.begin(_key(event.latitude, event.longitude, event.pincode));
     emit(const ExpressDashboardLoading());
 
     final params = ExpressDashboardParams(
@@ -45,6 +65,7 @@ class ExpressDashboardBloc
     );
 
     final result = await _getExpressDashboardUseCase(params);
+    if (emit.isDone || !_guard.isCurrent(token)) return;
 
     result.fold(
       (failure) {
@@ -59,7 +80,7 @@ class ExpressDashboardBloc
           'Express dashboard loaded successfully',
           {'sections_count': dashboard.sections.length},
         );
-        emit(ExpressDashboardLoaded(dashboard));
+        emit(_stateFor(dashboard));
       },
     );
   }
@@ -77,6 +98,8 @@ class ExpressDashboardBloc
       },
     );
 
+    final token =
+        _guard.begin(_key(event.latitude, event.longitude, event.pincode));
     if (state is ExpressDashboardLoaded) {
       emit(ExpressDashboardRefreshing(
           (state as ExpressDashboardLoaded).dashboard));
@@ -89,6 +112,7 @@ class ExpressDashboardBloc
     );
 
     final result = await _getExpressDashboardUseCase(params);
+    if (emit.isDone || !_guard.isCurrent(token)) return;
 
     result.fold(
       (failure) {
@@ -108,7 +132,7 @@ class ExpressDashboardBloc
           'Express dashboard refreshed successfully',
           {'sections_count': dashboard.sections.length},
         );
-        emit(ExpressDashboardLoaded(dashboard));
+        emit(_stateFor(dashboard));
       },
     );
   }

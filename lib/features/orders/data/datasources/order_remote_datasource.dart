@@ -13,7 +13,7 @@ import 'package:taksh_e_commerce/features/orders/data/models/return_request_resp
 /// Remote datasource for order operations
 abstract class OrderRemoteDatasource {
   /// Get all orders with pagination
-  Future<OrdersResponseModel> getOrders({int page = 1});
+  Future<OrdersResponseModel> getOrders({int page = 1, String? deliveryMode});
 
   /// Get order details by ID
   Future<OrderResponseModel> getOrderDetails(int orderId);
@@ -60,7 +60,10 @@ class OrderRemoteDatasourceImpl implements OrderRemoteDatasource {
   OrderRemoteDatasourceImpl(this._apiClient);
 
   @override
-  Future<OrdersResponseModel> getOrders({int page = 1}) async {
+  Future<OrdersResponseModel> getOrders({
+    int page = 1,
+    String? deliveryMode,
+  }) async {
     final log = loggerWithContext({
       'feature': 'orders',
       'class': 'OrderRemoteDatasourceImpl',
@@ -73,7 +76,10 @@ class OrderRemoteDatasourceImpl implements OrderRemoteDatasource {
 
       final response = await _apiClient.get(
         ApiConstants.orders,
-        queryParameters: {'page': page},
+        queryParameters: {
+          'page': page,
+          if (deliveryMode != null) 'delivery_mode': deliveryMode,
+        },
       );
 
       final ordersResponse = OrdersResponseModel.fromJson(response.data);

@@ -3,6 +3,7 @@ import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/error/exceptions.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/core/network/base_response_model.dart';
+import 'package:taksh_e_commerce/core/utils/quick_serviceability.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/product/data/models/category_model.dart';
 import 'package:taksh_e_commerce/features/product/data/models/delivery_availability_model.dart';
@@ -167,6 +168,18 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     );
 
     final data = response.data['data'] as DataMap;
+
+    // Defensive: a 2xx body flagged as not serviceable is never a listing.
+    final serviceability = QuickServiceability.fromData(data);
+    if (!serviceability.serviceable) {
+      throw CodedApiException(
+        serviceability.message ??
+            (response.data['message'] as String? ?? ''),
+        response.statusCode,
+        serviceability.code ?? quickNotServiceableCode,
+      );
+    }
+
     return ExpressProductsResponseModel.fromJson(data);
   }
 

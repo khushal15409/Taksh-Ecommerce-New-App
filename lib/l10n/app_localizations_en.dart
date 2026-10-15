@@ -2311,4 +2311,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trustSecurePayment => 'Secure Payment';
+
+  @override
+  String get quickNoCategories => 'No Quick delivery categories are available for this address yet.';
+
+  @override
+  String get quickLocationNeededTitle => 'Select a delivery address';
+
+  @override
+  String get quickLocationNeededBody => 'Quick delivery needs a delivery address with a map location. Choose or add one to see what is available near you.';
+
+  @override
+  String get quickNotServiceableTitle => 'Quick delivery isn\'t available here';
+
+  @override
+  String get quickNotServiceableDefault => 'Quick delivery is not available at this address right now. You can change the address or use Standard delivery.';
+
+  @override
+  String get changeAddress => 'Change address';
+
+  @override
+  String get quickCheckoutUnavailable => 'Quick delivery can\'t be confirmed for this address right now. Please change the address or choose Standard delivery.';
+
+  @override
+  String get quickDeliveryNearbyStore => 'Quick delivery from a nearby store';
 }

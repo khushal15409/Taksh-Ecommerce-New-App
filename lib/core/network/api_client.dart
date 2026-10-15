@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/error/exceptions.dart';
+import 'package:taksh_e_commerce/core/utils/api_error_code.dart';
 import 'package:taksh_e_commerce/core/utils/logger/log_redaction.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/utils/secure_store.dart';
@@ -300,6 +301,20 @@ class ApiClient {
 
         if (kDebugMode) {
           debugPrint('API error response: ${redactForLog(error.response?.data)}');
+        }
+
+        final apiCode = extractApiErrorCode(error.response?.data);
+        if (apiCode != null &&
+            (statusCode == 400 || statusCode == 404 || statusCode == 422)) {
+          final body = error.response?.data;
+          final bodyMessage = body is Map && body['message'] is String
+              ? body['message'] as String
+              : '';
+          return CodedApiException(
+            statusCode == 404 && bodyMessage.isNotEmpty ? bodyMessage : message,
+            statusCode,
+            apiCode,
+          );
         }
 
         switch (statusCode) {

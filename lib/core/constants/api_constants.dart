@@ -53,6 +53,7 @@ class ApiConstants {
 
   /// Cart endpoints
   static const String cart = '/cart/cart';
+  static const String cartQuote = '/cart/quote';
   static const String addToCart = '/cart/add';
   static const String updateCartItem = '/cart/update';
 

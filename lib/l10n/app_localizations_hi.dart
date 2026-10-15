@@ -2322,4 +2322,28 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get trustSecurePayment => 'सुरक्षित भुगतान';
+
+  @override
+  String get quickNoCategories => 'इस पते के लिए अभी कोई क्विक डिलीवरी श्रेणी उपलब्ध नहीं है।';
+
+  @override
+  String get quickLocationNeededTitle => 'डिलीवरी पता चुनें';
+
+  @override
+  String get quickLocationNeededBody => 'क्विक डिलीवरी के लिए मैप लोकेशन वाला डिलीवरी पता चाहिए। अपने पास उपलब्ध चीज़ें देखने के लिए पता चुनें या जोड़ें।';
+
+  @override
+  String get quickNotServiceableTitle => 'क्विक डिलीवरी यहाँ उपलब्ध नहीं है';
+
+  @override
+  String get quickNotServiceableDefault => 'इस पते पर अभी क्विक डिलीवरी उपलब्ध नहीं है। आप पता बदल सकते हैं या स्टैंडर्ड डिलीवरी चुन सकते हैं।';
+
+  @override
+  String get changeAddress => 'पता बदलें';
+
+  @override
+  String get quickCheckoutUnavailable => 'इस पते के लिए अभी क्विक डिलीवरी की पुष्टि नहीं हो सकी। कृपया पता बदलें या स्टैंडर्ड डिलीवरी चुनें।';
+
+  @override
+  String get quickDeliveryNearbyStore => 'पास के स्टोर से क्विक डिलीवरी';
 }
