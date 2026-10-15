@@ -16,6 +16,10 @@ import 'package:taksh_e_commerce/features/address/domain/repositories/address_re
 
 /// Implementation of AddressRepository with remote and local data sources
 class AddressRepositoryImpl implements AddressRepository {
+  /// Plain message for the user: server rules (e.g. an unknown pincode) come as an
+  /// [AppException], whose toString() adds a class name and HTTP status.
+  static String _messageOf(Object e) => e is AppException ? e.message : e.toString();
+
   final AddressRemoteDataSource _remoteDataSource;
   final AddressLocalDataSource _localDataSource;
   final NetworkInfo _networkInfo;
@@ -144,7 +148,7 @@ class AddressRepositoryImpl implements AddressRepository {
           'Failed to get cached addresses after unexpected error',
           {'cache_error': cacheError.toString()},
         );
-        return Left(GeneralFailure(e.toString()));
+        return Left(GeneralFailure(_messageOf(e)));
       }
     }
   }
@@ -181,7 +185,7 @@ class AddressRepositoryImpl implements AddressRepository {
         e,
         stackTrace,
       );
-      return Left(GeneralFailure(e.toString()));
+      return Left(GeneralFailure(_messageOf(e)));
     }
   }
 
@@ -258,7 +262,7 @@ class AddressRepositoryImpl implements AddressRepository {
         e,
         stackTrace,
       );
-      return Left(GeneralFailure(e.toString()));
+      return Left(GeneralFailure(_messageOf(e)));
     }
   }
 
@@ -341,7 +345,7 @@ class AddressRepositoryImpl implements AddressRepository {
         e,
         stackTrace,
       );
-      return Left(GeneralFailure(e.toString()));
+      return Left(GeneralFailure(_messageOf(e)));
     }
   }
 
@@ -411,7 +415,7 @@ class AddressRepositoryImpl implements AddressRepository {
         e,
         stackTrace,
       );
-      return Left(GeneralFailure(e.toString()));
+      return Left(GeneralFailure(_messageOf(e)));
     }
   }
 
@@ -503,7 +507,7 @@ class AddressRepositoryImpl implements AddressRepository {
         e,
         stackTrace,
       );
-      return Left(GeneralFailure(e.toString()));
+      return Left(GeneralFailure(_messageOf(e)));
     }
   }
 
