@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/location.dart';
+import 'package:taksh_e_commerce/features/address/domain/entities/place_suggestion.dart';
 
 /// Base class for all map states
 abstract class MapState extends Equatable {
@@ -50,6 +51,18 @@ class MapSearchResults extends MapState {
 
   @override
   List<Object?> get props => [places, query];
+}
+
+/// Type-ahead suggestions (name + area) for the typed text; coordinates are
+/// fetched when one is picked.
+class MapSuggestionsLoaded extends MapState {
+  final List<PlaceSuggestion> suggestions;
+  final String query;
+
+  const MapSuggestionsLoaded({required this.suggestions, required this.query});
+
+  @override
+  List<Object?> get props => [suggestions, query];
 }
 
 /// Error state

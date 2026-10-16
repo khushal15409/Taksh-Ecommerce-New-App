@@ -16,6 +16,7 @@ import 'package:taksh_e_commerce/features/address/domain/usecases/update_address
 // Data layer
 import 'package:taksh_e_commerce/features/address/data/datasources/address_local_datasource.dart';
 import 'package:taksh_e_commerce/features/address/data/datasources/address_remote_datasource.dart';
+import 'package:taksh_e_commerce/features/address/data/datasources/places_remote_datasource.dart';
 import 'package:taksh_e_commerce/features/address/data/models/address_model.dart';
 import 'package:taksh_e_commerce/features/address/data/models/location_model.dart';
 import 'package:taksh_e_commerce/features/address/data/repositories/address_repository_impl.dart';
@@ -97,6 +98,7 @@ void registerAddressDependencies(GetIt getIt, {bool useMock = false}) {
       getCurrentLocation: getIt(),
       searchPlaces: getIt(),
       getLocationFromLatLng: getIt(),
+      places: PlacesRemoteDataSource(),
     ),
   );
 

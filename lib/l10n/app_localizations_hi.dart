@@ -2352,4 +2352,34 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get loginToAddToCart => 'कार्ट में आइटम जोड़ने के लिए कृपया लॉगिन करें।';
+
+  @override
+  String get quickAvailabilityTitle => 'उपलब्धता';
+
+  @override
+  String get quickAvailabilityChecking => 'आपके पते पर उपलब्धता जाँची जा रही है…';
+
+  @override
+  String get quickAvailabilityAvailable => 'आपके पते पर क्विक डिलीवरी के लिए उपलब्ध';
+
+  @override
+  String get quickAvailabilityNotInArea => 'यह उत्पाद आपके क्षेत्र में अभी उपलब्ध नहीं है।';
+
+  @override
+  String get quickAvailabilityOutOfStock => 'यह उत्पाद अभी स्टॉक में नहीं है।';
+
+  @override
+  String get quickAvailabilityLocationRequired => 'उपलब्धता जाँचने के लिए मानचित्र स्थान वाला पता चुनें।';
+
+  @override
+  String get quickAvailabilityUnavailable => 'यह उत्पाद अभी क्विक डिलीवरी के लिए उपलब्ध नहीं है।';
+
+  @override
+  String get quickAvailabilityFailed => 'हम उपलब्धता नहीं जाँच सके। कृपया फिर से प्रयास करें।';
+
+  @override
+  String get quickBadgeNotInArea => 'आपके क्षेत्र में नहीं';
+
+  @override
+  String get quickCatalogueFallbackNotice => 'इस पते पर क्विक डिलीवरी उपलब्ध नहीं है। आप ये उत्पाद देख सकते हैं।';
 }

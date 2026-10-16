@@ -56,6 +56,9 @@ class ExpressDashboardRemoteDataSourceImpl
           // The API validates a pincode field but never uses it to decide
           // serviceability; a device-location request has none.
           'pincode': pincode.isEmpty ? '000000' : pincode,
+          // Ask for the whole Quick catalogue: orderable products first, the rest
+          // marked with their availability (older servers ignore this flag).
+          'include_unavailable': '1',
         },
       );
 

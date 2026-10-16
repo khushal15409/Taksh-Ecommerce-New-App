@@ -159,6 +159,8 @@ class ApiConstants {
 
   static String productDetails(int productId) => '/products/$productId';
   static const String expressProducts = '/express-30/products';
+  static String quickProductAvailability(int productId) =>
+      '/express-30/products/$productId/availability';
   static const String ecommerceProducts = '/ecommerce/products';
 
   static String ecommerceProductDetails(int productId) =>

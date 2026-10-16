@@ -224,7 +224,7 @@ class _ViewAllProductsPageState extends State<ViewAllProductsPage> {
               onTap: () => context.push(
                 AppRoutes.productDetails(product.id),
                 extra: {
-                  'inStock': product.inStock,
+                  'inStock': product.canOrder,
                   'outOfStockMessage': product.outOfStockMessage,
                 },
               ),

@@ -2341,4 +2341,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginToAddToCart => 'Please login to add items to your cart.';
+
+  @override
+  String get quickAvailabilityTitle => 'Availability';
+
+  @override
+  String get quickAvailabilityChecking => 'Checking availability at your address…';
+
+  @override
+  String get quickAvailabilityAvailable => 'Available for Quick delivery at your address';
+
+  @override
+  String get quickAvailabilityNotInArea => 'This product is not available in your area right now.';
+
+  @override
+  String get quickAvailabilityOutOfStock => 'This product is out of stock right now.';
+
+  @override
+  String get quickAvailabilityLocationRequired => 'Select an address with a map location to check availability.';
+
+  @override
+  String get quickAvailabilityUnavailable => 'This product is not available for Quick delivery right now.';
+
+  @override
+  String get quickAvailabilityFailed => 'We could not check availability. Please try again.';
+
+  @override
+  String get quickBadgeNotInArea => 'Not in your area';
+
+  @override
+  String get quickCatalogueFallbackNotice => 'Quick delivery is not available at this address. You can still browse these products.';
 }

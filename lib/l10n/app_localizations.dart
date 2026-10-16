@@ -4433,4 +4433,64 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
     'that was used.',
   );
+
+  /// No description provided for @quickAvailabilityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability'**
+  String get quickAvailabilityTitle;
+
+  /// No description provided for @quickAvailabilityChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking availability at your address…'**
+  String get quickAvailabilityChecking;
+
+  /// No description provided for @quickAvailabilityAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available for Quick delivery at your address'**
+  String get quickAvailabilityAvailable;
+
+  /// No description provided for @quickAvailabilityNotInArea.
+  ///
+  /// In en, this message translates to:
+  /// **'This product is not available in your area right now.'**
+  String get quickAvailabilityNotInArea;
+
+  /// No description provided for @quickAvailabilityOutOfStock.
+  ///
+  /// In en, this message translates to:
+  /// **'This product is out of stock right now.'**
+  String get quickAvailabilityOutOfStock;
+
+  /// No description provided for @quickAvailabilityLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an address with a map location to check availability.'**
+  String get quickAvailabilityLocationRequired;
+
+  /// No description provided for @quickAvailabilityUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This product is not available for Quick delivery right now.'**
+  String get quickAvailabilityUnavailable;
+
+  /// No description provided for @quickAvailabilityFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not check availability. Please try again.'**
+  String get quickAvailabilityFailed;
+
+  /// No description provided for @quickBadgeNotInArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in your area'**
+  String get quickBadgeNotInArea;
+
+  /// No description provided for @quickCatalogueFallbackNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick delivery is not available at this address. You can still browse these products.'**
+  String get quickCatalogueFallbackNotice;
 }

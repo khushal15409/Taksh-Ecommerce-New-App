@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:taksh_e_commerce/core/utils/money_format.dart';
+import 'package:taksh_e_commerce/core/utils/quick_availability.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product.dart';
 import 'package:taksh_e_commerce/features/product/data/models/brand_model.dart';
@@ -323,6 +324,17 @@ class ProductModel extends Product {
   @JsonKey(name: 'out_of_stock_message')
   final String? outOfStockMessage;
 
+  @override
+  @JsonKey(
+    name: 'availability',
+    fromJson: _availabilityFromJson,
+    includeToJson: false,
+  )
+  final QuickProductAvailability? availability;
+
+  static QuickProductAvailability? _availabilityFromJson(Object? json) =>
+      QuickProductAvailability.fromJson(json);
+
   const ProductModel({
     required super.id,
     required super.categoryId,
@@ -351,6 +363,7 @@ class ProductModel extends Product {
     super.saleId,
     this.inStock = true,
     this.outOfStockMessage,
+    this.availability,
   }) : super(
          brandId: brandId,
          isTrending: isTrending,
@@ -365,6 +378,7 @@ class ProductModel extends Product {
          questionsAnswers: questionsAnswersModels,
          inStock: inStock,
          outOfStockMessage: outOfStockMessage,
+         availability: availability,
        );
 
   factory ProductModel.fromJson(DataMap json) {

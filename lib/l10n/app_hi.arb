@@ -766,5 +766,15 @@
   "quickCheckoutUnavailable": "इस पते के लिए अभी क्विक डिलीवरी की पुष्टि नहीं हो सकी। कृपया पता बदलें या स्टैंडर्ड डिलीवरी चुनें।",
   "quickDeliveryNearbyStore": "पास के स्टोर से क्विक डिलीवरी",
   "loginRequiredTitle": "लॉगिन ज़रूरी है",
-  "loginToAddToCart": "कार्ट में आइटम जोड़ने के लिए कृपया लॉगिन करें।"
+  "loginToAddToCart": "कार्ट में आइटम जोड़ने के लिए कृपया लॉगिन करें।",
+  "quickAvailabilityTitle": "उपलब्धता",
+  "quickAvailabilityChecking": "आपके पते पर उपलब्धता जाँची जा रही है…",
+  "quickAvailabilityAvailable": "आपके पते पर क्विक डिलीवरी के लिए उपलब्ध",
+  "quickAvailabilityNotInArea": "यह उत्पाद आपके क्षेत्र में अभी उपलब्ध नहीं है।",
+  "quickAvailabilityOutOfStock": "यह उत्पाद अभी स्टॉक में नहीं है।",
+  "quickAvailabilityLocationRequired": "उपलब्धता जाँचने के लिए मानचित्र स्थान वाला पता चुनें।",
+  "quickAvailabilityUnavailable": "यह उत्पाद अभी क्विक डिलीवरी के लिए उपलब्ध नहीं है।",
+  "quickAvailabilityFailed": "हम उपलब्धता नहीं जाँच सके। कृपया फिर से प्रयास करें।",
+  "quickBadgeNotInArea": "आपके क्षेत्र में नहीं",
+  "quickCatalogueFallbackNotice": "इस पते पर क्विक डिलीवरी उपलब्ध नहीं है। आप ये उत्पाद देख सकते हैं।"
 }
