@@ -15,7 +15,6 @@ import 'package:taksh_e_commerce/features/cart/domain/entities/cart_item.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/extra_charge.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_state.dart';
-import 'package:taksh_e_commerce/features/cart/presentation/widgets/cart_suggestions_section.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/selected_checkout_items.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
@@ -370,7 +369,6 @@ class _CartPageState extends State<CartPage>
   }
 
   Widget _buildCartBody(BuildContext context, Cart cart) {
-    final isQuick = _selectedDeliveryType == CartCubit.deliveryTypeExpress;
     return Column(
       children: [
         Expanded(
@@ -379,14 +377,6 @@ class _CartPageState extends State<CartPage>
             children: [
               for (final item in cart.items) _buildCartItem(context, item),
               _buildTrustStrip(),
-              CartSuggestionsSection(
-                key: ValueKey(isQuick),
-                isQuickDelivery: isQuick,
-                excludeProductIds: {
-                  for (final item in cart.items)
-                    if (item.productId != null) item.productId!,
-                },
-              ),
               _buildBillDetails(context, cart),
             ],
           ),

@@ -624,34 +624,14 @@ class AddressRepositoryImpl implements AddressRepository {
       }
 
       final placemark = placemarks.first;
-      
-      // Build formatted address
-      final addressParts = <String>[];
-      if (placemark.street != null && placemark.street!.isNotEmpty) {
-        addressParts.add(placemark.street!);
-      }
-      if (placemark.subLocality != null && placemark.subLocality!.isNotEmpty) {
-        addressParts.add(placemark.subLocality!);
-      }
-      if (placemark.locality != null && placemark.locality!.isNotEmpty) {
-        addressParts.add(placemark.locality!);
-      }
-      if (placemark.administrativeArea != null && placemark.administrativeArea!.isNotEmpty) {
-        addressParts.add(placemark.administrativeArea!);
-      }
-      if (placemark.postalCode != null && placemark.postalCode!.isNotEmpty) {
-        addressParts.add(placemark.postalCode!);
-      }
 
-      final formattedAddress = addressParts.isNotEmpty
-          ? addressParts.join(', ')
-          : 'Location at $lat, $lng';
+      final formattedAddress = _formatPlacemark(placemark) ?? 'Location at $lat, $lng';
 
       final location = Location(
         latitude: lat,
         longitude: lng,
         formattedAddress: formattedAddress,
-        street: placemark.street,
+        street: _meaningfulStreet(placemark),
         city: placemark.locality,
         state: placemark.administrativeArea,
         country: placemark.country,
@@ -730,32 +710,19 @@ class AddressRepositoryImpl implements AddressRepository {
 
           if (placemarks.isNotEmpty) {
             final placemark = placemarks.first;
-            
-            // Build formatted address
-            final addressParts = <String>[];
-            if (placemark.street != null && placemark.street!.isNotEmpty) {
-              addressParts.add(placemark.street!);
-            }
-            if (placemark.subLocality != null && placemark.subLocality!.isNotEmpty) {
-              addressParts.add(placemark.subLocality!);
-            }
-            if (placemark.locality != null && placemark.locality!.isNotEmpty) {
-              addressParts.add(placemark.locality!);
-            }
-            if (placemark.administrativeArea != null && placemark.administrativeArea!.isNotEmpty) {
-              addressParts.add(placemark.administrativeArea!);
-            }
 
-            final formattedAddress = addressParts.isNotEmpty
-                ? addressParts.join(', ')
-                : query;
+            // The typed text names the place the user meant (e.g. "Alpha One Mall"),
+            // which reverse geocoding often loses. Use it when the placemark has no
+            // readable name of its own.
+            final formattedAddress =
+                _formatPlacemark(placemark, fallbackName: query.trim()) ?? query;
 
             results.add(
               Location(
                 latitude: location.latitude,
                 longitude: location.longitude,
                 formattedAddress: formattedAddress,
-                street: placemark.street,
+                street: _meaningfulStreet(placemark),
                 city: placemark.locality,
                 state: placemark.administrativeArea,
                 country: placemark.country,
@@ -788,4 +755,49 @@ class AddressRepositoryImpl implements AddressRepository {
       return Left(GeneralFailure('Failed to search places: ${e.toString()}'));
     }
   }
+}
+
+/// A house number ("12", "12/A") or a plus code ("7JQ4+MF") is not a readable place name.
+bool _isReadablePart(String? value) {
+  final v = value?.trim() ?? '';
+  if (v.isEmpty) return false;
+  if (RegExp(r'^[\d\s/\-,.]+[A-Za-z]?$').hasMatch(v)) return false;
+  if (RegExp(r'^[A-Z0-9]{4,8}\+[A-Z0-9]{2,}').hasMatch(v)) return false;
+  return true;
+}
+
+/// Street without a bare house number; falls back to the placemark's thoroughfare.
+String? _meaningfulStreet(geocoding.Placemark p) {
+  if (_isReadablePart(p.street)) return p.street!.trim();
+  if (_isReadablePart(p.thoroughfare)) return p.thoroughfare!.trim();
+  return null;
+}
+
+/// "Place name, street, area, city, state, pincode" with house numbers/plus codes
+/// dropped and repeated parts removed. Returns null when nothing readable is left.
+String? _formatPlacemark(geocoding.Placemark p, {String? fallbackName}) {
+  final parts = <String>[];
+  void add(String? value, {bool allowNumeric = false}) {
+    if (!allowNumeric && !_isReadablePart(value)) return;
+    if (value == null || value.trim().isEmpty) return;
+    final v = value.trim();
+    final lower = v.toLowerCase();
+    if (parts.any((e) {
+      final x = e.toLowerCase();
+      return x == lower || x.contains(lower);
+    })) {
+      return;
+    }
+    parts.add(v);
+  }
+
+  final named = _isReadablePart(p.name) ? p.name : fallbackName;
+  add(named);
+  add(p.street);
+  add(p.subLocality);
+  add(p.locality);
+  add(p.administrativeArea);
+  add(p.postalCode, allowNumeric: true);
+
+  return parts.isEmpty ? null : parts.join(', ');
 }
