@@ -7,6 +7,7 @@ import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address_type.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/location.dart';
+import 'package:taksh_e_commerce/features/address/domain/usecases/get_current_location.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_state.dart';
@@ -60,7 +61,31 @@ class _AddAddressPageState extends State<AddAddressPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _openMapPicker();
       });
+    } else {
+      // New address: start from where the customer is, so the form is already
+      // filled (area, city, state, pincode) and the map opens on that spot.
+      _prefillCurrentLocation();
     }
+  }
+
+  /// Best effort: no permission / no fix just leaves the form empty as before,
+  /// and a location the customer already picked is never replaced.
+  Future<void> _prefillCurrentLocation() async {
+    final result = await getIt<GetCurrentLocation>()();
+    if (!mounted || _selectedLocation != null) return;
+    result.fold((_) {}, (location) {
+      setState(() => _applyLocation(location, location.formattedAddress));
+    });
+  }
+
+  /// Puts a picked / detected location into the form fields.
+  void _applyLocation(Location location, String? address) {
+    _selectedLocation = location;
+    _selectedAddress = address;
+    _houseController.text = location.formattedAddress ?? '';
+    _cityController.text = location.city ?? '';
+    _stateController.text = location.state ?? '';
+    _pincodeController.text = location.postalCode ?? '';
   }
 
   void _initializeWithExistingAddress() {
@@ -443,13 +468,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
     if (result != null && result is Map) {
       final location = result['location'] as Location?;
       setState(() {
-        _selectedLocation = location;
-        _selectedAddress = result['address'] as String?;
         if (location != null) {
-          _houseController.text = location.formattedAddress ?? '';
-          _cityController.text = location.city ?? '';
-          _stateController.text = location.state ?? '';
-          _pincodeController.text = location.postalCode ?? '';
+          _applyLocation(location, result['address'] as String?);
+        } else {
+          _selectedAddress = result['address'] as String?;
         }
       });
     }

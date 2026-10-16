@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:taksh_e_commerce/core/utils/quick_availability.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/brand.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
 import 'package:taksh_e_commerce/features/product/domain/entities/product_variant.dart';
@@ -41,6 +42,14 @@ class Product extends Equatable {
   /// Message shown when product is out of stock (from API `out_of_stock_message`)
   final String? outOfStockMessage;
 
+  /// Quick only: the server's verdict for the selected address (null for Standard
+  /// products and older servers, where [inStock] alone decides).
+  final QuickProductAvailability? availability;
+
+  /// False when out of stock OR when the server says this address cannot order it.
+  bool get canOrder =>
+      inStock && (availability == null || availability!.canOrder);
+
   const Product({
     required this.id,
     required this.categoryId,
@@ -69,6 +78,7 @@ class Product extends Equatable {
     this.saleId,
     this.inStock = true,
     this.outOfStockMessage,
+    this.availability,
   });
 
   /// Create an empty product
@@ -131,6 +141,7 @@ class Product extends Equatable {
       saleId: saleId,
       inStock: inStock,
       outOfStockMessage: outOfStockMessage,
+      availability: availability,
     );
   }
 
@@ -202,6 +213,7 @@ class Product extends Equatable {
     saleId,
     inStock,
     outOfStockMessage,
+    availability,
   ];
 
   @override

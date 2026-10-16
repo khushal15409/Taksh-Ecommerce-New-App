@@ -520,13 +520,14 @@ class _HomePageState extends State<_HomePageContent> {
 
                   return ExpressDashboardContent(
                     dashboard: dashboard,
+                    onChangeAddress: _showAddressSelectionBottomSheet,
                     latitude: location.latitude,
                     longitude: location.longitude,
                     onProductTap: (product) {
                       context.push(
                         AppRoutes.productDetails(product.id),
                         extra: {
-                          'inStock': product.inStock,
+                          'inStock': product.canOrder,
                           'outOfStockMessage': product.outOfStockMessage,
                         },
                       );

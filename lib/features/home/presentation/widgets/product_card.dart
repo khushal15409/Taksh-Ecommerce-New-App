@@ -247,7 +247,7 @@ class _ProductCardState extends State<ProductCard>
                               color: AppColors.grey400,
                             ),
                     ),
-                    if (!product.inStock)
+                    if (!product.canOrder)
                       Container(
                         color: Colors.white.withOpacity(0.72),
                         alignment: Alignment.center,
@@ -261,7 +261,7 @@ class _ProductCardState extends State<ProductCard>
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'Out of\nStock',
+                            _unavailableLabel(product),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -293,7 +293,7 @@ class _ProductCardState extends State<ProductCard>
               productId: product.id,
               productVariantId: product.productVariantId,
               style: ProductAddToCartButtonStyle.outlinedGreen,
-              inStock: product.inStock,
+              inStock: product.canOrder,
               isQuickDelivery: widget.showDeliveryTime,
               variants: product.variants,
               productName: product.name,
@@ -304,6 +304,16 @@ class _ProductCardState extends State<ProductCard>
         ],
       ),
     );
+  }
+
+  /// Badge text of a card that cannot be ordered. A location-level verdict says
+  /// so (the product is fine, the address is not); everything else is stock.
+  String _unavailableLabel(ProductModel product) {
+    final status = product.availability?.status;
+    if (status != null && status.isLocationLevel) {
+      return AppLocalizations.of(context)!.quickBadgeNotInArea;
+    }
+    return 'Out of\nStock';
   }
 
   Widget _buildDiscountBadge(int discount) {

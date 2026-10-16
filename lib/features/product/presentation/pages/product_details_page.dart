@@ -3,6 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/core/utils/quick_availability.dart';
+import 'package:taksh_e_commerce/core/utils/quick_location.dart';
+import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
+import 'package:taksh_e_commerce/features/address/presentation/bloc/address_state.dart';
+import 'package:taksh_e_commerce/features/address/presentation/widgets/address_selection_bottom_sheet.dart';
+import 'package:taksh_e_commerce/features/quick_delivery/presentation/cubit/quick_product_availability_cubit.dart';
+import 'package:taksh_e_commerce/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
@@ -49,6 +58,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   /// Cubit for checking delivery availability
   late final DeliveryCheckCubit _deliveryCheckCubit;
 
+  /// Quick only: the server's verdict for the selected address. Add to Cart and
+  /// Buy Now stay disabled until it says `available` for the current variant.
+  late final QuickProductAvailabilityCubit _availabilityCubit;
+
+  /// Last key handed to the cubit, so a rebuild can never re-request in a loop.
+  String? _lastAvailabilityKey;
+
   final TextEditingController _pincodeController = TextEditingController();
 
   final PageController _imagePageController = PageController();
@@ -63,6 +79,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     super.initState();
     _similarProductsCubit = getIt<SimilarProductsCubit>();
     _deliveryCheckCubit = getIt<DeliveryCheckCubit>();
+    _availabilityCubit = getIt<QuickProductAvailabilityCubit>();
   }
 
   @override
@@ -71,6 +88,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     _imagePageController.dispose();
     _similarProductsCubit.close();
     _deliveryCheckCubit.close();
+    _availabilityCubit.close();
     super.dispose();
   }
 
@@ -91,7 +109,20 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       value: _similarProductsCubit,
       child: BlocProvider<DeliveryCheckCubit>.value(
         value: _deliveryCheckCubit,
-        child: Scaffold(
+        child: BlocProvider<QuickProductAvailabilityCubit>.value(
+          value: _availabilityCubit,
+          child: BlocListener<AddressBloc, AddressState>(
+          // A different selected address means a different verdict.
+          listenWhen: (previous, current) =>
+              _selectedAddressOf(previous)?.id !=
+              _selectedAddressOf(current)?.id,
+          listener: (context, _) {
+            final productState = context.read<ProductCubit>().state;
+            if (productState is ProductDetailsLoaded) {
+              _syncAvailability(productState.product);
+            }
+          },
+          child: Scaffold(
           backgroundColor: Colors.white,
           extendBodyBehindAppBar: true,
           appBar: AppBar(
@@ -216,6 +247,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
               if (state is ProductDetailsLoaded) {
                 _cacheVariantLabels(state.product);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) _syncAvailability(state.product);
+                });
                 // Auto-select first variant if available
                 if (_selectedVariant == null &&
                     state.product.variants != null &&
@@ -230,7 +264,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     }
                   });
                 }
-                return _buildProductContent(context, state.product);
+                // Rebuilt when the availability verdict changes, so stock badge and
+                // the Add to Cart / Buy Now buttons always follow the latest verdict.
+                return BlocBuilder<QuickProductAvailabilityCubit,
+                    QuickProductAvailabilityState>(
+                  builder: (context, _) =>
+                      _buildProductContent(context, state.product),
+                );
               }
 
               return const SizedBox.shrink();
@@ -238,8 +278,251 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             ),
           ),
         ),
+          ),
+        ),
       ),
     );
+  }
+
+  /// Selected delivery address of an AddressBloc state (null while unknown).
+  Address? _selectedAddressOf(AddressState state) {
+    if (state is AddressesLoaded) return state.selectedAddress;
+    if (state is AddressOperationSuccess) return state.selectedAddress;
+    if (state is AddressOperationError) return state.selectedAddress;
+    return null;
+  }
+
+  /// Location the Quick verdict is asked for: the same precedence the Quick
+  /// dashboard uses (selected address, saved address, device). Null while the
+  /// addresses are still loading.
+  ({QuickLocation? location, bool ready}) _quickLocation() {
+    final state = context.read<AddressBloc>().state;
+    List<Address>? saved;
+    Address? selected;
+    if (state is AddressesLoaded) {
+      saved = state.addresses;
+      selected = state.selectedAddress;
+    } else if (state is AddressOperationSuccess) {
+      saved = state.addresses;
+      selected = state.selectedAddress;
+    } else if (state is AddressOperationError) {
+      saved = state.addresses;
+      selected = state.selectedAddress;
+    } else if (state is AddressError) {
+      saved = const <Address>[];
+    }
+    if (saved == null) return (location: null, ready: false);
+
+    final splash = context.read<SplashCubit>();
+    final device = splash.currentLocation;
+    return (
+      location: resolveQuickLocation(
+        selected: selected,
+        saved: saved,
+        deviceLatitude: device?.latitude,
+        deviceLongitude: device?.longitude,
+        deviceAllowed: splash.hasLocationPermission,
+      ),
+      ready: true,
+    );
+  }
+
+  /// Asks the server for this product's availability at the selected address.
+  /// Standard products are never gated. Repeats for an unchanged
+  /// product / variant / address are ignored here and in the cubit.
+  void _syncAvailability(Product product, {bool force = false}) {
+    if (!mounted) return;
+    if (!product.isExpress30) {
+      _lastAvailabilityKey = null;
+      _availabilityCubit.reset();
+      return;
+    }
+    final resolved = _quickLocation();
+    if (!resolved.ready) return; // addresses still loading: stays not orderable
+
+    final variantId = _selectedOrPreferredVariant(product)?.id;
+    final key = QuickProductAvailabilityCubit.keyFor(
+      product.id,
+      variantId,
+      resolved.location,
+    );
+    if (!force && key == _lastAvailabilityKey) return;
+    _lastAvailabilityKey = key;
+    _availabilityCubit.check(
+      productId: product.id,
+      variantId: variantId,
+      location: resolved.location,
+      force: force,
+    );
+  }
+
+  /// A Quick product can be ordered only after the server said `available`
+  /// for the current variant and address; any other state keeps it disabled.
+  bool _quickOrderable(Product product) =>
+      !product.isExpress30 || _availabilityCubit.state.canOrder;
+
+  Future<void> _changeAddress(Product product) async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! Authenticated) {
+      context.push(
+        '${AppRoutes.login}?redirectAfter=${Uri.encodeComponent(AppRoutes.productDetails(product.id))}',
+      );
+      return;
+    }
+    final addressBloc = context.read<AddressBloc>();
+    final picked = await AddressSelectionBottomSheet.show(
+      context,
+      currentAddress: _selectedAddressOf(addressBloc.state),
+    );
+    if (picked != null && mounted) {
+      // The AddressBloc listener above re-checks availability for the new address.
+      addressBloc.add(SelectAddressForDeliveryEvent(picked));
+    }
+  }
+
+  /// Availability panel of a Quick product at the selected address.
+  Widget _buildQuickAvailabilityPanel(Product product) {
+    if (!product.isExpress30) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<QuickProductAvailabilityCubit,
+        QuickProductAvailabilityState>(
+      builder: (context, state) {
+        late final Color tone;
+        late final Color background;
+        late final IconData icon;
+        late final String text;
+        var showChangeAddress = false;
+        var showRetry = false;
+        var loading = false;
+
+        if (state.phase == QuickAvailabilityPhase.failed) {
+          tone = const Color(0xFFB45309);
+          background = const Color(0xFFFFF4E5);
+          icon = Icons.error_outline_rounded;
+          text = l10n.quickAvailabilityFailed;
+          showRetry = true;
+        } else if (state.phase == QuickAvailabilityPhase.checked &&
+            state.availability != null) {
+          final availability = state.availability!;
+          if (availability.canOrder) {
+            tone = AppColors.secondaryGreen;
+            background = _greenTint;
+            icon = Icons.check_circle_rounded;
+            text = l10n.quickAvailabilityAvailable;
+          } else {
+            tone = const Color(0xFFB71C1C);
+            background = const Color(0xFFFFEBEE);
+            icon = availability.status.isLocationLevel
+                ? Icons.location_off_outlined
+                : Icons.remove_shopping_cart_outlined;
+            text = _unavailableText(availability, l10n);
+            showChangeAddress = availability.status.isLocationLevel;
+          }
+        } else {
+          // idle / checking: not orderable yet
+          tone = AppColors.grey600;
+          background = const Color(0xFFF5F5F5);
+          icon = Icons.hourglass_empty_rounded;
+          text = l10n.quickAvailabilityChecking;
+          loading = true;
+        }
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: tone.withOpacity(0.35)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  loading
+                      ? SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: tone,
+                          ),
+                        )
+                      : Icon(icon, size: 18, color: tone),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.quickAvailabilityTitle,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: tone,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          text,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            height: 1.3,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.grey900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (showChangeAddress || showRetry)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: showRetry
+                        ? () => _syncAvailability(product, force: true)
+                        : () => _changeAddress(product),
+                    icon: Icon(
+                      showRetry
+                          ? Icons.refresh_rounded
+                          : Icons.edit_location_alt_outlined,
+                      size: 16,
+                    ),
+                    label: Text(
+                      showRetry ? l10n.retry : l10n.changeAddress,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Customer text of an unavailable verdict. The server message is in the
+  /// customer's language; the ARB text is the fallback.
+  String _unavailableText(
+    QuickProductAvailability availability,
+    AppLocalizations l10n,
+  ) {
+    final fromServer = availability.message;
+    if (fromServer != null) return fromServer;
+    switch (availability.status) {
+      case QuickAvailabilityStatus.areaUnserviceable:
+        return l10n.quickAvailabilityNotInArea;
+      case QuickAvailabilityStatus.outOfStock:
+        return l10n.quickAvailabilityOutOfStock;
+      case QuickAvailabilityStatus.locationRequired:
+        return l10n.quickAvailabilityLocationRequired;
+      default:
+        return l10n.quickAvailabilityUnavailable;
+    }
   }
 
   /// Soft peach gradient behind the app bar and the page content.
@@ -295,6 +578,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 const SizedBox(height: 10),
                 _buildPriceRow(context, product),
                 const SizedBox(height: 14),
+                if (product.isExpress30) ...[
+                  _buildQuickAvailabilityPanel(product),
+                  const SizedBox(height: 10),
+                ],
                 _buildDeliveryAvailabilitySection(product.id),
                 if (product.variants != null &&
                     product.variants!.isNotEmpty) ...[
@@ -355,6 +642,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final selectedVariant = _selectedOrPreferredVariant(product);
     final variantId = selectedVariant?.id;
     final isInStock = _effectiveInStock(product);
+    // Quick: in stock somewhere is not enough, this address must be able to order it.
+    final quickBlocked = isInStock && !_quickOrderable(product);
 
     // Without a purchasable variant (and in stock) there is nothing to act on.
     if (isInStock && variantId == null) return const SizedBox.shrink();
@@ -431,7 +720,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 9, 14, 9),
-          child: isInStock
+          child: isInStock && !quickBlocked
               ? Row(
                   children: [
                     priceBlock,
@@ -470,7 +759,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Expanded(child: _buildBuyNowButton(product)),
                   ],
                 )
-              : _buildOutOfStockActions(product),
+              : _buildOutOfStockActions(
+                  product,
+                  messageOverride: quickBlocked ? _quickBlockedMessage() : null,
+                ),
         ),
       ),
     );
@@ -551,8 +843,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  Widget _buildOutOfStockActions(Product product) {
-    final outOfStockMessage = _effectiveOutOfStockMessage(product);
+  /// Why a Quick product in stock somewhere still cannot be ordered here.
+  String _quickBlockedMessage() {
+    final l10n = AppLocalizations.of(context)!;
+    final state = _availabilityCubit.state;
+    if (state.phase == QuickAvailabilityPhase.failed) {
+      return l10n.quickAvailabilityFailed;
+    }
+    final availability = state.availability;
+    if (state.phase == QuickAvailabilityPhase.checked && availability != null) {
+      return _unavailableText(availability, l10n);
+    }
+    return l10n.quickAvailabilityChecking;
+  }
+
+  Widget _buildOutOfStockActions(Product product, {String? messageOverride}) {
+    final outOfStockMessage =
+        messageOverride ?? _effectiveOutOfStockMessage(product);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -630,6 +937,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   Future<void> _handleBuyNow(Product product) async {
+    // Never rely on the button being disabled: no verdict, no purchase.
+    if (!_quickOrderable(product)) {
+      _showOutOfStockSnackBar(_quickBlockedMessage());
+      return;
+    }
     if (!_effectiveInStock(product)) {
       _showOutOfStockSnackBar(
         _effectiveOutOfStockMessage(product),
@@ -674,6 +986,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     });
 
     if (cartState is CartError) {
+      // The server refused the line (stock or area changed since the check): ask
+      // again, so the page shows the current verdict instead of a stale "available".
+      if (product.isExpress30) _syncAvailability(product, force: true);
       // Server rules (delivery bucket / vendor conflicts) come with their own
       // message: show it as is, never convert the product silently.
       if (cartState.message.trim().isNotEmpty) {
@@ -1759,6 +2074,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   bool _effectiveInStock(Product product) {
+    // Quick: a fresh server verdict outranks the stock flag carried over from the
+    // listing the customer came from (which may belong to another address).
+    if (product.isExpress30) {
+      final verdict = _availabilityCubit.state;
+      if (verdict.phase == QuickAvailabilityPhase.checked) {
+        if (verdict.canOrder) return true;
+        if (verdict.availability?.status == QuickAvailabilityStatus.outOfStock) {
+          return false;
+        }
+      }
+    }
     final selectedVariant = _selectedOrPreferredVariant(product);
     if (selectedVariant != null && selectedVariant.hasStockInfo) {
       return selectedVariant.isAvailableForSale;

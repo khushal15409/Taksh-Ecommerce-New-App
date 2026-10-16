@@ -160,6 +160,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
       'page_number': page.toString(),
+      // Whole Quick catalogue of the category, orderable products first.
+      'include_unavailable': '1',
     });
 
     final response = await apiClient.post(

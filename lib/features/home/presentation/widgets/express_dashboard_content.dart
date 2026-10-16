@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/features/home/data/models/banner_model.dart';
@@ -21,10 +23,14 @@ class ExpressDashboardContent extends StatelessWidget {
   final double latitude;
   final double longitude;
 
+  /// Opens the address selector (the notice shown for an unserviceable address).
+  final VoidCallback? onChangeAddress;
+
   const ExpressDashboardContent({
     super.key,
     required this.dashboard,
     this.onProductTap,
+    this.onChangeAddress,
     required this.latitude,
     required this.longitude,
   });
@@ -138,6 +144,11 @@ class ExpressDashboardContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (!dashboard.serviceable)
+          _LocationNotice(
+            message: dashboard.message,
+            onChangeAddress: onChangeAddress,
+          ),
         if (topBanners != null) topBanners,
         ...orderedProducts,
         Padding(
@@ -165,6 +176,53 @@ class ExpressDashboardContent extends StatelessWidget {
             'title': banner.title,
           });
         },
+      ),
+    );
+  }
+}
+
+/// Shown above the browsable catalogue when the server cannot deliver Quick to the
+/// selected address: the products below are marked unavailable, not out of stock.
+class _LocationNotice extends StatelessWidget {
+  final String? message;
+  final VoidCallback? onChangeAddress;
+
+  const _LocationNotice({this.message, this.onChangeAddress});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final text = (message != null && message!.trim().isNotEmpty)
+        ? message!
+        : l10n.quickCatalogueFallbackNotice;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF4E5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFFFD8A8)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.location_off_outlined, color: Color(0xFFB45309)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 12.5,
+                height: 1.3,
+                color: AppColors.grey900,
+              ),
+            ),
+          ),
+          if (onChangeAddress != null)
+            TextButton(
+              onPressed: onChangeAddress,
+              child: Text(l10n.changeAddress),
+            ),
+        ],
       ),
     );
   }

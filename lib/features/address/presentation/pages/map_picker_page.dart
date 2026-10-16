@@ -124,6 +124,14 @@ class _MapPickerViewState extends State<_MapPickerView> {
                               onLocationSelected: (location) {
                                 context.read<MapCubit>().selectPlace(location);
                               },
+                              onSuggestionSelected: (suggestion) {
+                                context
+                                    .read<MapCubit>()
+                                    .selectSuggestion(suggestion);
+                              },
+                              suggestions: state is MapSuggestionsLoaded
+                                  ? state.suggestions
+                                  : const [],
                               searchResults: state is MapSearchResults
                                   ? state.places
                                   : [],

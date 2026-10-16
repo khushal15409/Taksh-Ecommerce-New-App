@@ -18,7 +18,13 @@ class ExpressDashboardBloc
       '${lat.toStringAsFixed(5)}|${lng.toStringAsFixed(5)}|$pincode';
 
   ExpressDashboardState _stateFor(ExpressDashboardEntity dashboard) {
-    if (!dashboard.serviceable) {
+    // Not serviceable: with no browsable catalogue the not-serviceable screen is
+    // shown. With one (new servers), the products are shown as unavailable under a
+    // location notice instead, so the customer can still discover them.
+    final hasCatalogue = dashboard.sections.any(
+      (s) => s.key != 'Logo' && s.key != 'Banners' && s.hasData,
+    );
+    if (!dashboard.serviceable && !hasCatalogue) {
       return ExpressDashboardNotServiceable(
         message: dashboard.message,
         code: dashboard.code,

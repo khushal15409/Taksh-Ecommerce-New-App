@@ -176,7 +176,7 @@ class _CategoryProductCardState extends State<CategoryProductCard>
                               color: AppColors.grey400,
                             ),
                     ),
-                    if (!product.inStock)
+                    if (!product.canOrder)
                       Container(
                         color: Colors.white.withOpacity(0.72),
                         alignment: Alignment.center,
@@ -189,10 +189,14 @@ class _CategoryProductCardState extends State<CategoryProductCard>
                             color: Colors.black.withOpacity(0.62),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            'Out of\nStock',
+                          child: Text(
+                            product.availability?.status.isLocationLevel ==
+                                    true
+                                ? AppLocalizations.of(context)!
+                                      .quickBadgeNotInArea
+                                : 'Out of\nStock',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w800,
                               fontSize: 12,
@@ -225,7 +229,7 @@ class _CategoryProductCardState extends State<CategoryProductCard>
       productId: product.id,
       productVariantId: _firstVariantId,
       style: ProductAddToCartButtonStyle.outlinedGreen,
-      inStock: product.inStock,
+      inStock: product.canOrder,
       isQuickDelivery: widget.showDeliveryTime,
       variants: ProductVariantInfo.fromProductVariants(product.variants),
       productName: product.name,

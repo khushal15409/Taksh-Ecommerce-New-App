@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/core/utils/json_converters.dart';
+import 'package:taksh_e_commerce/core/utils/quick_availability.dart';
 import 'package:taksh_e_commerce/features/home/domain/entities/product_entity.dart';
 import 'package:taksh_e_commerce/features/home/domain/entities/product_variant_info.dart';
 
@@ -310,6 +311,16 @@ class ProductModel extends ProductEntity {
   @override
   final String? outOfStockMessage;
 
+  /// Quick only: the server's verdict for the selected address. Null for Standard
+  /// products and for older servers (then [inStock] alone decides, as before).
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final QuickProductAvailability? availability;
+
+  /// False when the server says this Quick product cannot be ordered at the
+  /// selected address, even if it has stock somewhere.
+  bool get canOrder =>
+      inStock && (availability == null || availability!.canOrder);
+
   @override
   @JsonKey(fromJson: _variantsFromJson, toJson: _variantsToJson)
   final List<ProductVariantInfo>? variants;
@@ -338,6 +349,7 @@ class ProductModel extends ProductEntity {
     this.inStock = true,
     this.outOfStockMessage,
     this.variants,
+    this.availability,
   }) : salePrice = salePrice ?? price,
        super(
          originalPrice: originalPrice,
@@ -485,6 +497,9 @@ class ProductModel extends ProductEntity {
         normalizedJson['out_of_stock_message'],
       ),
       variants: variants,
+      availability: QuickProductAvailability.fromJson(
+        normalizedJson['availability'],
+      ),
     );
   }
 

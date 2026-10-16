@@ -917,5 +917,15 @@
   "quickCheckoutUnavailable": "Quick delivery can't be confirmed for this address right now. Please change the address or choose Standard delivery.",
   "quickDeliveryNearbyStore": "Quick delivery from a nearby store",
   "loginRequiredTitle": "Login required",
-  "loginToAddToCart": "Please login to add items to your cart."
+  "loginToAddToCart": "Please login to add items to your cart.",
+  "quickAvailabilityTitle": "Availability",
+  "quickAvailabilityChecking": "Checking availability at your address…",
+  "quickAvailabilityAvailable": "Available for Quick delivery at your address",
+  "quickAvailabilityNotInArea": "This product is not available in your area right now.",
+  "quickAvailabilityOutOfStock": "This product is out of stock right now.",
+  "quickAvailabilityLocationRequired": "Select an address with a map location to check availability.",
+  "quickAvailabilityUnavailable": "This product is not available for Quick delivery right now.",
+  "quickAvailabilityFailed": "We could not check availability. Please try again.",
+  "quickBadgeNotInArea": "Not in your area",
+  "quickCatalogueFallbackNotice": "Quick delivery is not available at this address. You can still browse these products."
 }
