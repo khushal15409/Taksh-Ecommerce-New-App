@@ -484,6 +484,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
       latitude: _selectedLocation!.latitude,
       longitude: _selectedLocation!.longitude,
       formattedAddress: _selectedAddress ?? _selectedLocation!.formattedAddress,
+      street: _selectedLocation!.street,
       city: _cityController.text,
       state: _stateController.text,
       country: _selectedLocation!.country,
