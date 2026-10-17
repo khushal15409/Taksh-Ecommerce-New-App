@@ -41,6 +41,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # .env is a gitignored Flutter asset; create it so the build doesn't fail.
+      # Set the GOOGLE_PLACES_API_KEY repo secret to enable Places suggestions.
+      - name: Create .env
+        run: |
+          cp .env.example .env
+          if [ -n "${{ secrets.GOOGLE_PLACES_API_KEY }}" ]; then
+            echo "GOOGLE_PLACES_API_KEY=${{ secrets.GOOGLE_PLACES_API_KEY }}" > .env
+          fi
+
       # *.g.dart / *.freezed.dart are gitignored, so they must be generated in CI.
       - name: Generate code (build_runner)
         run: dart run build_runner build --delete-conflicting-outputs
