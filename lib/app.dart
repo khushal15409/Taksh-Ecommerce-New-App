@@ -145,7 +145,14 @@ class TakshECommerceApp extends material.StatelessWidget {
           create: (context) => getIt<AddressBloc>(),
         ),
       ],
-      child: BlocListener<AuthBloc, AuthState>(
+      child: BlocListener<SplashCubit, SplashState>(
+        // Once the splash (and its location prompt) is done, ask for the notification
+        // permission. The service asks only once and only if never decided before.
+        listenWhen: (previous, current) =>
+            current is SplashCompleted && previous is! SplashCompleted,
+        listener: (context, state) =>
+            PushNotificationService.instance.requestPermissionAtStart(),
+        child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
             // Register this device for push notifications (permission asked once).
@@ -189,6 +196,7 @@ class TakshECommerceApp extends material.StatelessWidget {
             );
           },
         ),
+      ),
       ),
     );
   }

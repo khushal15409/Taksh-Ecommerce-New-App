@@ -43,10 +43,12 @@ flutter {
     source = "../.."
 }
 
-// Firebase push notifications: the Google Services plugin turns google-services.json into the
-// app's Firebase configuration and FAILS the build when that file has no client for this
-// applicationId. So it is applied only when the file is registered for this app; otherwise
-// the app builds and runs as before, without push (see PushNotificationService).
+// Firebase push notifications. The Google Services plugin turns google-services.json into the
+// app's Firebase configuration, but it FAILS the build when that file has no client for this
+// applicationId. So it is applied only when the file is registered for this app. Otherwise the
+// same configuration values (src/firebaseFallback/res) are compiled in, so Firebase still starts
+// and push works; register this applicationId in Firebase and commit its google-services.json
+// to switch to the standard setup.
 val applicationIdValue = android.defaultConfig.applicationId
 val googleServicesFile = file("google-services.json")
 if (googleServicesFile.exists() &&
@@ -55,11 +57,6 @@ if (googleServicesFile.exists() &&
 ) {
     apply(plugin = "com.google.gms.google-services")
 } else {
-    logger.warn("Push notifications disabled: app/google-services.json is missing or not registered for $applicationIdValue")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-    }
+    android.sourceSets.getByName("main").res.srcDir("src/firebaseFallback/res")
+    logger.warn("google-services.json is not registered for $applicationIdValue: using the built-in Firebase configuration (src/firebaseFallback)")
 }
