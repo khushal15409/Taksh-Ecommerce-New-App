@@ -17,6 +17,7 @@ class CheckDeliveryAvailability
     return repository.checkDeliveryAvailability(
       productId: params.productId,
       pincode: params.pincode,
+      productVariantId: params.productVariantId,
     );
   }
 }
@@ -24,12 +25,14 @@ class CheckDeliveryAvailability
 class CheckDeliveryAvailabilityParams extends Equatable {
   final int productId;
   final String pincode;
+  final int? productVariantId;
 
   const CheckDeliveryAvailabilityParams({
     required this.productId,
     required this.pincode,
+    this.productVariantId,
   });
 
   @override
-  List<Object?> get props => [productId, pincode];
+  List<Object?> get props => [productId, pincode, productVariantId];
 }

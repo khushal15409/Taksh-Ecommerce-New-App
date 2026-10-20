@@ -23,6 +23,11 @@ class CartItem extends Equatable {
   /// Null means unknown (not yet enriched). False / true are explicit values.
   final bool? isExpress30;
 
+  /// The shop this line is bought from. Lines of different shops become separate
+  /// orders at checkout. Null when the server did not say.
+  final int? vendorId;
+  final String? vendorName;
+
   const CartItem({
     required this.id,
     required this.productVariantId,
@@ -35,6 +40,8 @@ class CartItem extends Equatable {
     this.variantName,
     this.productId,
     this.isExpress30,
+    this.vendorId,
+    this.vendorName,
   });
 
   /// Return a copy with updated delivery metadata
@@ -52,6 +59,8 @@ class CartItem extends Equatable {
       variantName: variantName,
       productId: productId,
       isExpress30: isExpress30,
+      vendorId: vendorId,
+      vendorName: vendorName,
     );
   }
 
@@ -69,6 +78,8 @@ class CartItem extends Equatable {
       variantName: variantName,
       productId: productId,
       isExpress30: isExpress30,
+      vendorId: vendorId,
+      vendorName: vendorName,
     );
   }
 
@@ -107,6 +118,8 @@ class CartItem extends Equatable {
         variantName,
         productId,
         isExpress30,
+        vendorId,
+        vendorName,
       ];
 
   @override

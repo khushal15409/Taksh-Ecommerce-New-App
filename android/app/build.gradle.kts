@@ -43,6 +43,21 @@ flutter {
     source = "../.."
 }
 
+// Firebase push notifications: the Google Services plugin turns google-services.json into the
+// app's Firebase configuration and FAILS the build when that file has no client for this
+// applicationId. So it is applied only when the file is registered for this app; otherwise
+// the app builds and runs as before, without push (see PushNotificationService).
+val applicationIdValue = android.defaultConfig.applicationId
+val googleServicesFile = file("google-services.json")
+if (googleServicesFile.exists() &&
+    Regex("\"package_name\"\\s*:\\s*\"${Regex.escape(applicationIdValue ?: "")}\"")
+        .containsMatchIn(googleServicesFile.readText())
+) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.warn("Push notifications disabled: app/google-services.json is missing or not registered for $applicationIdValue")
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)

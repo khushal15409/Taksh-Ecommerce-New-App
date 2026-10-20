@@ -4493,4 +4493,28 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   /// In en, this message translates to:
   /// **'Quick delivery is not available at this address. You can still browse these products.'**
   String get quickCatalogueFallbackNotice;
+
+  /// No description provided for @multiOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your items are split into {count} orders'**
+  String multiOrderTitle(int count);
+
+  /// No description provided for @multiOrderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Each shop prepares and delivers its own order.'**
+  String get multiOrderSubtitle;
+
+  /// No description provided for @checkoutSplitNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your items are from {count} shops, so {count} separate orders will be placed.'**
+  String checkoutSplitNotice(int count);
+
+  /// No description provided for @orderOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Order {index} of {total}'**
+  String orderOfTotal(int index, int total);
 }

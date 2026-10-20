@@ -58,6 +58,7 @@ abstract class ProductRemoteDataSource {
   Future<DeliveryAvailabilityModel> checkDeliveryAvailability({
     required int productId,
     required String pincode,
+    int? productVariantId,
   });
 }
 
@@ -266,10 +267,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   Future<DeliveryAvailabilityModel> checkDeliveryAvailability({
     required int productId,
     required String pincode,
+    int? productVariantId,
   }) async {
     final response = await apiClient.post(
       ApiConstants.ecommerceCheckDelivery(productId),
-      data: FormData.fromMap({'pincode': pincode}),
+      data: FormData.fromMap({
+        'pincode': pincode,
+        if (productVariantId != null) 'product_variant_id': productVariantId,
+      }),
     );
 
     final responseData = response.data as DataMap;

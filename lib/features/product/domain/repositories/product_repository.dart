@@ -51,8 +51,11 @@ abstract class ProductRepository {
   ResultFuture<List<RecentView>> getRecentViews();
 
   /// Check delivery availability for a product at a given pincode
+  ///
+  /// [productVariantId] makes the stock check about the variant being bought.
   ResultFuture<DeliveryAvailability> checkDeliveryAvailability({
     required int productId,
     required String pincode,
+    int? productVariantId,
   });
 }

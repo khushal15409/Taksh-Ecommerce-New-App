@@ -927,5 +927,33 @@
   "quickAvailabilityUnavailable": "This product is not available for Quick delivery right now.",
   "quickAvailabilityFailed": "We could not check availability. Please try again.",
   "quickBadgeNotInArea": "Not in your area",
-  "quickCatalogueFallbackNotice": "Quick delivery is not available at this address. You can still browse these products."
+  "quickCatalogueFallbackNotice": "Quick delivery is not available at this address. You can still browse these products.",
+  "multiOrderTitle": "Your items are split into {count} orders",
+  "@multiOrderTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "multiOrderSubtitle": "Each shop prepares and delivers its own order.",
+  "checkoutSplitNotice": "Your items are from {count} shops, so {count} separate orders will be placed.",
+  "@checkoutSplitNotice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderOfTotal": "Order {index} of {total}",
+  "@orderOfTotal": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

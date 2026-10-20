@@ -224,6 +224,7 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Either<Failure, DeliveryAvailability>> checkDeliveryAvailability({
     required int productId,
     required String pincode,
+    int? productVariantId,
   }) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure('No internet connection'));
@@ -233,6 +234,7 @@ class ProductRepositoryImpl implements ProductRepository {
       final result = await remoteDataSource.checkDeliveryAvailability(
         productId: productId,
         pincode: pincode,
+        productVariantId: productVariantId,
       );
       return Right(result);
     } on ServerException catch (e) {

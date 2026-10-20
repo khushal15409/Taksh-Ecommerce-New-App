@@ -307,6 +307,8 @@ Created in the admin panel (Notifications → panel **Customer app**, with a typ
 |--------|------|---------|
 | GET | `/express-30/dashboard` | Auth required. Unserviceable location: HTTP 200 with `data.serviceable=false`, `code`, `message`, `sections=[]` |
 | POST | `/express-30/products` | Auth required. Unserviceable: HTTP 404 (422 without location) with `data.code` (`quick_not_serviceable` / `quick_location_required`) |
+| GET | `/express-30/products/{id}/availability` | Auth required. `address_id` (or lat/lng) + optional `variant_id`; returns `status`, `can_order`, `serviceable`, `code`, `message`. Fails closed. |
+| — | `include_unavailable=1` on dashboard / products | Opt-in catalogue mode: orderable first, others with `availability`; unserviceable is HTTP 200 with `serviceable=false` + catalogue |
 | GET | `/cart/quote?delivery_type=30_min&address_id=` | Server serviceability verdict for the checkout address (app sends only the address id; checkout fails closed) |
 | GET | `/order/orders?delivery_mode=quick\|standard` | Server-side delivery filter; order payloads carry `is_quick` |
 

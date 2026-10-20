@@ -64,7 +64,7 @@ Called from `app.dart` with `AppConfig.baseUrl` and `AppConfig.useMockData`.
 | `orders/di/order_di.dart` | `registerOrderDependencies` | Orders |
 | `checkout/di/checkout_injection.dart` | `registerCheckoutDependencies` | Checkout |
 | `payment/di/payment_injection.dart` | `registerPaymentDependencies` | Payment |
-| `quick_delivery/di/quick_delivery_di.dart` | `registerQuickDeliveryDependencies` | Tracking + express products |
+| `quick_delivery/di/quick_delivery_di.dart` | `registerQuickDeliveryDependencies` | Tracking + express products + `QuickProductAvailabilityCubit` (factory) |
 | `wallet/di/wallet_di.dart` | `registerWalletDependencies` | Wallet |
 | `home_service/di/home_service_di.dart` | `registerHomeServiceDependencies` | Home services |
 | `core/websocket/di/websocket_di.dart` | `registerWebSocketDependencies` | `WebSocketManagerFactory` |

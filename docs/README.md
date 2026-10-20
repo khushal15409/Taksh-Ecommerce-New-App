@@ -62,6 +62,7 @@ flutter run -t lib/main_mock.dart         # offline mocks, OTP: 1234
 | [features/WISHLIST.md](features/WISHLIST.md) | Wishlist CRUD |
 | [features/SPLASH_AND_ONBOARDING.md](features/SPLASH_AND_ONBOARDING.md) | Startup, locale/theme, onboarding |
 | [features/QUICK_DELIVERY.md](features/QUICK_DELIVERY.md) | Live map tracking, express product pages |
+| [QUICK_DELIVERY_FLOW_REVIEW.md](QUICK_DELIVERY_FLOW_REVIEW.md) | End-to-end Quick flow review (app + admin API), risks, do-not-break checklist |
 | [features/PROFILE.md](features/PROFILE.md) | Profile hub, join flows, legal pages |
 
 In-feature READMEs (kept in place):

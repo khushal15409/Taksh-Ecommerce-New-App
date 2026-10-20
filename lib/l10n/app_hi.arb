@@ -776,5 +776,9 @@
   "quickAvailabilityUnavailable": "यह उत्पाद अभी क्विक डिलीवरी के लिए उपलब्ध नहीं है।",
   "quickAvailabilityFailed": "हम उपलब्धता नहीं जाँच सके। कृपया फिर से प्रयास करें।",
   "quickBadgeNotInArea": "आपके क्षेत्र में नहीं",
-  "quickCatalogueFallbackNotice": "इस पते पर क्विक डिलीवरी उपलब्ध नहीं है। आप ये उत्पाद देख सकते हैं।"
+  "quickCatalogueFallbackNotice": "इस पते पर क्विक डिलीवरी उपलब्ध नहीं है। आप ये उत्पाद देख सकते हैं।",
+  "multiOrderTitle": "आपके आइटम {count} ऑर्डर में बँटे हैं",
+  "multiOrderSubtitle": "हर दुकान अपना ऑर्डर खुद तैयार करके पहुँचाती है।",
+  "checkoutSplitNotice": "आपके आइटम {count} दुकानों के हैं, इसलिए {count} अलग-अलग ऑर्डर दिए जाएँगे।",
+  "orderOfTotal": "ऑर्डर {index} / {total}"
 }

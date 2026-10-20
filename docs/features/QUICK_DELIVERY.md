@@ -53,3 +53,6 @@ Map tracking here is **HTTP location endpoint** driven. Separate WS-based `LiveO
 - Map performance: throttle polls; handle permission denials.  
 - Keep customer lat/lng query params optional with sensible camera defaults.  
 - Express empty FC product list is valid — show empty state, not error.
+
+## Current state (2026-10-16): catalogue with availability
+The Quick dashboard and category listing request `include_unavailable=1`: orderable products first, other approved Quick products afterwards with an `availability` object (`ProductModel.availability`, `canOrder`). Product details ask `GET /express-30/products/{id}/availability` through `QuickProductAvailabilityCubit` and keep Add to Cart / Buy Now disabled until the server says `available`. Details and API contract: [QUICK_DELIVERY_FLOW_REVIEW.md](../QUICK_DELIVERY_FLOW_REVIEW.md#9-smart-quick-catalogue-and-location-based-availability-2026-10-16).

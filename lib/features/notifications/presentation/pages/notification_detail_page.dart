@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/features/notifications/domain/entities/app_notification.dart';
 import 'package:taksh_e_commerce/features/notifications/presentation/widgets/notification_visuals.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 const Color _accent = Color(0xFFFF7A00);
 
-/// Notification detail screen. Static content for now (Diwali offer layout).
+/// Notification detail screen: the title, time and full message of the notification the
+/// customer opened (sent from the admin panel).
 class NotificationDetailPage extends StatelessWidget {
   final AppNotification? notification;
 
@@ -14,10 +17,23 @@ class NotificationDetailPage extends StatelessWidget {
 
   void _shopNow(BuildContext context) => context.go(AppRoutes.home);
 
+  void _viewOrders(BuildContext context) => context.go(AppRoutes.orders);
+
+  /// Offers lead to shopping, order / delivery / payment / review notifications to the
+  /// customer's orders; a general notification has no action.
+  static bool _isOffer(AppNotification n) => n.isOffer;
+
+  static bool _hasOrdersAction(AppNotification n) =>
+      n.isOrder ||
+      n.type == NotificationType.payment ||
+      n.type == NotificationType.review;
+
+
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
-    final n = notification ?? AppNotification.sample.first;
+    final n = notification;
+    if (n == null) return _buildUnavailable(context);
     final visual = NotificationVisual.of(n.type);
 
     return Scaffold(
@@ -78,11 +94,26 @@ class NotificationDetailPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildHero(context),
-                        const SizedBox(height: 16),
+                        if (_isOffer(n)) ...[
+                          _buildHero(context, n),
+                          const SizedBox(height: 16),
+                        ],
                         _buildBody(context, n, visual),
-                        const SizedBox(height: 18),
-                        _buildShopButton(context),
+                        if (_isOffer(n)) ...[
+                          const SizedBox(height: 18),
+                          _buildActionButton(
+                            context,
+                            label: 'Shop Now',
+                            onTap: () => _shopNow(context),
+                          ),
+                        ] else if (_hasOrdersAction(n)) ...[
+                          const SizedBox(height: 18),
+                          _buildActionButton(
+                            context,
+                            label: AppLocalizations.of(context)!.viewMyOrders,
+                            onTap: () => _viewOrders(context),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -95,11 +126,11 @@ class NotificationDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHero(BuildContext context) {
+  Widget _buildHero(BuildContext context, AppNotification n) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: SizedBox(
-        height: 230,
+        height: 200,
         width: double.infinity,
         child: Stack(
           fit: StackFit.expand,
@@ -129,27 +160,19 @@ class NotificationDetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Diwali\nSpecial Offer!',
-                    style: TextStyle(
-                      fontSize: 30,
-                      height: 1.1,
+                  Text(
+                    n.title,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      height: 1.15,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFFFFE7A3),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Get up to 50% OFF\non all categories',
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.25,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   GestureDetector(
                     onTap: () => _shopNow(context),
                     child: Container(
@@ -193,11 +216,10 @@ class NotificationDetailPage extends StatelessWidget {
     AppNotification n,
     NotificationVisual visual,
   ) {
-    const bullets = [
-      'Big discounts on top brands',
-      'Wide range of products',
-      'Limited time offer',
-    ];
+    final sentAt = n.sentAt;
+    final when = sentAt != null
+        ? DateFormat('d MMM yyyy, h:mm a').format(sentAt)
+        : n.timeAgo;
 
     return Container(
       width: double.infinity,
@@ -241,69 +263,69 @@ class NotificationDetailPage extends StatelessWidget {
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      n.timeAgo.replaceAll('m ago', ' minutes ago'),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black45,
+                    if (when.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        when,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.black45,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 18),
-          const Text(
-            'Dear Customer,',
-            style: TextStyle(fontSize: 15, color: Colors.black87),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'This Diwali, enjoy up to 50% OFF on your favourite products across groceries, electronics, fashion, home needs and more.',
-            style: TextStyle(fontSize: 15, height: 1.45, color: Colors.black87),
-          ),
-          const SizedBox(height: 14),
-          for (final b in bullets)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF3CAE5C),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.check,
-                        size: 16, color: Colors.white),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    b,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
+          SelectableText(
+            n.message,
+            style: const TextStyle(
+              fontSize: 15,
+              height: 1.45,
+              color: Colors.black87,
             ),
-          const SizedBox(height: 4),
-          const Text(
-            'Start shopping now and make your Diwali extra special with Taksh!',
-            style: TextStyle(fontSize: 15, height: 1.45, color: Colors.black87),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildShopButton(BuildContext context) {
+  /// Shown when the screen is opened without a notification (for example after the app
+  /// was restored): nothing is invented, the customer is sent back to the list.
+  Widget _buildUnavailable(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Notification Details')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'This notification is not available.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.go(AppRoutes.notifications),
+                child: const Text('Back to notifications'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    BuildContext context, {
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
-      onTap: () => _shopNow(context),
+      onTap: onTap,
       child: Container(
         height: 56,
         alignment: Alignment.center,
@@ -320,19 +342,19 @@ class NotificationDetailPage extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Shop Now',
-              style: TextStyle(
+              label,
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_forward, size: 20, color: Colors.white),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward, size: 20, color: Colors.white),
           ],
         ),
       ),

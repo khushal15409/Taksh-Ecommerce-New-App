@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/placed_order_summary.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Page displayed after an order is placed successfully.
@@ -13,12 +15,19 @@ class OrderPlacedPage extends StatelessWidget {
   final String? orderNumber;
   final String? paymentMethod;
 
+  /// Every order the checkout created. More than one when the cart had items from
+  /// several shops; then all of them are listed instead of a single order number.
+  final List<PlacedOrderSummary> placedOrders;
+
   const OrderPlacedPage({
     super.key,
     required this.orderId,
     this.orderNumber,
     this.paymentMethod,
+    this.placedOrders = const [],
   });
+
+  bool get _isMultiOrder => placedOrders.length > 1;
 
   bool get _isCod =>
       paymentMethod != null &&
@@ -100,7 +109,11 @@ class OrderPlacedPage extends StatelessWidget {
                           ),
                       textAlign: TextAlign.center,
                     ),
-                    if (orderNumber != null && orderNumber!.isNotEmpty) ...[
+                    if (_isMultiOrder) ...[
+                      const SizedBox(height: 24),
+                      _buildPlacedOrders(context),
+                    ] else if (orderNumber != null &&
+                        orderNumber!.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       _buildOrderNumberCard(context, orderNumber!),
                     ],
@@ -177,6 +190,106 @@ class OrderPlacedPage extends StatelessWidget {
         Icons.check,
         color: Colors.white,
         size: 60,
+      ),
+    );
+  }
+
+  /// One card per order of a multi-shop checkout: order number, shop, items and amount.
+  Widget _buildPlacedOrders(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.multiOrderTitle(placedOrders.length),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.multiOrderSubtitle,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 12),
+        for (var i = 0; i < placedOrders.length; i++)
+          _buildPlacedOrderCard(context, placedOrders[i], i + 1),
+      ],
+    );
+  }
+
+  Widget _buildPlacedOrderCard(
+    BuildContext context,
+    PlacedOrderSummary order,
+    int index,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final total = double.tryParse(order.grandTotal ?? '');
+    final shop = order.shopName;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => context.push(AppRoutes.orderDetails(order.id.toString())),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.orderOfTotal(index, placedOrders.length),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      order.orderNumber ?? '#${order.id}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryOrange,
+                          ),
+                    ),
+                    if (shop != null && shop.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        shop,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                    if (order.itemsCount > 0) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.itemsCount(order.itemsCount),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (total != null)
+                Text(
+                  '₹${formatRupees(total)}',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
       ),
     );
   }

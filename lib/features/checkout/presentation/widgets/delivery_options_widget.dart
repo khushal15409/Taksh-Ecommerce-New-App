@@ -122,6 +122,37 @@ class DeliveryOptionsWidget extends StatelessWidget {
                 }),
                 // Quick is blocked until the server confirms the address:
                 // explain why (server message when there is one).
+                if (!(selectedOption?.isExpress ?? false) &&
+                    context.read<CheckoutBloc>().isStandardBlocked)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      border: Border.all(color: Colors.red.shade200),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: Colors.red.shade700,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            context.read<CheckoutBloc>().standardBlockMessage ??
+                                '',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.red.shade800),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 if ((selectedOption?.isExpress ?? false) &&
                     context.read<CheckoutBloc>().isQuickBlocked)
                   Container(

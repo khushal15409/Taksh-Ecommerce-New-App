@@ -17,6 +17,8 @@ class CartItemModel extends CartItem {
     // they are enriched separately during checkout delivery availability check.
     super.productId,
     super.isExpress30,
+    super.vendorId,
+    super.vendorName,
   });
 
   factory CartItemModel.fromJson(DataMap json) {
@@ -42,6 +44,8 @@ class CartItemModel extends CartItem {
       variantName: json['variant_name']?.toString(),
       productId: _toInt(json['product_id']),
       isExpress30: parsedExpress ?? inferredFromType,
+      vendorId: _toInt(json['vendor_id']),
+      vendorName: json['vendor_name']?.toString(),
     );
   }
 
@@ -74,5 +78,7 @@ class CartItemModel extends CartItem {
     if (variantName != null) 'variant_name': variantName,
     if (productId != null) 'product_id': productId,
     if (isExpress30 != null) 'is_express30': isExpress30,
+    if (vendorId != null) 'vendor_id': vendorId,
+    if (vendorName != null) 'vendor_name': vendorName,
   };
 }
