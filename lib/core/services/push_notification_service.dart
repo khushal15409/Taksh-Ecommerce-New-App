@@ -93,6 +93,7 @@ class PushNotificationService {
   bool _ready = false;
   bool _loggedIn = false;
   bool _listening = false;
+  bool _permissionRequested = false;
   String? _registeredToken;
   PushTarget? _pendingTarget;
   String? _lastOpenedMessageId;
@@ -118,6 +119,9 @@ class PushNotificationService {
       _log.infoWithContext('Push notifications are off: Firebase is not configured', {
         'error': e.toString(),
       });
+      // Also visible in a release build (adb logcat | grep "\[push\]"): the log level of a
+      // production build hides the line above.
+      debugPrint('[push] Firebase is not configured for this build, push is off: $e');
       return;
     }
 
@@ -143,6 +147,22 @@ class PushNotificationService {
     );
   }
 
+  /// Asks for the notification permission when the app opens (once per app start, and only
+  /// while the customer has never decided), so the system "Allow notifications" dialog appears
+  /// right away instead of after login. Called after the splash, whose location prompt has
+  /// finished by then, so two system dialogs never overlap.
+  Future<void> requestPermissionAtStart() async {
+    if (!_ready || _permissionRequested) return;
+    _permissionRequested = true;
+
+    try {
+      final granted = await _ensurePermission();
+      debugPrint('[push] notification permission ${granted ? 'granted' : 'not granted'}');
+    } catch (e) {
+      debugPrint('[push] permission request failed: $e');
+    }
+  }
+
   /// The customer is logged in: ask for permission once, register this device with the
   /// server and open a push that launched the app.
   Future<void> onLogin() async {
@@ -152,9 +172,13 @@ class PushNotificationService {
     try {
       if (await _ensurePermission()) {
         final token = await FirebaseMessaging.instance.getToken();
+        debugPrint('[push] FCM token ${token == null ? 'NOT available' : 'received'}');
         if (token != null) await _register(token);
+      } else {
+        debugPrint('[push] notification permission not granted, device not registered');
       }
     } catch (e) {
+      debugPrint('[push] registration failed: $e');
       _log.errorWithContext('Push registration failed', {'error': e.toString()});
     }
 
@@ -207,7 +231,9 @@ class PushNotificationService {
         },
       );
       _registeredToken = token;
+      debugPrint('[push] device registered with the server');
     } catch (e) {
+      debugPrint('[push] server rejected the device registration: $e');
       // Left unregistered: the next login or token refresh tries again.
       _log.errorWithContext('Device token registration failed', {'error': e.toString()});
     }
