@@ -26,6 +26,10 @@ class MainActivity : FlutterActivity() {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Updates about your orders, payments and refunds"
+            enableLights(true)
+            lightColor = 0xFFFFA340.toInt()
+            enableVibration(true)
+            setShowBadge(true)
         }
         manager.createNotificationChannel(channel)
     }
