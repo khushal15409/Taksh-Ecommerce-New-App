@@ -241,6 +241,7 @@ class PushNotificationService {
 
   void _onForeground(RemoteMessage message) {
     final notification = message.notification;
+    debugPrint('[push] message received while the app is open (has notification: ${notification != null})');
     if (notification == null) return;
 
     // A notification from the admin panel is also in the app's notification section:
@@ -250,8 +251,14 @@ class PushNotificationService {
       getIt<NotificationsCubit>().refresh();
     }
 
-    final context = _router?.router.routerDelegate.navigatorKey.currentContext;
-    if (context == null) return;
+    // The overlay's own context: the navigator's context sits ABOVE its overlay, so the toast
+    // (which inserts itself into the overlay) could not find one and showed nothing.
+    final context =
+        _router?.router.routerDelegate.navigatorKey.currentState?.overlay?.context;
+    if (context == null) {
+      debugPrint('[push] no overlay available to show the message');
+      return;
+    }
 
     AppToast.show(
       context,
@@ -265,6 +272,7 @@ class PushNotificationService {
 
   /// The app was in the background and the customer tapped the notification.
   void _onOpened(RemoteMessage message) {
+    debugPrint('[push] notification tapped');
     if (!_remember(message)) return;
     if (_loggedIn) _openPending();
   }

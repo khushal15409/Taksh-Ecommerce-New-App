@@ -19,6 +19,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/taksh_notification_color" />
 
         <!-- Google Maps API Key -->
         <meta-data
