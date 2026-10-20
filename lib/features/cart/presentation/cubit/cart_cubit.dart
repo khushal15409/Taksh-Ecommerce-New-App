@@ -154,6 +154,8 @@ class CartCubit extends Cubit<CartState> {
                       variantName: item.variantName,
                       productId: item.productId,
                       isExpress30: item.isExpress30,
+                      vendorId: item.vendorId,
+                      vendorName: item.vendorName,
                     ),
                   )
                   .toList(),
@@ -229,6 +231,8 @@ class CartCubit extends Cubit<CartState> {
       variantName: item.variantName,
       productId: item.productId,
       isExpress30: isExpress,
+      vendorId: item.vendorId,
+      vendorName: item.vendorName,
     );
   }
 

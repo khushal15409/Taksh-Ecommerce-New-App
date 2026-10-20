@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Route path constants
 class AppRoutes {
   AppRoutes._();
@@ -133,10 +135,14 @@ class AppRoutes {
   }
 
   /// Build query string for the order-placed page
+  ///
+  /// [placedOrders] is the JSON form of every order a checkout created, passed only
+  /// when there is more than one (a cart with items from several shops).
   static String orderPlacedPath({
     required int orderId,
     String? orderNumber,
     String? paymentMethod,
+    List<Map<String, dynamic>>? placedOrders,
   }) {
     final params = <String, String>{
       'orderId': orderId.toString(),
@@ -144,6 +150,8 @@ class AppRoutes {
         'orderNumber': orderNumber,
       if (paymentMethod != null && paymentMethod.isNotEmpty)
         'paymentMethod': paymentMethod,
+      if (placedOrders != null && placedOrders.length > 1)
+        'placed': Uri.encodeQueryComponent(jsonEncode(placedOrders)),
     };
     final query = params.entries.map((e) => '${e.key}=${e.value}').join('&');
     return '$orderPlaced?$query';

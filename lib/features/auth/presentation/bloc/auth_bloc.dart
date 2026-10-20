@@ -6,6 +6,7 @@ import 'package:taksh_e_commerce/features/auth/domain/entities/update_profile_pa
 import 'package:taksh_e_commerce/features/auth/domain/usecases/fetch_profile_usecase.dart';
 import 'package:taksh_e_commerce/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:taksh_e_commerce/features/auth/domain/usecases/is_logged_in_usecase.dart';
+import 'package:taksh_e_commerce/core/services/push_notification_service.dart';
 import 'package:taksh_e_commerce/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:taksh_e_commerce/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:taksh_e_commerce/features/auth/domain/usecases/update_profile_usecase.dart';
@@ -240,6 +241,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     log.infoWithContext('Initiating user logout', {'action': 'start'});
 
     emit(const AuthLoading());
+
+    // Stop pushes for this customer on this device (needs the login token, so it runs first).
+    await PushNotificationService.instance.unregisterDevice();
 
     final result = await _logoutUseCase();
 

@@ -2371,4 +2371,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickCatalogueFallbackNotice => 'Quick delivery is not available at this address. You can still browse these products.';
+
+  @override
+  String multiOrderTitle(int count) {
+    return 'Your items are split into $count orders';
+  }
+
+  @override
+  String get multiOrderSubtitle => 'Each shop prepares and delivers its own order.';
+
+  @override
+  String checkoutSplitNotice(int count) {
+    return 'Your items are from $count shops, so $count separate orders will be placed.';
+  }
+
+  @override
+  String orderOfTotal(int index, int total) {
+    return 'Order $index of $total';
+  }
 }

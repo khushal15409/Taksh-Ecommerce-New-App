@@ -13,6 +13,7 @@ import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bl
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_state.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_item_card.dart';
+import 'package:taksh_e_commerce/features/checkout/presentation/widgets/multi_order_notice.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Immutable snapshot of the checkout data used by the review page.
@@ -270,6 +271,8 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
   Widget _buildItems(BuildContext context, List<CartItem> items) {
     return Column(
       children: [
+        // Items from several shops: one order is placed per shop.
+        MultiOrderNotice(items: items),
         for (var i = 0; i < items.length; i++) ...[
           if (i > 0) const Divider(height: 1),
           CheckoutItemCard(item: items[i]),

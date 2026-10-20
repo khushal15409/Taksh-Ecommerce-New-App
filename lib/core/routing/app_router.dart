@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,6 +39,7 @@ import 'package:taksh_e_commerce/features/checkout/presentation/pages/order_plac
 import 'package:taksh_e_commerce/features/checkout/presentation/pages/pay_now_page.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/placed_order_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/selected_checkout_items.dart';
 import 'package:taksh_e_commerce/features/payment/presentation/pages/payment_success_page.dart';
 import 'package:taksh_e_commerce/features/payment/presentation/pages/payment_failed_page.dart';
@@ -686,6 +689,9 @@ class AppRouter {
             orderId: orderId,
             orderNumber: orderNumber,
             paymentMethod: paymentMethod,
+            placedOrders: _placedOrdersFromQuery(
+              state.uri.queryParameters['placed'],
+            ),
           ),
           transitionsBuilder: _fadeTransition,
         );
@@ -861,6 +867,17 @@ class AppRouter {
         ),
       ),
     );
+  }
+
+  /// The orders of a multi-shop checkout carried in the order-placed route; anything
+  /// missing or malformed gives an empty list (the page then shows the single order).
+  static List<PlacedOrderSummary> _placedOrdersFromQuery(String? raw) {
+    if (raw == null || raw.isEmpty) return const [];
+    try {
+      return PlacedOrderSummary.listFromJson(jsonDecode(raw));
+    } catch (_) {
+      return const [];
+    }
   }
 
   // ==================== Transition Builders ====================

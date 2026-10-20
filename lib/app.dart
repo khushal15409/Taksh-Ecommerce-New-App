@@ -5,6 +5,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
+import 'package:taksh_e_commerce/core/network/api_client.dart';
+import 'package:taksh_e_commerce/core/services/push_notification_service.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/routing/app_router.dart';
@@ -145,6 +147,10 @@ class TakshECommerceApp extends material.StatelessWidget {
       ],
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
+          if (state is Authenticated) {
+            // Register this device for push notifications (permission asked once).
+            PushNotificationService.instance.onLogin();
+          }
           if (state is Unauthenticated) {
             context.read<AddressBloc>().add(const ResetAddressesEvent());
             // The cart (in memory and cached) belongs to the previous session.
@@ -251,6 +257,13 @@ Future<void> runApp(AppConfig config) async {
       {
         'duration_ms': DateTime.now().difference(diStartTime).inMilliseconds,
       },
+    );
+
+    // Push notifications (Firebase). Never blocks or fails start-up: without a matching
+    // google-services.json it logs and the app runs as before.
+    await PushNotificationService.instance.initialize(
+      apiClient: getIt<ApiClient>(),
+      router: getIt<AppRouter>(),
     );
 
     // Log startup metrics

@@ -142,6 +142,9 @@ class ApiConstants {
       '/notifications/$notificationId/read';
   static const String markAllAsRead = '/notifications/read-all';
 
+  /// Register / remove this device for push notifications (FCM token).
+  static const String deviceToken = '/notifications/device-token';
+
   /// Location endpoints
   static const String searchLocation = '/location/search';
   static const String geocode = '/location/geocode';

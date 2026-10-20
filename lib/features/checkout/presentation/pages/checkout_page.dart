@@ -16,12 +16,14 @@ import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_state.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/placed_order_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_event.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_state.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/pages/order_review_page.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/address_selector_widget.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_item_card.dart';
+import 'package:taksh_e_commerce/features/checkout/presentation/widgets/multi_order_notice.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/checkout_section_card.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/payment_method_selector_widget.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/widgets/price_breakdown_widget.dart';
@@ -161,6 +163,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return;
     }
 
+    // Standard: some shop of the cart does not deliver to this address.
+    if (checkoutBloc.isStandardBlocked) {
+      AppErrorToast.show(context, message: checkoutBloc.standardBlockMessage);
+      return;
+    }
+
     if (checkoutBloc.selectedAddress == null) {
       AppToastMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -217,12 +225,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
     required int orderId,
     String? orderNumber,
     required String paymentMethod,
+    List<PlacedOrderSummary> placedOrders = const [],
   }) {
     context.go(
       AppRoutes.orderPlacedPath(
         orderId: orderId,
         orderNumber: orderNumber,
         paymentMethod: paymentMethod,
+        placedOrders: placedOrders.map((o) => o.toJson()).toList(),
       ),
     );
   }
@@ -336,6 +346,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     orderId: state.orderId,
                     orderNumber: state.orderNumber,
                     paymentMethod: paymentMethod.type.value,
+                    placedOrders: state.placedOrders,
                   );
                 } else {
                   // Online: dispatch initiate payment
@@ -368,7 +379,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 });
 
                 final orderId = state.orderId;
-                if (orderId != null && state.isQuickDelivery) {
+                // Several shops' orders are listed together on the order-placed page,
+                // also for Quick (the tracking page follows a single order).
+                if (orderId != null &&
+                    state.isQuickDelivery &&
+                    state.placedOrders.length < 2) {
                   _navigateToQuickDeliveryTracking(
                     orderId: orderId,
                     orderNumber: state.orderNumber,
@@ -378,6 +393,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     orderId: orderId,
                     orderNumber: state.orderNumber,
                     paymentMethod: PaymentMethodType.online.value,
+                    placedOrders: state.placedOrders,
                   );
                 } else {
                   context.go(AppRoutes.orders);
@@ -517,6 +533,8 @@ class _OrderItemsSectionState extends State<_OrderItemsSection> {
           decoration: checkoutCardDecoration(),
           child: Column(
             children: [
+              // Items from several shops: one order is placed per shop.
+              MultiOrderNotice(items: items),
               InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () => setState(() => _showItemDetails = !_showItemDetails),
@@ -806,7 +824,8 @@ class _CheckoutBottomBar extends StatelessWidget {
                               canPlaceOrder &&
                               !isProcessing &&
                               !hasNoAddresses &&
-                              !context.read<CheckoutBloc>().isQuickBlocked,
+                              !context.read<CheckoutBloc>().isQuickBlocked &&
+                              !context.read<CheckoutBloc>().isStandardBlocked,
                           isProcessing: isProcessing,
                           hasNoAddresses: hasNoAddresses,
                           isCod: paymentMethod.type == PaymentMethodType.cod,

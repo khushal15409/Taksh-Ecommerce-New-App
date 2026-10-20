@@ -2382,4 +2382,22 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get quickCatalogueFallbackNotice => 'इस पते पर क्विक डिलीवरी उपलब्ध नहीं है। आप ये उत्पाद देख सकते हैं।';
+
+  @override
+  String multiOrderTitle(int count) {
+    return 'आपके आइटम $count ऑर्डर में बँटे हैं';
+  }
+
+  @override
+  String get multiOrderSubtitle => 'हर दुकान अपना ऑर्डर खुद तैयार करके पहुँचाती है।';
+
+  @override
+  String checkoutSplitNotice(int count) {
+    return 'आपके आइटम $count दुकानों के हैं, इसलिए $count अलग-अलग ऑर्डर दिए जाएँगे।';
+  }
+
+  @override
+  String orderOfTotal(int index, int total) {
+    return 'ऑर्डर $index / $total';
+  }
 }

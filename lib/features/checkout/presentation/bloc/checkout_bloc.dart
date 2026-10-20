@@ -15,6 +15,7 @@ import 'package:taksh_e_commerce/features/checkout/domain/quick_checkout_gate.da
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/get_delivery_quote.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/order_request.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/placed_order_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/price_breakdown.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/selected_checkout_items.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/usecases/calculate_checkout.dart';
@@ -52,6 +53,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   String? _appliedCoupon;
   int? _lastPlacedOrderId;
   String? _lastPlacedOrderNumber;
+  List<PlacedOrderSummary> _lastPlacedOrders = const [];
   bool _lastPlacedWasQuickDelivery = false;
 
   /// Server quote of Quick delivery for [_quickQuoteAddressId] (null = not
@@ -61,6 +63,11 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
   /// The last quote request failed (network/server); it is retried, not cached.
   bool _quickQuoteFailed = false;
+
+  /// Server verdict of Standard delivery at the selected address, shop by shop. Null while
+  /// unknown or when the request failed: Standard is then NOT blocked here (placing the
+  /// order still enforces the same rule on the server).
+  DeliveryQuote? _standardQuote;
 
   /// Cached delivery mode for the current item selection (set when address is selected)
   CartDeliveryMode _cartDeliveryMode = CartDeliveryMode.standardOnly;
@@ -148,6 +155,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         variantName: item.variantName,
         productId: item.productId,
         isExpress30: item.isExpress30,
+        vendorId: item.vendorId,
+        vendorName: item.vendorName,
       );
     }).toList();
 
@@ -248,6 +257,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       _quickQuote = null;
       _quickQuoteAddressId = null;
     }
+    _standardQuote = null;
     _selectedAddress = event.address;
     emit(AddressSelected(event.address));
 
@@ -295,6 +305,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     _selectedDeliveryOption ??= DeliveryOption.normal();
     if (_selectedDeliveryOption!.isExpress) {
       await _refreshQuickQuote();
+    } else {
+      await _refreshStandardQuote();
     }
     final selectedType = _selectedDeliveryOption!.type;
     _selectedDeliveryOption = options.firstWhere(
@@ -329,6 +341,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     _selectedDeliveryOption = event.option;
     if (event.option.isExpress) {
       await _refreshQuickQuote();
+    } else {
+      await _refreshStandardQuote();
     }
 
     // Recalculate checkout with selected delivery option.
@@ -555,9 +569,11 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     _appliedCoupon = null;
     _lastPlacedOrderId = null;
     _lastPlacedOrderNumber = null;
+    _lastPlacedOrders = const [];
     _lastPlacedWasQuickDelivery = false;
     _quickQuote = null;
     _quickQuoteAddressId = null;
+    _standardQuote = null;
     _currentDeliveryOptions = [
       DeliveryOption.normal().copyWith(isAvailable: true),
       // DeliveryOption.oneDay().copyWith(isAvailable: true),
@@ -642,6 +658,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
         _lastPlacedOrderId = response.orderId;
         _lastPlacedOrderNumber = response.orderNumber;
+        _lastPlacedOrders = response.placedOrders;
         _lastPlacedWasQuickDelivery = _selectedDeliveryOption?.type == '30_min';
 
         emit(
@@ -649,6 +666,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
             orderId: response.orderId,
             orderNumber: response.orderNumber,
             message: response.message,
+            placedOrders: response.placedOrders,
           ),
         );
       },
@@ -766,6 +784,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
               orderId: _lastPlacedOrderId,
               orderNumber: _lastPlacedOrderNumber,
               isQuickDelivery: _lastPlacedWasQuickDelivery,
+              placedOrders: _lastPlacedOrders,
             ),
           );
         } else {
@@ -852,6 +871,48 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       },
     );
   }
+
+  /// Asks the server which shops of the cart can deliver (Standard) to the selected
+  /// address. A failed request leaves the answer unknown, which does not block anything.
+  Future<void> _refreshStandardQuote() async {
+    final address = _selectedAddress;
+    if (address == null) {
+      _standardQuote = null;
+      return;
+    }
+
+    final result = await _getDeliveryQuote(
+      GetDeliveryQuoteParams(deliveryType: 'normal', addressId: address.id),
+    );
+
+    // The address changed while the request was running: drop the answer.
+    if (isClosed || _selectedAddress?.id != address.id) return;
+
+    result.fold(
+      (failure) {
+        _log.errorWithContext('Standard delivery check failed', {
+          'error': failure.message,
+        });
+        _standardQuote = null;
+      },
+      (quote) {
+        _standardQuote = quote;
+      },
+    );
+  }
+
+  /// Whether Standard delivery is selected but the server said some shop of the cart
+  /// cannot deliver to the selected address: Place Order must stay disabled.
+  bool get isStandardBlocked {
+    final quote = _standardQuote;
+    return !(_selectedDeliveryOption?.isExpress ?? false) &&
+        quote != null &&
+        quote.checked &&
+        !quote.serviceable;
+  }
+
+  /// Server message naming the shops that cannot deliver (null when not blocked).
+  String? get standardBlockMessage => _standardQuote?.message;
 
   /// Whether the selected delivery option is Quick but not (yet) confirmed
   /// serviceable by the server: Place Order must stay disabled.

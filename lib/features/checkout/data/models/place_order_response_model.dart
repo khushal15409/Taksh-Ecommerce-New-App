@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:taksh_e_commerce/core/utils/typedef.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/place_order_response.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/placed_order_summary.dart';
 
 part 'place_order_response_model.g.dart';
 
@@ -32,6 +33,10 @@ class PlaceOrderResponseModel {
   @JsonKey(name: 'order_status')
   final String? orderStatus;
 
+  /// Read by hand in [fromJson] (not by the generated code).
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final List<PlacedOrderSummary> placedOrders;
+
   const PlaceOrderResponseModel({
     this.orderId,
     this.id,
@@ -41,10 +46,23 @@ class PlaceOrderResponseModel {
     this.totalAmount,
     this.paymentStatus,
     this.orderStatus,
+    this.placedOrders = const [],
   });
 
-  factory PlaceOrderResponseModel.fromJson(DataMap json) =>
-      _$PlaceOrderResponseModelFromJson(json);
+  factory PlaceOrderResponseModel.fromJson(DataMap json) {
+    final parsed = _$PlaceOrderResponseModelFromJson(json);
+    return PlaceOrderResponseModel(
+      orderId: parsed.orderId,
+      id: parsed.id,
+      orderNumber: parsed.orderNumber,
+      message: parsed.message,
+      status: parsed.status,
+      totalAmount: parsed.totalAmount,
+      paymentStatus: parsed.paymentStatus,
+      orderStatus: parsed.orderStatus,
+      placedOrders: PlacedOrderSummary.listFromJson(json['placed_orders']),
+    );
+  }
 
   /// Get the actual order ID from various possible fields
   int get actualOrderId => orderId ?? id ?? 0;
@@ -63,6 +81,7 @@ class PlaceOrderResponseModel {
       totalAmount: totalAmount?.toString(),
       paymentStatus: paymentStatus,
       orderStatus: orderStatus,
+      placedOrders: placedOrders,
     );
   }
 }

@@ -13,6 +13,7 @@ class DeliveryCheckCubit extends Cubit<DeliveryCheckState> {
   Future<void> check({
     required int productId,
     required String pincode,
+    int? productVariantId,
   }) async {
     emit(const DeliveryCheckLoading());
 
@@ -20,6 +21,7 @@ class DeliveryCheckCubit extends Cubit<DeliveryCheckState> {
       CheckDeliveryAvailabilityParams(
         productId: productId,
         pincode: pincode,
+        productVariantId: productVariantId,
       ),
     );
 

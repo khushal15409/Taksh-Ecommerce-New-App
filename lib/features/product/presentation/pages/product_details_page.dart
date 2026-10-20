@@ -80,6 +80,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     _similarProductsCubit = getIt<SimilarProductsCubit>();
     _deliveryCheckCubit = getIt<DeliveryCheckCubit>();
     _availabilityCubit = getIt<QuickProductAvailabilityCubit>();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prefillPincode());
   }
 
   @override
@@ -117,6 +118,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               _selectedAddressOf(previous)?.id !=
               _selectedAddressOf(current)?.id,
           listener: (context, _) {
+            _prefillPincode();
             final productState = context.read<ProductCubit>().state;
             if (productState is ProductDetailsLoaded) {
               _syncAvailability(productState.product);
@@ -290,6 +292,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (state is AddressOperationSuccess) return state.selectedAddress;
     if (state is AddressOperationError) return state.selectedAddress;
     return null;
+  }
+
+  /// Starts the pincode box with the selected address's pincode, only while it is empty
+  /// (a pincode the customer typed is never overwritten).
+  void _prefillPincode() {
+    if (!mounted || _pincodeController.text.isNotEmpty) return;
+    final selected = _selectedAddressOf(context.read<AddressBloc>().state);
+    final pincode = selected?.location.postalCode?.trim() ?? '';
+    if (pincode.length == 6) {
+      _pincodeController.text = pincode;
+    }
   }
 
   /// Location the Quick verdict is asked for: the same precedence the Quick
@@ -582,7 +595,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   _buildQuickAvailabilityPanel(product),
                   const SizedBox(height: 10),
                 ],
-                _buildDeliveryAvailabilitySection(product.id),
+                _buildDeliveryAvailabilitySection(
+                  product.id,
+                  variantId: _selectedOrPreferredVariant(product)?.id,
+                ),
                 if (product.variants != null &&
                     product.variants!.isNotEmpty) ...[
                   const SizedBox(height: 14),
@@ -1410,7 +1426,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  Widget _buildDeliveryAvailabilitySection(int productId) {
+  Widget _buildDeliveryAvailabilitySection(int productId, {int? variantId}) {
     return Container(
       padding: const EdgeInsets.fromLTRB(9, 8, 8, 8),
       decoration: BoxDecoration(
@@ -1562,6 +1578,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             context.read<DeliveryCheckCubit>().check(
                               productId: productId,
                               pincode: pincode,
+                              productVariantId: variantId,
                             );
                           },
                     style: ElevatedButton.styleFrom(
@@ -1973,6 +1990,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       setState(() {
                         _selectedVariant = variant;
                       });
+                      // The delivery check was for the previous variant's stock.
+                      if (_deliveryCheckCubit.state is! DeliveryCheckInitial) {
+                        _deliveryCheckCubit.reset();
+                      }
                     }
                   : null,
               child: Container(

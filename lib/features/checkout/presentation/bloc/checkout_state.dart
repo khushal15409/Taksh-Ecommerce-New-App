@@ -3,6 +3,7 @@ import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/cart/domain/entities/cart_item.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/checkout_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/delivery_option.dart';
+import 'package:taksh_e_commerce/features/checkout/domain/entities/placed_order_summary.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/selected_checkout_items.dart';
 import 'package:taksh_e_commerce/features/orders/domain/entities/order.dart';
 
@@ -150,14 +151,18 @@ class OrderPlaced extends CheckoutState {
   final String? orderNumber;
   final String? message;
 
+  /// Every order this checkout created (one per shop); empty when not reported.
+  final List<PlacedOrderSummary> placedOrders;
+
   const OrderPlaced({
     required this.orderId,
     this.orderNumber,
     this.message,
+    this.placedOrders = const [],
   });
 
   @override
-  List<Object?> get props => [orderId, orderNumber, message];
+  List<Object?> get props => [orderId, orderNumber, message, placedOrders];
 }
 
 /// Payment initiating state (new flow - step 2)
@@ -193,15 +198,25 @@ class PaymentVerified extends CheckoutState {
   final String? orderNumber;
   final bool isQuickDelivery;
 
+  /// Every order this checkout created (one per shop); empty when not reported.
+  final List<PlacedOrderSummary> placedOrders;
+
   const PaymentVerified({
     this.message,
     this.orderId,
     this.orderNumber,
     this.isQuickDelivery = false,
+    this.placedOrders = const [],
   });
 
   @override
-  List<Object?> get props => [message, orderId, orderNumber, isQuickDelivery];
+  List<Object?> get props => [
+        message,
+        orderId,
+        orderNumber,
+        isQuickDelivery,
+        placedOrders,
+      ];
 }
 
 /// Error state
