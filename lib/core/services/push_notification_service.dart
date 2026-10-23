@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
@@ -13,6 +14,7 @@ import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:taksh_e_commerce/features/notifications/domain/entities/app_notification.dart';
 import 'package:taksh_e_commerce/features/notifications/presentation/cubit/notifications_cubit.dart';
+import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
 /// Runs when a push arrives while the app is in the background or closed. The system
 /// already shows the notification itself (the server sends a `notification` payload), so
@@ -80,7 +82,7 @@ class PushTarget {
 /// Firebase is optional at runtime: when it is not configured for this build (no matching
 /// google-services.json), [initialize] logs and returns, and every other method does
 /// nothing, so the app starts and works exactly as before.
-class PushNotificationService {
+class PushNotificationService with WidgetsBindingObserver {
   PushNotificationService._();
 
   static final PushNotificationService instance = PushNotificationService._();
@@ -115,6 +117,7 @@ class PushNotificationService {
       await Firebase.initializeApp();
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       _ready = true;
+      WidgetsBinding.instance.addObserver(this);
     } catch (e) {
       _log.infoWithContext('Push notifications are off: Firebase is not configured', {
         'error': e.toString(),
@@ -147,42 +150,109 @@ class PushNotificationService {
     );
   }
 
-  /// Asks for the notification permission when the app opens (once per app start, and only
-  /// while the customer has never decided), so the system "Allow notifications" dialog appears
-  /// right away instead of after login. Called after the splash, whose location prompt has
-  /// finished by then, so two system dialogs never overlap.
+  /// Asks for the notification permission when the app opens, like the location permission:
+  /// once per app start, after the splash (whose location prompt has finished by then, so two
+  /// system dialogs never overlap).
+  ///
+  ///  - granted: nothing to do;
+  ///  - never decided, or denied once: the system "Allow notifications" dialog;
+  ///  - turned off for good (Android will not show its dialog again): a dialog that explains
+  ///    why and opens the app's settings page, where the customer can switch them on.
   Future<void> requestPermissionAtStart() async {
     if (!_ready || _permissionRequested) return;
     _permissionRequested = true;
 
     try {
-      final granted = await _ensurePermission();
-      debugPrint('[push] notification permission ${granted ? 'granted' : 'not granted'}');
+      var status = await ph.Permission.notification.status;
+      if (status.isGranted || status.isProvisional) {
+        debugPrint('[push] notification permission already granted');
+      } else if (status.isPermanentlyDenied) {
+        debugPrint('[push] notifications are turned off: offering the settings page');
+        await _offerSettings();
+      } else {
+        final watch = Stopwatch()..start();
+        status = await ph.Permission.notification.request();
+        // An answer within a blink means no system dialog could appear (older Android with
+        // notifications switched off, or a permanent denial): send the customer to settings.
+        final answeredAtOnce = watch.elapsedMilliseconds < 500;
+        debugPrint('[push] notification permission ${status.isGranted ? 'granted' : 'not granted'}');
+        if (!status.isGranted && !status.isProvisional && answeredAtOnce) {
+          await _offerSettings();
+        }
+      }
     } catch (e) {
       debugPrint('[push] permission request failed: $e');
     }
+
+    // Allowed just now (and the customer is already logged in): register the device.
+    if (_loggedIn) await _registerCurrentToken();
   }
 
-  /// The customer is logged in: ask for permission once, register this device with the
-  /// server and open a push that launched the app.
+  /// Explains why notifications matter and opens the app's settings page on request.
+  Future<void> _offerSettings() async {
+    final context =
+        _router?.router.routerDelegate.navigatorKey.currentState?.overlay?.context;
+    if (context == null || !context.mounted) return;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+
+    final open = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.notificationPermissionTitle),
+        content: Text(l10n.notificationPermissionMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.maybeLater),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.openSettings),
+          ),
+        ],
+      ),
+    );
+
+    if (open == true) await ph.openAppSettings();
+  }
+
+  /// Back from the settings page (or any pause): if notifications are now on and this
+  /// customer's device is not registered yet, register it.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _ready && _loggedIn && _registeredToken == null) {
+      _registerCurrentToken();
+    }
+  }
+
+  /// The customer is logged in: make sure the permission question has been asked, then
+  /// register this device with the server and open a push that launched the app.
   Future<void> onLogin() async {
     if (!_ready) return;
     _loggedIn = true;
 
+    // Normally asked after the splash; if login came first, ask now (once either way).
+    if (!await _isAllowed()) await requestPermissionAtStart();
+    await _registerCurrentToken();
+
+    _openPending();
+  }
+
+  /// Registers this device when notifications are allowed; otherwise does nothing.
+  Future<void> _registerCurrentToken() async {
     try {
-      if (await _ensurePermission()) {
-        final token = await FirebaseMessaging.instance.getToken();
-        debugPrint('[push] FCM token ${token == null ? 'NOT available' : 'received'}');
-        if (token != null) await _register(token);
-      } else {
+      if (!await _isAllowed()) {
         debugPrint('[push] notification permission not granted, device not registered');
+        return;
       }
+      final token = await FirebaseMessaging.instance.getToken();
+      debugPrint('[push] FCM token ${token == null ? 'NOT available' : 'received'}');
+      if (token != null) await _register(token);
     } catch (e) {
       debugPrint('[push] registration failed: $e');
       _log.errorWithContext('Push registration failed', {'error': e.toString()});
     }
-
-    _openPending();
   }
 
   /// Stops pushes for the current customer on this device only. Call it BEFORE the login
@@ -207,14 +277,9 @@ class PushNotificationService {
     }
   }
 
-  /// Asks for the notification permission only while it has never been decided, so a
-  /// customer who said no is not asked again.
-  Future<bool> _ensurePermission() async {
-    final messaging = FirebaseMessaging.instance;
-    var settings = await messaging.getNotificationSettings();
-    if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
-      settings = await messaging.requestPermission();
-    }
+  /// Whether the customer allows notifications right now (never asks).
+  Future<bool> _isAllowed() async {
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
     return settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
   }

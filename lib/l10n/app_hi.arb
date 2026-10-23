@@ -780,5 +780,7 @@
   "multiOrderTitle": "आपके आइटम {count} ऑर्डर में बँटे हैं",
   "multiOrderSubtitle": "हर दुकान अपना ऑर्डर खुद तैयार करके पहुँचाती है।",
   "checkoutSplitNotice": "आपके आइटम {count} दुकानों के हैं, इसलिए {count} अलग-अलग ऑर्डर दिए जाएँगे।",
-  "orderOfTotal": "ऑर्डर {index} / {total}"
+  "orderOfTotal": "ऑर्डर {index} / {total}",
+  "notificationPermissionTitle": "नोटिफ़िकेशन चालू करें",
+  "notificationPermissionMessage": "Taksh से ऑर्डर अपडेट, पेमेंट कन्फर्मेशन और ऑफ़र पाने के लिए नोटिफ़िकेशन की अनुमति दें। आप इन्हें अपने डिवाइस की सेटिंग्स में चालू कर सकते हैं।"
 }

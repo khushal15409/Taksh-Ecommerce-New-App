@@ -2389,4 +2389,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String orderOfTotal(int index, int total) {
     return 'Order $index of $total';
   }
+
+  @override
+  String get notificationPermissionTitle => 'Turn on notifications';
+
+  @override
+  String get notificationPermissionMessage => 'Allow notifications to get order updates, payment confirmations and offers from Taksh. You can turn them on in your device settings.';
 }

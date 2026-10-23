@@ -955,5 +955,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "notificationPermissionTitle": "Turn on notifications",
+  "notificationPermissionMessage": "Allow notifications to get order updates, payment confirmations and offers from Taksh. You can turn them on in your device settings."
 }

@@ -4517,4 +4517,16 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   /// In en, this message translates to:
   /// **'Order {index} of {total}'**
   String orderOfTotal(int index, int total);
+
+  /// No description provided for @notificationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on notifications'**
+  String get notificationPermissionTitle;
+
+  /// No description provided for @notificationPermissionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications to get order updates, payment confirmations and offers from Taksh. You can turn them on in your device settings.'**
+  String get notificationPermissionMessage;
 }
