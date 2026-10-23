@@ -757,10 +757,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         VariantCacheService.instance.getVariantLabel(item.productVariantId) ??
         '';
     final qty = item.qty;
-    // `price` is the vendor share; the Taksh charge is stored separately and
-    // must be added to show what the customer actually paid per piece.
-    final unitPrice = (double.tryParse(item.price) ?? 0) +
-        (double.tryParse(item.takshCharge ?? '') ?? 0);
+    // `price` already includes the Taksh charge (it is the price the customer
+    // saw in the cart), so it is shown as it is.
+    final unitPrice = double.tryParse(item.price) ?? 0;
     final totalPrice = unitPrice * qty;
     final canReturn = order.orderStatus.toLowerCase() == 'delivered';
 
@@ -967,14 +966,20 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   /// Build order summary section
   Widget _buildOrderSummarySection(Order order) {
     final l10n = AppLocalizations.of(context)!;
-    final itemsTotal =
-        _parseAmount(order.itemsTotal) ??
-        _parseAmount(order.subtotalAmount) ??
-        order.items.fold<double>(
-          0,
-          (sum, item) => sum + ((double.tryParse(item.price) ?? 0) * item.qty),
-        );
-    final takshCharge = _parseAmount(order.takshChargeTotal);
+    // `itemsTotal` is the vendor share; the Taksh charge is part of what the
+    // customer pays for the product, so it is folded into the subtotal instead
+    // of being shown as a separate line.
+    final takshCharge = _parseAmount(order.takshChargeTotal) ?? 0;
+    final vendorItemsTotal = _parseAmount(order.itemsTotal);
+    final itemsTotal = vendorItemsTotal != null
+        ? vendorItemsTotal + takshCharge
+        : _parseAmount(order.subtotalAmount) ??
+              order.items.fold<double>(
+                0,
+                (sum, item) =>
+                    sum + ((double.tryParse(item.price) ?? 0) * item.qty),
+              );
+    final deliveryCharges = _parseAmount(order.deliveryCharges);
     final platformFee = _parseAmount(order.platformFee);
     final quickDeliveryFee = _parseAmount(order.quickDeliveryFee);
     final discount = _parseAmount(order.discountAmount);
@@ -992,14 +997,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             '${l10n.subtotal} ($itemCount ${itemCount == 1 ? 'item' : 'items'})',
             '₹${itemsTotal.toStringAsFixed(2)}',
           ),
-          if (takshCharge != null && takshCharge != 0) ...[
-            const SizedBox(height: 6),
-            _buildSummaryRow(
-              l10n.takshCharge,
-              '₹${takshCharge.toStringAsFixed(2)}',
-              info: true,
-            ),
-          ],
+          const SizedBox(height: 6),
+          _buildSummaryRow(
+            l10n.deliveryCharges,
+            deliveryCharges != null && deliveryCharges != 0
+                ? '₹${deliveryCharges.toStringAsFixed(2)}'
+                : l10n.free,
+            valueColor: deliveryCharges != null && deliveryCharges != 0
+                ? null
+                : AppColors.secondaryGreen,
+          ),
           if (platformFee != null && platformFee != 0) ...[
             const SizedBox(height: 6),
             _buildSummaryRow(

@@ -2400,4 +2400,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String orderOfTotal(int index, int total) {
     return 'ऑर्डर $index / $total';
   }
+
+  @override
+  String get notificationPermissionTitle => 'नोटिफ़िकेशन चालू करें';
+
+  @override
+  String get notificationPermissionMessage => 'Taksh से ऑर्डर अपडेट, पेमेंट कन्फर्मेशन और ऑफ़र पाने के लिए नोटिफ़िकेशन की अनुमति दें। आप इन्हें अपने डिवाइस की सेटिंग्स में चालू कर सकते हैं।';
 }
