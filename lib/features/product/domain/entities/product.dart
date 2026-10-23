@@ -36,6 +36,15 @@ class Product extends Equatable {
   final String? discountLabel;
   final int? saleId;
 
+  /// `veg`, `non_veg` or `none` (not a food item); null on older servers.
+  final String? foodType;
+
+  /// Return window in days from the API; null when the server did not send it.
+  final int? returnDays;
+
+  /// True only for a food item that says whether it is vegetarian.
+  bool get hasFoodType => foodType == 'veg' || foodType == 'non_veg';
+
   /// Whether the product is currently in stock (from API `in_stock` field)
   final bool inStock;
 
@@ -76,6 +85,8 @@ class Product extends Equatable {
     this.salePrice,
     this.discountLabel,
     this.saleId,
+    this.foodType,
+    this.returnDays,
     this.inStock = true,
     this.outOfStockMessage,
     this.availability,
@@ -139,6 +150,8 @@ class Product extends Equatable {
       salePrice: salePrice,
       discountLabel: discountLabel,
       saleId: saleId,
+      foodType: foodType,
+      returnDays: returnDays,
       inStock: inStock,
       outOfStockMessage: outOfStockMessage,
       availability: availability,
@@ -211,6 +224,8 @@ class Product extends Equatable {
     salePrice,
     discountLabel,
     saleId,
+    foodType,
+    returnDays,
     inStock,
     outOfStockMessage,
     availability,

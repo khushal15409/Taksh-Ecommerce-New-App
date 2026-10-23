@@ -80,7 +80,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     _similarProductsCubit = getIt<SimilarProductsCubit>();
     _deliveryCheckCubit = getIt<DeliveryCheckCubit>();
     _availabilityCubit = getIt<QuickProductAvailabilityCubit>();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _prefillPincode());
   }
 
   @override
@@ -118,7 +117,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               _selectedAddressOf(previous)?.id !=
               _selectedAddressOf(current)?.id,
           listener: (context, _) {
-            _prefillPincode();
+            // The pincode box is never filled in for the customer: the
+            // verdict shown is always for a pincode they typed and checked.
             final productState = context.read<ProductCubit>().state;
             if (productState is ProductDetailsLoaded) {
               _syncAvailability(productState.product);
@@ -292,17 +292,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (state is AddressOperationSuccess) return state.selectedAddress;
     if (state is AddressOperationError) return state.selectedAddress;
     return null;
-  }
-
-  /// Starts the pincode box with the selected address's pincode, only while it is empty
-  /// (a pincode the customer typed is never overwritten).
-  void _prefillPincode() {
-    if (!mounted || _pincodeController.text.isNotEmpty) return;
-    final selected = _selectedAddressOf(context.read<AddressBloc>().state);
-    final pincode = selected?.location.postalCode?.trim() ?? '';
-    if (pincode.length == 6) {
-      _pincodeController.text = pincode;
-    }
   }
 
   /// Location the Quick verdict is asked for: the same precedence the Quick
@@ -569,14 +558,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 const SizedBox(height: 7),
                 _buildTopMetaRow(product),
                 const SizedBox(height: 9),
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.grey900,
-                    height: 1.2,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (product.hasFoodType) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3, right: 8),
+                        child: _FoodTypeMark(isVeg: product.foodType == 'veg'),
+                      ),
+                    ],
+                    Expanded(
+                      child: Text(
+                        product.name,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.grey900,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -590,6 +592,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 _buildBrandSkuLine(product),
                 const SizedBox(height: 10),
                 _buildPriceRow(context, product),
+                _buildReturnWindow(product),
                 const SizedBox(height: 14),
                 if (product.isExpress30) ...[
                   _buildQuickAvailabilityPanel(product),
@@ -598,6 +601,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 _buildDeliveryAvailabilitySection(
                   product.id,
                   variantId: _selectedOrPreferredVariant(product)?.id,
+                  isQuick: product.isExpress30,
                 ),
                 if (product.variants != null &&
                     product.variants!.isNotEmpty) ...[
@@ -624,6 +628,48 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
         _buildBottomBar(product),
       ],
+    );
+  }
+
+  /// "7 days return" / "No returns" under the price (hidden when the server
+  /// did not send the window).
+  Widget _buildReturnWindow(Product product) {
+    final days = product.returnDays;
+    if (days == null) return const SizedBox.shrink();
+    final returnable = days > 0;
+    final color = returnable ? AppColors.secondaryGreen : AppColors.grey600;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: returnable ? _greenTint : AppColors.grey100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              returnable
+                  ? Icons.assignment_return_outlined
+                  : Icons.block_rounded,
+              size: 15,
+              color: color,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              returnable
+                  ? (days == 1 ? '1 day return' : '$days days return')
+                  : 'No returns',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1351,13 +1397,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.timer_outlined, color: Color(0xFFE4B800), size: 14),
+          // Only Quick products are delivered in minutes; Standard ones say so.
+          Icon(
+            product.isExpress30
+                ? Icons.timer_outlined
+                : Icons.local_shipping_outlined,
+            color: const Color(0xFFE4B800),
+            size: 14,
+          ),
           const SizedBox(width: 6),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('25 MINS', style: titleStyle),
-              Text('Delivery Time', style: subStyle),
+              Text(
+                product.isExpress30 ? '30 MINS' : 'STANDARD',
+                style: titleStyle,
+              ),
+              const Text('Delivery Time', style: subStyle),
             ],
           ),
           if (rating != null) ...[
@@ -1426,7 +1482,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  Widget _buildDeliveryAvailabilitySection(int productId, {int? variantId}) {
+  Widget _buildDeliveryAvailabilitySection(
+    int productId, {
+    int? variantId,
+    bool isQuick = false,
+  }) {
     return Container(
       padding: const EdgeInsets.fromLTRB(9, 8, 8, 8),
       decoration: BoxDecoration(
@@ -1466,11 +1526,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.delivery_dining_rounded,
+            Icon(
+              isQuick
+                  ? Icons.delivery_dining_rounded
+                  : Icons.local_shipping_outlined,
               size: 26,
-              color: Color(0xFFFF8A1F),
+              color: const Color(0xFFFF8A1F),
             ),
+            if (isQuick) ...[
             const SizedBox(width: 4),
             Container(
               width: 26,
@@ -1505,6 +1568,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 ],
               ),
             ),
+            ],
           ],
         ),
         const SizedBox(height: 6),
@@ -2245,6 +2309,42 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The Indian food mark: a green dot in a green box for veg, a red triangle in
+/// a red box for non-veg.
+class _FoodTypeMark extends StatelessWidget {
+  final bool isVeg;
+
+  const _FoodTypeMark({required this.isVeg});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isVeg ? const Color(0xFF1E9E4A) : const Color(0xFFD32F2F);
+    return Tooltip(
+      message: isVeg ? 'Veg' : 'Non-veg',
+      child: Container(
+        width: 16,
+        height: 16,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: color, width: 1.5),
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: isVeg
+            ? Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              )
+            : Transform.rotate(
+                angle: -1.5708,
+                child: Icon(Icons.play_arrow_rounded, size: 11, color: color),
+              ),
       ),
     );
   }
