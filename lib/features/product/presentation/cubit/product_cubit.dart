@@ -458,6 +458,8 @@ class ProductCubit extends Cubit<ProductState> {
         salePrice: primary.salePrice ?? fallback.salePrice,
         discountLabel: primary.discountLabel ?? fallback.discountLabel,
         saleId: primary.saleId ?? fallback.saleId,
+        foodType: primary.foodType ?? fallback.foodType,
+        returnDays: primary.returnDays ?? fallback.returnDays,
         inStock: resolvedInStock,
         outOfStockMessage: resolvedOutOfStockMessage,
       ),

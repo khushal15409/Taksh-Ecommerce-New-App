@@ -361,6 +361,8 @@ class ProductModel extends Product {
     super.salePrice,
     super.discountLabel,
     super.saleId,
+    super.foodType,
+    super.returnDays,
     this.inStock = true,
     this.outOfStockMessage,
     this.availability,
@@ -407,6 +409,10 @@ class ProductModel extends Product {
         processedJson['fulfillment_center_id'] == null
         ? null
         : _productAsInt(processedJson['fulfillment_center_id']);
+    processedJson['food_type'] = _productAsString(processedJson['food_type']);
+    processedJson['return_days'] = processedJson['return_days'] == null
+        ? null
+        : int.tryParse(processedJson['return_days'].toString());
     processedJson['is_trending'] = _productAsBool(processedJson['is_trending']);
     processedJson['is_latest'] = _productAsBool(processedJson['is_latest']);
     processedJson['is_express_30'] = _productAsBool(
