@@ -363,6 +363,10 @@ class ProductModel extends Product {
     super.saleId,
     super.foodType,
     super.returnDays,
+    super.origin,
+    super.packaging,
+    super.vendorName,
+    super.vendorAddress,
     this.inStock = true,
     this.outOfStockMessage,
     this.availability,
@@ -410,6 +414,9 @@ class ProductModel extends Product {
         ? null
         : _productAsInt(processedJson['fulfillment_center_id']);
     processedJson['food_type'] = _productAsString(processedJson['food_type']);
+    for (final key in ['origin', 'packaging', 'vendor_name', 'vendor_address']) {
+      processedJson[key] = _productAsString(processedJson[key]);
+    }
     processedJson['return_days'] = processedJson['return_days'] == null
         ? null
         : int.tryParse(processedJson['return_days'].toString());

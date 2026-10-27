@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:taksh_e_commerce/core/constants/api_constants.dart';
+import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/features/checkout/domain/entities/payment_method_selection.dart';
 import 'package:taksh_e_commerce/features/checkout/presentation/bloc/checkout_bloc.dart';
@@ -25,6 +28,51 @@ class _PaymentMethodSelectorWidgetState
     super.initState();
     // Set initial selection from bloc
     _selectedMethod = context.read<CheckoutBloc>().selectedPaymentMethod;
+    _loadOptions();
+  }
+
+  /// Which methods the admin has left on, e.g. {'standard': {'cod': true, ...}}.
+  /// Until it arrives (or if it fails) every method stays shown, as before.
+  Map<String, Map<String, bool>> _options = const {};
+
+  Future<void> _loadOptions() async {
+    try {
+      final response = await GetIt.I<ApiClient>().get(
+        ApiConstants.paymentOptions,
+      );
+      final data = ((response.data as Map)['data'] as Map?) ?? const {};
+      final parsed = <String, Map<String, bool>>{
+        for (final entry in data.entries)
+          entry.key.toString(): {
+            'cod': (entry.value as Map)['cod'] != false,
+            'online': (entry.value as Map)['online'] != false,
+          },
+      };
+      if (mounted) setState(() => _options = parsed);
+    } catch (_) {
+      // Keep showing everything; the server still refuses a method that is off.
+    }
+  }
+
+  bool _isOn(PaymentMethodType type) {
+    final express =
+        context.read<CheckoutBloc>().selectedDeliveryOption?.isExpress ?? false;
+    final flags = _options[express ? 'quick' : 'standard'];
+    return flags == null || flags[type.value] != false;
+  }
+
+  /// If the chosen method was switched off, move to the one that is left.
+  void _fixSelection() {
+    if (_isOn(_selectedMethod.type)) return;
+    final fallback = _isOn(PaymentMethodType.cod)
+        ? PaymentMethodSelection.cod
+        : _isOn(PaymentMethodType.online)
+        ? PaymentMethodSelection.online
+        : null;
+    if (fallback == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selectPaymentMethod(fallback);
+    });
   }
 
   void _selectPaymentMethod(PaymentMethodSelection method) {
@@ -36,6 +84,13 @@ class _PaymentMethodSelectorWidgetState
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild when the delivery option changes, since the options differ per kind of order.
+    context.watch<CheckoutBloc>();
+    final codOn = _isOn(PaymentMethodType.cod);
+    final onlineOn = _isOn(PaymentMethodType.online);
+    if (!codOn && !onlineOn) return const SizedBox.shrink();
+    _fixSelection();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -49,6 +104,7 @@ class _PaymentMethodSelectorWidgetState
           child: Column(
             children: [
               // COD Payment Method
+              if (codOn)
               _buildPaymentMethodTile(
                 method: PaymentMethodSelection.cod,
                 icon: Icons.payments_outlined,
@@ -57,8 +113,9 @@ class _PaymentMethodSelectorWidgetState
                 isSelected: _selectedMethod.type == PaymentMethodType.cod,
                 onTap: () => _selectPaymentMethod(PaymentMethodSelection.cod),
               ),
-              const SizedBox(height: 6),
+              if (codOn && onlineOn) const SizedBox(height: 6),
               // Online Payment Method
+              if (onlineOn)
               _buildPaymentMethodTile(
                 method: PaymentMethodSelection.online,
                 icon: Icons.credit_card_rounded,

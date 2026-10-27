@@ -1916,12 +1916,25 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     add('Category', product.category?.name);
     add('SKU', variant?.sku);
     add('Weight', variant?.weight);
+    add('Origin', product.origin);
     final dims = [variant?.length, variant?.width, variant?.height];
     if (dims.every((d) => d != null && d.trim().isNotEmpty)) {
       add('Dimensions', dims.map((d) => d!.trim()).join(' x '));
     }
 
-    if (rows.isEmpty) return const [];
+    // Long text goes in a full-width card so it is not squeezed into half the screen.
+    final wideRows = <MapEntry<String, String>>[];
+    void addWide(String label, String? value) {
+      if (value != null && value.trim().isNotEmpty) {
+        wideRows.add(MapEntry(label, value.trim()));
+      }
+    }
+
+    addWide('Packaging', product.packaging);
+    addWide('Sold by', product.vendorName);
+    addWide('Seller address', product.vendorAddress);
+
+    if (rows.isEmpty && wideRows.isEmpty) return const [];
 
     Widget card(List<MapEntry<String, String>> items) {
       return Container(
@@ -1984,7 +1997,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       const SizedBox(height: 14),
       _buildSectionHeader(Icons.list_rounded, 'Specifications'),
       const SizedBox(height: 7),
-      if (split)
+      if (rows.isNotEmpty && split)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1993,8 +2006,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             Expanded(child: card(rows.sublist(half))),
           ],
         )
-      else
+      else if (rows.isNotEmpty)
         card(rows),
+      if (rows.isNotEmpty && wideRows.isNotEmpty) const SizedBox(height: 7),
+      if (wideRows.isNotEmpty) card(wideRows),
     ];
   }
 
