@@ -39,6 +39,12 @@ class Product extends Equatable {
   /// `veg`, `non_veg` or `none` (not a food item); null on older servers.
   final String? foodType;
 
+  /// Where the product comes from, who packed it and who sells it; null when the server has none.
+  final String? origin;
+  final String? packaging;
+  final String? vendorName;
+  final String? vendorAddress;
+
   /// Return window in days from the API; null when the server did not send it.
   final int? returnDays;
 
@@ -87,6 +93,10 @@ class Product extends Equatable {
     this.saleId,
     this.foodType,
     this.returnDays,
+    this.origin,
+    this.packaging,
+    this.vendorName,
+    this.vendorAddress,
     this.inStock = true,
     this.outOfStockMessage,
     this.availability,
@@ -152,6 +162,10 @@ class Product extends Equatable {
       saleId: saleId,
       foodType: foodType,
       returnDays: returnDays,
+      origin: origin,
+      packaging: packaging,
+      vendorName: vendorName,
+      vendorAddress: vendorAddress,
       inStock: inStock,
       outOfStockMessage: outOfStockMessage,
       availability: availability,
@@ -226,6 +240,10 @@ class Product extends Equatable {
     saleId,
     foodType,
     returnDays,
+    origin,
+    packaging,
+    vendorName,
+    vendorAddress,
     inStock,
     outOfStockMessage,
     availability,

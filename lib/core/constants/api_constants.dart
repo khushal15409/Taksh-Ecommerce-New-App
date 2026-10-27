@@ -120,6 +120,9 @@ class ApiConstants {
 
   /// Payment endpoints
   static const String paymentMethods = '/payments/methods';
+
+  /// Which of cash on delivery / online the admin has left on, per kind of order.
+  static const String paymentOptions = '/payment-options';
   static const String createPayment =
       '/payments/create'; // Creates Razorpay order
   static const String verifyPayment =
