@@ -41,7 +41,7 @@ class TermsConditionsPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    AppLocalizations.of(context)!.lastUpdated('January 22, 2026'),
+                    AppLocalizations.of(context)!.lastUpdated('October 28, 2026'),
                     style: TextStyle(
                       fontSize: 13,
                       color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -86,14 +86,32 @@ class TermsConditionsPage extends StatelessWidget {
 
             _buildSection(
               context,
+              title: AppLocalizations.of(context)!.termsPaymentTitle,
+              content: AppLocalizations.of(context)!.termsPaymentContent,
+            ),
+
+            _buildSection(
+              context,
               title: AppLocalizations.of(context)!.termsShippingTitle,
               content: AppLocalizations.of(context)!.termsShippingContent,
             ),
 
             _buildSection(
               context,
+              title: AppLocalizations.of(context)!.termsCancelTitle,
+              content: AppLocalizations.of(context)!.termsCancelContent,
+            ),
+
+            _buildSection(
+              context,
               title: AppLocalizations.of(context)!.termsReturnsTitle,
               content: AppLocalizations.of(context)!.termsReturnsContent,
+            ),
+
+            _buildSection(
+              context,
+              title: AppLocalizations.of(context)!.termsOffersTitle,
+              content: AppLocalizations.of(context)!.termsOffersContent,
             ),
 
             _buildSection(
@@ -136,6 +154,12 @@ class TermsConditionsPage extends StatelessWidget {
               context,
               title: AppLocalizations.of(context)!.termsLawTitle,
               content: AppLocalizations.of(context)!.termsLawContent,
+            ),
+
+            _buildSection(
+              context,
+              title: AppLocalizations.of(context)!.termsGrievanceTitle,
+              content: AppLocalizations.of(context)!.termsGrievanceContent,
             ),
 
             _buildSection(

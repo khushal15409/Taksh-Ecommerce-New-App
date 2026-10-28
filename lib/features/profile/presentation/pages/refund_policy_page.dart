@@ -41,7 +41,7 @@ class RefundPolicyPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    AppLocalizations.of(context)!.lastUpdated('January 22, 2026'),
+                    AppLocalizations.of(context)!.lastUpdated('October 28, 2026'),
                     style: TextStyle(
                       fontSize: 13,
                       color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -236,7 +236,7 @@ class RefundPolicyPage extends StatelessWidget {
 
             _buildRefundMethodCard(
               context,
-              icon: Icons.credit_card,
+              icon: Icons.account_balance_wallet,
               title: AppLocalizations.of(context)!.refundMethodOriginalTitle,
               description: AppLocalizations.of(context)!.refundMethodOriginalDesc,
               days: AppLocalizations.of(context)!.refundMethodOriginalDays,
@@ -244,7 +244,7 @@ class RefundPolicyPage extends StatelessWidget {
 
             _buildRefundMethodCard(
               context,
-              icon: Icons.account_balance_wallet,
+              icon: Icons.swap_horiz,
               title: AppLocalizations.of(context)!.refundMethodCreditTitle,
               description: AppLocalizations.of(context)!.refundMethodCreditDesc,
               days: AppLocalizations.of(context)!.refundMethodCreditDays,
@@ -252,7 +252,7 @@ class RefundPolicyPage extends StatelessWidget {
 
             _buildRefundMethodCard(
               context,
-              icon: Icons.account_balance,
+              icon: Icons.credit_card,
               title: AppLocalizations.of(context)!.refundMethodBankTitle,
               description: AppLocalizations.of(context)!.refundMethodBankDesc,
               days: AppLocalizations.of(context)!.refundMethodBankDays,
