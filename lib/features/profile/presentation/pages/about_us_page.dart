@@ -139,7 +139,7 @@ class AboutUsPage extends StatelessWidget {
 
                   _buildValueCard(
                     context,
-                    icon: Icons.eco,
+                    icon: Icons.storefront,
                     title: AppLocalizations.of(context)!.sustainability,
                     description:
                         AppLocalizations.of(context)!.sustainabilityDesc,
@@ -190,16 +190,28 @@ class AboutUsPage extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildStat(context, '50K+',
-                                  AppLocalizations.of(context)!.happyCustomers),
+                              child: _buildHighlight(
+                                context,
+                                Icons.bolt,
+                                AppLocalizations.of(context)!
+                                    .aboutHighlightExpress,
+                              ),
                             ),
                             Expanded(
-                              child: _buildStat(context, '20K+',
-                                  AppLocalizations.of(context)!.products),
+                              child: _buildHighlight(
+                                context,
+                                Icons.local_shipping_outlined,
+                                AppLocalizations.of(context)!
+                                    .aboutHighlightDelivery,
+                              ),
                             ),
                             Expanded(
-                              child: _buildStat(context, '100+',
-                                  AppLocalizations.of(context)!.brands),
+                              child: _buildHighlight(
+                                context,
+                                Icons.lock_outline,
+                                AppLocalizations.of(context)!
+                                    .aboutHighlightPayments,
+                              ),
                             ),
                           ],
                         ),
@@ -207,16 +219,28 @@ class AboutUsPage extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildStat(context, '40+',
-                                  AppLocalizations.of(context)!.cities),
+                              child: _buildHighlight(
+                                context,
+                                Icons.payments_outlined,
+                                AppLocalizations.of(context)!
+                                    .aboutHighlightCod,
+                              ),
                             ),
                             Expanded(
-                              child: _buildStat(context, '4.5★',
-                                  AppLocalizations.of(context)!.rating),
+                              child: _buildHighlight(
+                                context,
+                                Icons.assignment_return_outlined,
+                                AppLocalizations.of(context)!
+                                    .aboutHighlightReturns,
+                              ),
                             ),
                             Expanded(
-                              child: _buildStat(context, '24/7',
-                                  AppLocalizations.of(context)!.support),
+                              child: _buildHighlight(
+                                context,
+                                Icons.storefront_outlined,
+                                AppLocalizations.of(context)!
+                                    .aboutHighlightLocal,
+                              ),
                             ),
                           ],
                         ),
@@ -250,7 +274,7 @@ class AboutUsPage extends StatelessWidget {
                           context,
                           Icons.email,
                           AppLocalizations.of(context)!.emailLabel,
-                          'info@takshllinone.in',
+                          'customersupport@takshallinone.in',
                         ),
                         const SizedBox(height: 12),
                         _buildContactItem(
@@ -375,23 +399,17 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(BuildContext context, String value, String label) {
+  Widget _buildHighlight(BuildContext context, IconData icon, String label) {
     return Column(
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryOrange,
-          ),
-        ),
-        const SizedBox(height: 4),
+        Icon(icon, size: 28, color: AppColors.primaryOrange),
+        const SizedBox(height: 6),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).textTheme.bodySmall?.color,
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).textTheme.bodyMedium?.color,
           ),
           textAlign: TextAlign.center,
         ),

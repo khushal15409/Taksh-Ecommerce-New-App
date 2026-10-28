@@ -444,590 +444,700 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get termsIntroTitle => '1. Introduction';
+  String get termsIntroTitle =>
+      '1. Introduction and Acceptance';
 
   @override
   String get termsIntroContent =>
-      'Welcome to our E-Commerce platform. These Terms and Conditions govern your use of our mobile application and services. By accessing or using our app, you agree to be bound by these terms. If you disagree with any part of these terms, you may not access our service.';
+      'Welcome to Taksh, operated by TAKSH ALL IN ONE ECOMMERCE & LOGISTICS WITH MULTI SERVICES PRIVATE LIMITED ("Taksh", "we", "us"). These Terms & Conditions govern your use of our mobile application and related services (the "Platform"). By downloading, registering or using the Platform, you agree to these Terms. If you do not agree, please do not use the Platform.\n\nYou must be at least 18 years old and legally able to enter into a contract under the Indian Contract Act, 1872. Minors may use the Platform only under the supervision of a parent or guardian.';
 
   @override
-  String get termsAccountTitle => '2. Account Registration';
+  String get termsAccountTitle =>
+      '2. Account Registration';
 
   @override
   String get termsAccountContent =>
-      'To use certain features of our service, you must register for an account. You agree to:\n\n• Provide accurate and complete information\n• Maintain the security of your password\n• Notify us immediately of any unauthorized use\n• Accept responsibility for all activities under your account';
+      'You sign in with your mobile number, verified by a One-Time Password (OTP). You agree to:\n\n• Provide accurate and complete information\n• Keep your device and OTP confidential and never share your OTP with anyone\n• Tell us immediately if you suspect unauthorised use\n• Accept responsibility for all activity under your account\n\nWe may suspend or close accounts that give false information or break these Terms.';
 
   @override
-  String get termsUserRespTitle => '3. User Responsibilities';
+  String get termsUserRespTitle =>
+      '3. User Responsibilities';
 
   @override
   String get termsUserRespContent =>
-      'As a user of our platform, you agree to:\n\n• Use the service only for lawful purposes\n• Not violate any applicable laws or regulations\n• Not infringe on intellectual property rights\n• Not transmit harmful or malicious code\n• Not attempt to gain unauthorized access to our systems';
+      'As a user of the Platform, you agree to:\n\n• Use it only for lawful purposes\n• Not provide false information or pretend to be someone else\n• Not misuse offers, coupons or referral benefits\n• Not post abusive, misleading or unlawful reviews or content\n• Not copy, scrape or interfere with the Platform or try to gain unauthorised access to our systems\n• Not infringe the intellectual property rights of others';
 
   @override
-  String get termsProductsTitle => '4. Products and Services';
+  String get termsProductsTitle =>
+      '4. Products and Pricing';
 
   @override
   String get termsProductsContent =>
-      'We strive to provide accurate product descriptions and pricing. However:\n\n• Product images are for illustration purposes\n• We reserve the right to modify prices without notice\n• Product availability may vary\n• We are not liable for pricing or description errors';
+      'We try to show accurate product descriptions, images, prices and availability. However:\n\n• Images are for illustration and colour or packaging may differ slightly\n• All prices are in Indian Rupees (INR) and include applicable taxes unless stated otherwise\n• Delivery or handling charges, if any, are shown before you place the order\n• Prices, offers and availability may change without notice; the price shown when you place the order applies\n• If a product is listed at a wrong price because of a technical or typing error, we may cancel the order and refund any amount paid';
 
   @override
-  String get termsOrdersTitle => '5. Orders and Payment';
+  String get termsOrdersTitle =>
+      '5. Orders';
 
   @override
   String get termsOrdersContent =>
-      'When placing an order, you agree that:\n\n• All information provided is accurate\n• You are authorized to use the payment method\n• You will pay all applicable charges\n• Orders are subject to acceptance and availability\n• We may cancel orders for any reason';
+      '• Placing an order is an offer to buy. A contract is formed only when we confirm your order\n• You confirm that the details you give (including your delivery address and phone number) are correct\n• We may cancel or refuse an order if stock is unavailable, there is a pricing error, fraud is suspected or the address cannot be served. If you have already paid, we will refund you\n• Quantity limits may apply to some products';
 
   @override
-  String get termsShippingTitle => '6. Shipping and Delivery';
+  String get termsPaymentTitle =>
+      '6. Payments';
+
+  @override
+  String get termsPaymentContent =>
+      '• You can pay online through our payment gateway (UPI, cards, net banking or wallets) or choose Cash on Delivery where available\n• Online payments are processed by a third-party payment gateway. We do not store your card number, CVV, UPI PIN or banking passwords\n• You confirm that you are authorised to use the payment method you choose\n• If money is debited but the order is not confirmed, the amount is normally reversed automatically within 5 to 7 working days. If it is not, please contact us with the transaction details\n• For Cash on Delivery, please keep the payment ready at delivery. We may limit or disable Cash on Delivery for accounts with repeated refused or undelivered orders';
+
+  @override
+  String get termsShippingTitle =>
+      '7. Delivery';
 
   @override
   String get termsShippingContent =>
-      'For shipping and delivery:\n\n• Delivery times are estimates only\n• We are not responsible for delays beyond our control\n• Risk of loss passes to you upon delivery\n• You must inspect items upon delivery\n• Delivery address must be accurate and complete';
+      '• Delivery options (Express 30-minute, Next-Day and Standard) depend on your location and product availability\n• Delivery times are estimates, not guarantees. Delays can happen due to weather, traffic, high demand or other events beyond our control\n• Please give a complete and correct address and keep your phone reachable. We are not responsible for failed delivery caused by wrong or incomplete details\n• Please check your items at delivery and report any problem as soon as possible\n• Risk of loss passes to you on delivery';
 
   @override
-  String get termsReturnsTitle => '7. Returns and Refunds';
+  String get termsCancelTitle =>
+      '8. Cancellations';
+
+  @override
+  String get termsCancelContent =>
+      '• You can cancel an order before it is dispatched, from the app or by contacting us\n• Once an order is dispatched it cannot be cancelled, but it may be returned as per our Refund & Return Policy\n• Prepaid orders cancelled before dispatch are refunded as described in our Refund & Return Policy';
+
+  @override
+  String get termsReturnsTitle =>
+      '9. Returns and Refunds';
 
   @override
   String get termsReturnsContent =>
-      'Our return and refund policy includes:\n\n• Items must be returned within the specified period\n• Products must be in original condition\n• Proof of purchase is required\n• Refunds will be processed to the original payment method\n• Some items may not be eligible for return';
+      'Returns, replacements and refunds are governed by our Refund & Return Policy, which is part of these Terms. In short:\n\n• Return requests must be raised in the app within the return window shown for the product\n• Items must be unused and in their original condition and packaging\n• Some items cannot be returned, as listed in the policy\n• Approved refunds for returned items are credited to your Taksh wallet';
 
   @override
-  String get termsIpTitle => '8. Intellectual Property';
+  String get termsOffersTitle =>
+      '10. Offers and Third-Party Sellers';
+
+  @override
+  String get termsOffersContent =>
+      '• Offers, discounts and coupons are subject to their own terms, validity and usage limits and may be withdrawn or changed at any time\n• Some products are sold by third-party sellers and delivered through our fulfillment centers or delivery partners. Taksh facilitates the sale and, where applicable, the seller\'s details are shown on the product page\n• The Platform may link to third-party services. We are not responsible for their content or practices';
+
+  @override
+  String get termsIpTitle =>
+      '11. Intellectual Property';
 
   @override
   String get termsIpContent =>
-      'All content on our platform, including but not limited to text, graphics, logos, images, and software, is our property or that of our licensors and is protected by copyright, trademark, and other intellectual property laws.';
+      'All content on the Platform, including logos, trademarks, text, graphics, images and software, belongs to Taksh or its licensors and is protected by Indian intellectual property laws. You may not copy, modify, distribute or use it commercially without our written permission.';
 
   @override
-  String get termsPrivacyTitle => '9. Privacy and Data Protection';
+  String get termsPrivacyTitle =>
+      '12. Privacy and Data Protection';
 
   @override
   String get termsPrivacyContent =>
-      'Your privacy is important to us. We collect and use your personal information in accordance with our Privacy Policy. By using our service, you consent to our collection and use of your information as described.';
+      'Your privacy matters to us. We collect and use your personal data as described in our Privacy Policy. By using the Platform, you consent to that collection and use.';
 
   @override
-  String get termsLiabilityTitle => '10. Limitation of Liability';
+  String get termsLiabilityTitle =>
+      '13. Limitation of Liability';
 
   @override
   String get termsLiabilityContent =>
-      'To the maximum extent permitted by law:\n\n• We are not liable for indirect or consequential damages\n• Our total liability is limited to the amount paid by you\n• We do not guarantee uninterrupted or error-free service\n• We are not responsible for third-party content or services';
+      'To the extent permitted by law:\n\n• The Platform is provided "as is" and "as available". We do not promise that it will always be uninterrupted or error-free\n• We are not liable for indirect or consequential losses\n• Our total liability for any claim about an order is limited to the amount you paid for that order\n• Manufacturer warranties, if any, are given by the manufacturer\n\nNothing in these Terms limits your rights under the Consumer Protection Act, 2019.';
 
   @override
-  String get termsIndemnifyTitle => '11. Indemnification';
+  String get termsIndemnifyTitle =>
+      '14. Indemnification';
 
   @override
   String get termsIndemnifyContent =>
-      'You agree to indemnify and hold us harmless from any claims, damages, losses, liabilities, and expenses arising from your use of our service or violation of these terms.';
+      'You agree to compensate and hold Taksh harmless against claims, losses and expenses that arise from your breach of these Terms or your violation of any law or the rights of others.';
 
   @override
-  String get termsModTitle => '12. Modifications to Terms';
+  String get termsModTitle =>
+      '15. Changes to These Terms';
 
   @override
   String get termsModContent =>
-      'We reserve the right to modify these terms at any time. We will notify you of significant changes. Your continued use of the service after changes constitutes acceptance of the modified terms.';
+      'We may update these Terms from time to time. The updated Terms will be shown in the app with a new "Last Updated" date. If you continue to use the Platform after the change, you accept the updated Terms.';
 
   @override
-  String get termsTerminationTitle => '13. Termination';
+  String get termsTerminationTitle =>
+      '16. Suspension and Termination';
 
   @override
   String get termsTerminationContent =>
-      'We may terminate or suspend your account and access to our service immediately, without prior notice, for any reason, including breach of these terms.';
+      'We may suspend or end your access if you break these Terms, misuse the Platform or the law requires it. You may stop using the Platform and delete your account at any time. Rights and obligations that arose before termination continue.';
 
   @override
-  String get termsLawTitle => '14. Governing Law';
+  String get termsLawTitle =>
+      '17. Governing Law and Jurisdiction';
 
   @override
   String get termsLawContent =>
-      'These terms are governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions.';
+      'These Terms are governed by the laws of India. Subject to your rights as a consumer under applicable law, the courts at Bhopal, Madhya Pradesh will have jurisdiction over disputes.';
 
   @override
-  String get termsContactTitle => '15. Contact Information';
+  String get termsGrievanceTitle =>
+      '18. Grievance Officer';
+
+  @override
+  String get termsGrievanceContent =>
+      'In line with the Information Technology Act, 2000 and the Consumer Protection (E-Commerce) Rules, 2020, you can send complaints to our Grievance Officer:\n\nGrievance Officer\nTAKSH ALL IN ONE ECOMMERCE & LOGISTICS WITH MULTI SERVICES PRIVATE LIMITED\nEmail: customersupport@takshallinone.in\nAddress: Bhopal, Madhya Pradesh, India\n\nWe acknowledge complaints within 48 hours and aim to resolve them within one month.';
+
+  @override
+  String get termsContactTitle =>
+      '19. Contact Us';
 
   @override
   String get termsContactContent =>
-      'If you have any questions about these Terms and Conditions, please contact us:\n\nEmail: support@taksh-ecommerce.com\nPhone: +91 1800-123-4567\nAddress: Mumbai, Maharashtra, India';
+      'For any question about these Terms, contact us:\n\nEmail: customersupport@takshallinone.in\nAddress: Bhopal, Madhya Pradesh, India';
 
   @override
   String get termsAck =>
-      'By using our service, you acknowledge that you have read and understood these Terms & Conditions.';
+      'By using Taksh, you confirm that you have read and understood these Terms & Conditions.';
 
   @override
-  String get refundCommitmentTitle => 'Our Commitment';
+  String get refundCommitmentTitle =>
+      'Our Commitment';
 
   @override
   String get refundCommitmentContent =>
-      'At Taksh E-Commerce, customer satisfaction is our top priority. We want you to be completely satisfied with your purchase. If you\'re not happy with your order, we\'re here to help with our easy return and refund process.';
+      'At Taksh E-Commerce we want you to be happy with every order. If something is wrong with your order, this policy explains how returns, replacements, cancellations and refunds work.';
 
   @override
   String get refundReadPolicy =>
-      'Please read this policy carefully to understand your rights and responsibilities regarding returns and refunds.';
+      'Please read this policy carefully. It is part of our Terms & Conditions.';
 
   @override
-  String get refundEligibilityTitle => '1. Return Eligibility';
+  String get refundEligibilityTitle =>
+      '1. Return Eligibility';
 
   @override
   String get refundEligibilityContent =>
-      'You can return most items within 7 days of delivery if:';
+      'You can request a return within the return window of the product, counted from the date of delivery. The window is shown on the product page and is 7 days unless stated otherwise. You can request a return if:';
 
   @override
   String get refundEligibilityItem1 =>
-      'The item is unused and in its original condition';
+      'You received a wrong, damaged or defective item, or one that is different from its description';
 
   @override
   String get refundEligibilityItem2 =>
-      'All original packaging, tags, and labels are intact';
+      'Parts, accessories or quantity are missing from your order';
 
   @override
   String get refundEligibilityItem3 =>
-      'You have proof of purchase (order confirmation or invoice)';
+      'There is a size, fit or colour issue (where the product allows it)';
 
   @override
   String get refundEligibilityItem4 =>
-      'The product is not on the non-returnable list';
+      'The item is unused, with original packaging, tags and labels intact';
 
   @override
   String get refundEligibilityItem5 =>
-      'The item has not been damaged or altered';
+      'You raise the request in the app with a reason and clear photos';
 
   @override
-  String get refundNonReturnableTitle => '2. Non-Returnable Items';
+  String get refundNonReturnableTitle =>
+      '2. Non-Returnable Items';
 
   @override
   String get refundNonReturnableContent =>
-      'The following items cannot be returned:';
+      'The following items cannot be returned, unless they arrive damaged, defective or wrong:';
 
   @override
   String get refundNonReturnableItem1 =>
-      'Perishable goods (food, flowers, etc.)';
+      'Perishable goods such as fresh food, fruits and vegetables';
 
   @override
-  String get refundNonReturnableItem2 => 'Intimate or sanitary products';
+  String get refundNonReturnableItem2 =>
+      'Opened or used personal care, hygiene and intimate items';
 
   @override
-  String get refundNonReturnableItem3 => 'Customized or personalized items';
+  String get refundNonReturnableItem3 =>
+      'Customised or personalised items';
 
   @override
-  String get refundNonReturnableItem4 => 'Digital products and downloads';
+  String get refundNonReturnableItem4 =>
+      'Digital products, gift cards and vouchers';
 
   @override
-  String get refundNonReturnableItem5 => 'Gift cards and vouchers';
+  String get refundNonReturnableItem5 =>
+      'Products marked "non-returnable" on the product page';
 
   @override
   String get refundNonReturnableItem6 =>
-      'Products marked as \"non-returnable\" at the time of purchase';
+      'Items damaged through misuse after delivery';
 
   @override
-  String get refundProcessTitle => '3. Return Process';
+  String get refundProcessTitle =>
+      '3. Return Process';
 
   @override
   String get refundProcessContent =>
-      'Follow these simple steps to initiate a return:';
+      'Follow these steps to return an item:';
 
   @override
-  String get refundStep1Title => 'Initiate Return Request';
+  String get refundStep1Title =>
+      'Raise a Return Request';
 
   @override
   String get refundStep1Desc =>
-      'Go to \"Your Orders\" section in the app and select the item you want to return. Choose the return reason and submit your request.';
+      'Go to "Your Orders", select the item and tap Return. Choose a reason, add up to 5 photos and submit.';
 
   @override
-  String get refundStep2Title => 'Return Approval';
+  String get refundStep2Title =>
+      'Request Review';
 
   @override
   String get refundStep2Desc =>
-      'Our team will review your request within 24 hours. You\'ll receive a confirmation email with return instructions.';
+      'Our team reviews your request, usually within 24 to 48 hours. You can see the status in the app.';
 
   @override
-  String get refundStep3Title => 'Pack the Item';
+  String get refundStep3Title =>
+      'Pack the Item';
 
   @override
   String get refundStep3Desc =>
-      'Pack the item securely in its original packaging with all accessories, tags, and invoice.';
+      'Keep the item in its original packaging with all accessories, tags and the invoice.';
 
   @override
-  String get refundStep4Title => 'Pickup or Drop-off';
+  String get refundStep4Title =>
+      'Pickup and Resolution';
 
   @override
   String get refundStep4Desc =>
-      'Choose between free pickup from your address or drop-off at our partner locations.';
+      'If approved, we will arrange a pickup or tell you how to send the item back. After it is received and checked, your refund or replacement is processed.';
 
   @override
-  String get refundTimelineTitle => '4. Refund Timeline';
+  String get refundTimelineTitle =>
+      '4. Refund Timeline';
 
   @override
-  String get refundTimelineContent => 'After we receive your returned item:';
+  String get refundTimelineContent =>
+      'A typical timeline after your return request is approved (actual time may vary by location and product):';
 
   @override
-  String get refundTimelineItem1Day => 'Day 1-2';
+  String get refundTimelineItem1Day =>
+      'Day 1-2';
 
   @override
   String get refundTimelineItem1Desc =>
-      'Item received at our facility and quality check initiated';
+      'Item picked up or received and quality check started';
 
   @override
-  String get refundTimelineItem2Day => 'Day 3-4';
+  String get refundTimelineItem2Day =>
+      'Day 3-4';
 
   @override
   String get refundTimelineItem2Desc =>
-      'Quality inspection completed and refund approved';
+      'Quality check completed and refund approved';
 
   @override
-  String get refundTimelineItem3Day => 'Day 5-7';
+  String get refundTimelineItem3Day =>
+      'Day 5-7';
 
   @override
   String get refundTimelineItem3Desc =>
-      'Refund processed to your original payment method';
+      'Refund credited to your Taksh wallet or replacement dispatched';
 
   @override
   String get refundProcessingNote =>
-      'Bank processing may take an additional 3-5 business days depending on your bank.';
+      'These timelines are estimates. Delays can happen during sale periods and holidays or when extra verification is needed.';
 
   @override
-  String get refundMethodsTitle => '5. Refund Methods';
+  String get refundMethodsTitle =>
+      '5. How You Get Your Money Back';
 
   @override
-  String get refundMethodsContent => 'Refunds will be processed through:';
+  String get refundMethodsContent =>
+      'Depending on your case, your request is settled in one of these ways:';
 
   @override
-  String get refundMethodOriginalTitle => 'Original Payment Method';
+  String get refundMethodOriginalTitle =>
+      'Taksh Wallet Credit';
 
   @override
   String get refundMethodOriginalDesc =>
-      'Refunded to the same card/UPI/wallet used for purchase';
+      'Refunds for approved returns are credited to your Taksh wallet and can be used on future orders';
 
   @override
-  String get refundMethodOriginalDays => '5-7 days';
+  String get refundMethodOriginalDays =>
+      'After check';
 
   @override
-  String get refundMethodCreditTitle => 'Store Credit';
+  String get refundMethodCreditTitle =>
+      'Replacement';
 
   @override
   String get refundMethodCreditDesc =>
-      'Instant credit to your Taksh E-Commerce wallet for future purchases';
+      'The same item is sent again, subject to stock availability';
 
   @override
-  String get refundMethodCreditDays => 'Instant';
+  String get refundMethodCreditDays =>
+      'Subject to stock';
 
   @override
-  String get refundMethodBankTitle => 'Bank Transfer';
+  String get refundMethodBankTitle =>
+      'Original Payment Method';
 
   @override
   String get refundMethodBankDesc =>
-      'Direct transfer to your bank account (requires account details)';
+      'Prepaid orders cancelled before dispatch are refunded to the card, UPI or bank account used to pay';
 
   @override
-  String get refundMethodBankDays => '7-10 days';
+  String get refundMethodBankDays =>
+      '5-7 days';
 
   @override
-  String get refundDamagedTitle => '6. Damaged or Defective Products';
+  String get refundDamagedTitle =>
+      '6. Damaged or Defective Products';
 
   @override
   String get refundDamagedContent =>
-      'If you receive a damaged or defective product:\n\n• Report within 48 hours of delivery\n• Provide clear photos of the damage/defect\n• We will arrange immediate pickup\n• Replacement or full refund will be processed\n• No questions asked for genuine cases';
+      'If you receive a damaged or defective product:\n\n• Report it in the app as soon as possible, ideally within 48 hours of delivery and always within the return window\n• Add clear photos of the item and its packaging\n• After verification we will offer a replacement or refund\n• For perishable items, please report at the time of delivery or within 24 hours';
 
   @override
-  String get refundWrongTitle => '7. Wrong Product Delivered';
+  String get refundWrongTitle =>
+      '7. Wrong Product Delivered';
 
   @override
   String get refundWrongContent =>
-      'If you receive the wrong product:\n\n• Contact us immediately through the app\n• We will arrange free return pickup\n• Correct product will be shipped immediately\n• If correct product is unavailable, full refund will be issued';
+      'If you receive the wrong product:\n\n• Raise a return in the app with photos\n• We will not charge you for a return that results from our error\n• We will send the correct item, subject to stock\n• If the correct item is not available, you will be refunded';
 
   @override
-  String get refundPartialTitle => '8. Partial Refunds';
+  String get refundPartialTitle =>
+      '8. Partial Refunds';
 
   @override
   String get refundPartialContent =>
-      'In certain situations, partial refunds may be granted:';
+      'In some cases only a part of the amount may be refunded:';
 
   @override
   String get refundPartialItem1 =>
-      'Items returned after the return window but within 15 days';
+      'The item shows signs of use or minor damage not caused by us';
 
   @override
-  String get refundPartialItem2 => 'Products with signs of use or minor damage';
+  String get refundPartialItem2 =>
+      'Accessories, tags or original packaging are missing';
 
   @override
-  String get refundPartialItem3 => 'Items missing accessories or packaging';
+  String get refundPartialItem3 =>
+      'Only a part of the order is affected or returned';
 
   @override
-  String get refundPartialItem4 => 'Discounted or sale items (as per terms)';
+  String get refundPartialItem4 =>
+      'Free or promotional items that came with the order are not returned';
 
   @override
-  String get refundExchangeTitle => '9. Exchange Policy';
+  String get refundExchangeTitle =>
+      '9. Replacement';
 
   @override
   String get refundExchangeContent =>
-      'We offer easy exchanges for:\n\n• Size or color variations\n• Different product models\n• Upgraded versions\n\nThe exchange process is similar to returns, but you can select a replacement product during the return request.';
+      'When you raise a return, you can ask for a replacement instead of a refund. We send the same item again, subject to stock. If it is not available, the amount is refunded to your Taksh wallet.';
 
   @override
-  String get refundCancelTitle => '10. Cancellation Policy';
+  String get refundCancelTitle =>
+      '10. Cancellation Policy';
 
   @override
   String get refundCancelContent =>
-      'You can cancel your order before it is shipped:\n\n• Full refund for pre-shipment cancellations\n• Instant processing to original payment method\n• No cancellation charges\n• Refund within 3-5 business days';
+      'You can cancel an order before it is dispatched, from the app or by contacting us:\n\n• No cancellation charges before dispatch\n• Prepaid orders are refunded to the original payment method, usually within 5 to 7 working days (your bank\'s timelines may vary)\n• Cash on Delivery orders have nothing to refund\n• After dispatch an order cannot be cancelled, but you may return it as per this policy\n• If an order is refused at delivery or cannot be delivered because of a wrong address, it may be cancelled and delivery charges may be deducted from any refund';
 
   @override
-  String get refundContactTitle => '11. Contact for Returns';
+  String get refundContactTitle =>
+      '11. Contact for Returns';
 
   @override
   String get refundContactContent =>
-      'Need help with returns or refunds? Reach out to us:\n\nEmail: returns@taksh-ecommerce.com\nLive Chat: Available 24/7 in the app\n\nOur customer support team is here to assist you throughout the return and refund process.';
+      'Need help with a return or refund? Email us at customersupport@takshallinone.in with your order number and we will get back to you as soon as possible.\n\nThis policy does not affect your rights under the Consumer Protection Act, 2019.';
 
   @override
-  String get refundSatisfactionTitle => '100% Satisfaction Guarantee';
+  String get refundSatisfactionTitle =>
+      'We\'re Here to Help';
 
   @override
   String get refundSatisfactionContent =>
-      'We stand behind our products and are committed to your satisfaction.';
+      'If something is not right with your order, tell us and we will work with you to fix it.';
 
   @override
-  String get privacyIntroTitle => 'Introduction';
+  String get privacyIntroTitle =>
+      'Introduction';
 
   @override
   String get privacyIntroContent =>
-      'At Taksh E-Commerce, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and services.';
+      'TAKSH ALL IN ONE ECOMMERCE & LOGISTICS WITH MULTI SERVICES PRIVATE LIMITED ("Taksh", "we", "us") respects your privacy. This policy explains what personal data we collect through our mobile app, why we collect it, how we use, share and protect it, and the choices you have. It follows the Information Technology Act, 2000, the IT (Reasonable Security Practices and Procedures) Rules, 2011 and the Digital Personal Data Protection Act, 2023.';
 
   @override
   String get privacyAgreeContent =>
-      'By using our app, you agree to the collection and use of information in accordance with this policy.';
+      'By using our app and giving consent where we ask for it, you agree to the practices described in this policy.';
 
   @override
-  String get privacyCollectTitle => '1. Information We Collect';
+  String get privacyCollectTitle =>
+      '1. Information We Collect';
 
   @override
   String get privacyCollectContent =>
-      'We collect several types of information for various purposes:';
+      'We collect only the information we need to run the app and deliver your orders:';
 
   @override
-  String get privacyPersonalTitle => 'Personal Information';
+  String get privacyPersonalTitle =>
+      'Information You Give Us';
 
   @override
   String get privacyPersonalContent =>
-      '• Name, email address, and phone number\n• Shipping and billing addresses\n• Payment information (securely processed)\n• Date of birth (optional)\n• Profile picture (optional)';
+      '• Name and mobile number (used to sign you in with an OTP)\n• Email address, if you provide it\n• Delivery addresses and pincode\n• Profile details you choose to add';
 
   @override
-  String get privacyUsageTitle => 'Usage Data';
+  String get privacyUsageTitle =>
+      'Device and Usage Data';
 
   @override
   String get privacyUsageContent =>
-      '• App usage statistics and preferences\n• Device information (model, OS version)\n• IP address and location data\n• Cookies and similar tracking technologies\n• Search queries and browsing history';
+      '• Device information (model, operating system, app version)\n• Location, only with your permission, to show what can be delivered to you\n• App activity and crash reports, to fix problems\n• A notification token, to send you order updates';
 
   @override
-  String get privacyTransactionTitle => 'Transaction Data';
+  String get privacyTransactionTitle =>
+      'Order and Payment Data';
 
   @override
   String get privacyTransactionContent =>
-      '• Purchase history and order details\n• Payment transaction information\n• Delivery and shipping information\n• Product reviews and ratings';
+      '• Orders, delivery and return details\n• Payment status and transaction reference. Card, UPI and bank details are handled by our payment gateway and are not stored by us\n• Photos you upload with a return request\n• Reviews and ratings you submit';
 
   @override
-  String get privacyUseTitle => '2. How We Use Your Information';
+  String get privacyUseTitle =>
+      '2. How We Use Your Information';
 
   @override
   String get privacyUseContent =>
-      'We use your information for the following purposes:';
+      'We use your information to:';
 
   @override
-  String get privacyUseItem1 => 'Process and fulfill your orders';
+  String get privacyUseItem1 =>
+      'Create your account and verify you with an OTP';
 
   @override
   String get privacyUseItem2 =>
-      'Provide customer support and respond to inquiries';
+      'Process, deliver and track your orders';
 
   @override
-  String get privacyUseItem3 => 'Send order confirmations and shipping updates';
+  String get privacyUseItem3 =>
+      'Handle payments, cancellations, returns and refunds';
 
   @override
-  String get privacyUseItem4 => 'Personalize your shopping experience';
+  String get privacyUseItem4 =>
+      'Provide customer support and answer your queries';
 
   @override
-  String get privacyUseItem5 => 'Improve our products and services';
+  String get privacyUseItem5 =>
+      'Send order updates and important notifications';
 
   @override
   String get privacyUseItem6 =>
-      'Send promotional offers and marketing communications';
+      'Show products and delivery options available at your location';
 
   @override
-  String get privacyUseItem7 => 'Detect and prevent fraud and security issues';
+  String get privacyUseItem7 =>
+      'Send offers and promotions, only if you have agreed';
 
   @override
-  String get privacyUseItem8 => 'Comply with legal obligations';
+  String get privacyUseItem8 =>
+      'Improve the app and keep it secure, and detect and prevent fraud';
 
   @override
   String get privacyUseItem9 =>
-      'Analyze usage trends and optimize app performance';
+      'Comply with legal obligations';
 
   @override
-  String get privacySharingTitle => '3. Information Sharing and Disclosure';
+  String get privacySharingTitle =>
+      '3. Sharing of Information';
 
   @override
-  String get privacySharingContent => 'We may share your information with:';
+  String get privacySharingContent =>
+      'We do not sell your personal data. We share it only in these cases:';
 
   @override
-  String get privacyProvidersTitle => 'Service Providers';
+  String get privacyProvidersTitle =>
+      'Service Providers';
 
   @override
   String get privacyProvidersContent =>
-      'Third-party vendors who assist us in operating our platform, processing payments, shipping orders, and providing customer service.';
+      'Payment gateways, SMS and notification providers, cloud hosting and analytics providers who process data for us under confidentiality obligations.';
 
   @override
-  String get privacyPartnersTitle => 'Business Partners';
+  String get privacyPartnersTitle =>
+      'Sellers and Delivery Partners';
 
   @override
   String get privacyPartnersContent =>
-      'Trusted partners who offer complementary services or products that may interest you.';
+      'Sellers, fulfillment centers and delivery partners receive your name, address, phone number and order details only to prepare and deliver your order.';
 
   @override
-  String get privacyLegalTitle => 'Legal Requirements';
+  String get privacyLegalTitle =>
+      'Legal Requirements';
 
   @override
   String get privacyLegalContent =>
-      'When required by law, regulation, legal process, or governmental request.';
+      'When required by law, a court order or a request from a government authority, or to protect the rights and safety of our users and Taksh.';
 
   @override
-  String get privacyTransferTitle => 'Business Transfers';
+  String get privacyTransferTitle =>
+      'Business Transfers';
 
   @override
   String get privacyTransferContent =>
-      'In connection with a merger, acquisition, or sale of assets.';
+      'If Taksh is merged with or acquired by another business, your data may be transferred to it, and we will tell you before it becomes subject to a different policy.';
 
   @override
-  String get privacySecurityTitle => '4. Data Security';
+  String get privacySecurityTitle =>
+      '4. Data Security';
 
   @override
   String get privacySecurityContent =>
-      'We implement appropriate technical and organizational measures to protect your personal information:\n\n• Encryption of sensitive data in transit and at rest\n• Secure servers and regular security audits\n• Access controls and authentication mechanisms\n• Regular security training for our staff\n• Compliance with industry security standards';
+      'We use reasonable technical and organisational safeguards to protect your data:\n\n• Encryption of data in transit\n• Access controls and authentication\n• Access limited to authorised personnel\n• Payments handled by a secure payment gateway';
 
   @override
   String get privacySecurityNote =>
-      'While we strive to protect your information, no method of transmission over the internet is 100% secure.';
+      'No method of transmission or storage is 100% secure. Please never share your OTP with anyone.';
 
   @override
-  String get privacyRightsTitle => '5. Your Privacy Rights';
+  String get privacyRightsTitle =>
+      '5. Your Rights';
 
   @override
   String get privacyRightsContent =>
-      'You have the following rights regarding your personal information:';
+      'Subject to applicable law, you have the right to:';
 
   @override
   String get privacyRightsItem1 =>
-      'Access: Request a copy of your personal data';
+      'Access: ask what personal data we hold about you';
 
   @override
   String get privacyRightsItem2 =>
-      'Correction: Update or correct inaccurate information';
+      'Correction: update or correct inaccurate data';
 
   @override
   String get privacyRightsItem3 =>
-      'Deletion: Request deletion of your personal data';
+      'Erasure: delete your account and data, from the app or by emailing us';
 
   @override
   String get privacyRightsItem4 =>
-      'Opt-out: Unsubscribe from marketing communications';
+      'Withdraw consent at any time';
 
   @override
   String get privacyRightsItem5 =>
-      'Data Portability: Receive your data in a portable format';
+      'Opt out of promotional messages';
 
   @override
   String get privacyRightsItem6 =>
-      'Object: Object to certain data processing activities';
+      'Nominate a person to exercise your rights in case of your death or incapacity';
 
   @override
   String get privacyRightsItem7 =>
-      'Withdraw Consent: Withdraw previously given consent';
+      'Raise a grievance with our Grievance Officer';
 
   @override
-  String get privacyCookiesTitle => '6. Cookies and Tracking Technologies';
+  String get privacyCookiesTitle =>
+      '6. App Permissions';
 
   @override
   String get privacyCookiesContent =>
-      'We use cookies and similar technologies to:\n\n• Remember your preferences and settings\n• Understand how you use our app\n• Provide personalized content and advertisements\n• Analyze app performance and user behavior\n\nYou can control cookies through your device settings, though some features may not function properly if disabled.';
+      'The app may ask for these permissions:\n\n• Location: to show delivery availability near you\n• Notifications: for order updates and offers\n• Camera and photos: to add images to a return request or profile\n\nYou can change any permission in your device settings. Some features may not work without them.';
 
   @override
-  String get privacyLinksTitle => '7. Third-Party Links';
+  String get privacyLinksTitle =>
+      '7. Third-Party Links';
 
   @override
   String get privacyLinksContent =>
-      'Our app may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. We encourage you to review their privacy policies.';
+      'The app may link to third-party websites or services. We are not responsible for their privacy practices, so please read their policies.';
 
   @override
-  String get privacyChildrenTitle => '8. Children\'s Privacy';
+  String get privacyChildrenTitle =>
+      '8. Children\'s Privacy';
 
   @override
   String get privacyChildrenContent =>
-      'Our service is not intended for children under 13 years of age. We do not knowingly collect personal information from children. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.';
+      'Our service is meant for people aged 18 and above. We do not knowingly collect personal data of children without a parent\'s or guardian\'s consent. If you think a child has given us data, please contact us and we will delete it.';
 
   @override
-  String get privacyRetentionTitle => '9. Data Retention';
+  String get privacyRetentionTitle =>
+      '9. Data Retention';
 
   @override
   String get privacyRetentionContent =>
-      'We retain your personal information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law.';
+      'We keep your data while your account is active and as long as needed to provide our services. After that we keep only what the law requires, such as invoices and transaction records, or what is needed to resolve disputes. We then delete or anonymise it.';
 
   @override
-  String get privacyInternationalTitle => '10. International Data Transfers';
+  String get privacyInternationalTitle =>
+      '10. Data Storage and Transfers';
 
   @override
   String get privacyInternationalContent =>
-      'Your information may be transferred to and maintained on servers located outside your country. We ensure appropriate safeguards are in place for such transfers.';
+      'Our service providers may store or process data on servers in or outside India. Where data is processed outside India, we take steps to make sure it stays protected as required by law.';
 
   @override
-  String get privacyChangesTitle => '11. Changes to This Privacy Policy';
+  String get privacyChangesTitle =>
+      '11. Changes to This Policy';
 
   @override
   String get privacyChangesContent =>
-      'We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on this page and updating the \"Last Updated\" date.';
+      'We may update this policy from time to time. The new version will be shown in the app with a new "Last Updated" date.';
 
   @override
-  String get privacyContactTitle => '12. Contact Us';
+  String get privacyContactTitle =>
+      '12. Contact and Grievance Officer';
 
   @override
   String get privacyContactContent =>
-      'If you have any questions about this Privacy Policy or our data practices, please contact us:\n\nEmail: privacy@taksh-ecommerce.com\nPhone: +91 1800-123-4567\nAddress: Mumbai, Maharashtra, India';
+      'For questions, requests or complaints about your data, contact our Grievance Officer:\n\nGrievance Officer\nTAKSH ALL IN ONE ECOMMERCE & LOGISTICS WITH MULTI SERVICES PRIVATE LIMITED\nEmail: customersupport@takshallinone.in\nAddress: Bhopal, Madhya Pradesh, India\n\nWe acknowledge requests within 48 hours and aim to resolve them within one month.';
 
   @override
-  String get privacyMattersTitle => 'Your Privacy Matters';
+  String get privacyMattersTitle =>
+      'Your Privacy Matters';
 
   @override
   String get privacyMattersContent =>
-      'We are committed to protecting your privacy and handling your data responsibly.';
+      'We handle your data responsibly and only for the purposes described here.';
 
   @override
   String get ourStoryContent =>
-      'Founded in 2020, Taksh E-Commerce emerged with a vision to revolutionize online shopping in India. We started with a simple idea: to make quality products accessible to everyone, everywhere. Today, we serve millions of customers across the country, offering a diverse range of products from electronics to fashion, home essentials to groceries.';
+      'Taksh is a shopping app operated by TAKSH ALL IN ONE ECOMMERCE & LOGISTICS WITH MULTI SERVICES PRIVATE LIMITED, built to bring everyday products to your doorstep quickly and reliably. We work with local sellers and fulfillment centers, so you can choose Express delivery in 30 minutes in select areas, Next-Day delivery or Standard delivery, and pay online or with Cash on Delivery where available.';
 
   @override
   String get ourMissionContent =>
-      'Our mission is to empower consumers by providing a seamless, trustworthy, and delightful shopping experience. We strive to connect people with products they love while supporting local businesses and promoting sustainable practices.';
+      'To make everyday shopping simple, fast and trustworthy, with clear prices, genuine products and honest service, while supporting local businesses.';
 
   @override
   String get ourVisionContent =>
-      'To become India\'s most customer-centric e-commerce platform, where people can discover, explore, and purchase anything they want with complete confidence and convenience.';
+      'To be a shopping app that people across India trust for their daily needs, where they can find what they want and get it when they need it.';
 
   @override
   String get trustTransparencyDesc =>
-      'We believe in building lasting relationships through honest communication and reliable service.';
+      'Clear prices, clear policies and honest communication at every step.';
 
   @override
   String get qualityFirstDesc =>
-      'Every product we offer meets our stringent quality standards to ensure customer satisfaction.';
+      'We work with sellers and partners to offer genuine products in good condition.';
 
   @override
   String get customerCentricityDesc =>
-      'Our customers are at the heart of everything we do. Their satisfaction is our success.';
+      'Our customers are at the heart of everything we do. Your feedback shapes how we improve.';
 
   @override
   String get sustainabilityDesc =>
-      'We are committed to eco-friendly practices and reducing our environmental footprint.';
+      'We work with local sellers and fulfillment centers to deliver faster and support local businesses.';
 
   @override
   String get innovationDesc =>
-      'We continuously evolve our technology and services to provide the best shopping experience.';
+      'We keep improving our app and services to make shopping easier.';
 
   @override
   String get whatWeOfferContent =>
-      '• Wide Range of Products: From electronics to fashion, home & kitchen to beauty products\n\n• Competitive Prices: Best deals and offers on quality products\n\n• Fast Delivery: Quick and reliable shipping across India\n\n• Secure Payments: Multiple payment options with top-notch security\n\n• 24/7 Support: Our customer service team is always here to help\n\n• Easy Returns: Hassle-free returns and refunds';
+      '• Wide Range of Products: A growing selection across many categories from trusted sellers\n\n• Flexible Delivery: Express 30-minute (select areas), Next-Day and Standard delivery\n\n• Secure Payments: Pay online through a secure payment gateway, or choose Cash on Delivery where available\n\n• Easy Returns: Raise a return in the app for eligible items within the return window\n\n• Support: Write to us anytime and we will get back to you';
 
   @override
   String get emailLabel => 'Email';
@@ -1399,7 +1509,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customerCentricity => 'Customer Centricity';
 
   @override
-  String get sustainability => 'Sustainability';
+  String get sustainability =>
+      'Local First';
 
   @override
   String get innovation => 'Innovation';
@@ -1408,7 +1519,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whatWeOffer => 'What We Offer';
 
   @override
-  String get ourImpact => 'Our Impact';
+  String get ourImpact =>
+      'Why Shop with Taksh';
+
+  @override
+  String get aboutHighlightLocal =>
+      'Local Sellers';
+
+  @override
+  String get aboutHighlightReturns =>
+      'Easy Returns';
+
+  @override
+  String get aboutHighlightCod =>
+      'Cash on Delivery';
+
+  @override
+  String get aboutHighlightPayments =>
+      'Secure Payments';
+
+  @override
+  String get aboutHighlightDelivery =>
+      'Flexible Delivery';
+
+  @override
+  String get aboutHighlightExpress =>
+      '30-Min Express';
 
   @override
   String get happyCustomers => 'Happy Customers';

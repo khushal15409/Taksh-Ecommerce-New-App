@@ -41,7 +41,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    AppLocalizations.of(context)!.lastUpdated('January 22, 2026'),
+                    AppLocalizations.of(context)!.lastUpdated('October 28, 2026'),
                     style: TextStyle(
                       fontSize: 13,
                       color: Theme.of(context).textTheme.bodyMedium?.color,
