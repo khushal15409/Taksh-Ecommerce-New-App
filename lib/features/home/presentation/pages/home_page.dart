@@ -296,7 +296,10 @@ class _HomePageState extends State<_HomePageContent> {
     if (type == DeliveryType.quick) {
       // The picked address is passed explicitly: the bloc has not applied the
       // selection yet, and the address listener would otherwise reload again.
-      _loadQuickIfNeeded(selectedOverride: pickedAddress);
+      // Forced: every switch to Quick asks the server again (stock, price and
+      // serviceability may have changed since the last visit), even when the
+      // location is the same as the previous request.
+      _loadQuickIfNeeded(selectedOverride: pickedAddress, force: true);
     }
   }
 

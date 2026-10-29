@@ -52,6 +52,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
   /// Category id the standard grid is currently showing (parent or sub).
   int? _activeCategoryId;
 
+  /// Location the Quick listing was last requested for. Lets the app-wide
+  /// address listener reload only when the address really changed, and not a
+  /// second time after this page already requested it itself.
+  String? _lastQuickKey;
+
   bool get _isQuickDelivery => _homeDeliveryType == DeliveryType.quick;
 
   /// Address chosen on this page, else the delivery address selected app-wide.
@@ -118,6 +123,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     if (_isQuickDelivery) {
       final location = _quickLocation;
       if (location == null) return;
+      _lastQuickKey = location.key;
       context.read<ProductCubit>().fetchExpressProducts(
         categoryId: categoryId,
         latitude: location.latitude,
@@ -213,6 +219,42 @@ class _CategoriesPageState extends State<CategoriesPage> {
     }
   }
 
+  /// The delivery address selected app-wide in [state], if the state carries one.
+  Address? _selectedAddressOf(AddressState state) {
+    if (state is AddressesLoaded) return state.selectedAddress;
+    if (state is AddressOperationSuccess) return state.selectedAddress;
+    if (state is AddressOperationError) return state.selectedAddress;
+    return null;
+  }
+
+  String? _addressKey(Address? address) {
+    final location = quickLocationFromAddress(address);
+    if (location != null) return location.key;
+    return address == null ? null : 'no-location|${address.id}';
+  }
+
+  /// The address was changed somewhere else in the app (Home, product page,
+  /// checkout): the app-wide selection wins over this page's own pick, and
+  /// the Quick listing is requested again for it.
+  void _onSelectedAddressChanged(AddressState state) {
+    final selected = _selectedAddressOf(state);
+    if (selected == null || !mounted) return;
+
+    if (_selectedAddress != null &&
+        _addressKey(_selectedAddress) != _addressKey(selected)) {
+      setState(() => _selectedAddress = null);
+    }
+
+    if (!_isQuickDelivery ||
+        _categories.isEmpty ||
+        _selectedIndex >= _categories.length) {
+      return;
+    }
+    final location = quickLocationFromAddress(selected);
+    if (location == null || location.key == _lastQuickKey) return;
+    _fetchProductsForCategory(_categories[_selectedIndex].id);
+  }
+
   Future<void> _handleDeliveryTypeSelection(DeliveryType type) async {
     if (type == DeliveryType.services) {
       setState(() => _homeDeliveryType = type);
@@ -242,12 +284,22 @@ class _CategoriesPageState extends State<CategoriesPage> {
       }
 
       if (!mounted) return;
+      // Same as every other place that picks a delivery address: make it the
+      // app-wide selection too, so Home, the product page and checkout agree.
+      context.read<AddressBloc>().add(
+        SelectAddressForDeliveryEvent(selectedAddress),
+      );
       setState(() {
         _selectedAddress = selectedAddress;
       });
     }
 
     if (_homeDeliveryType == type && _categories.isNotEmpty) {
+      // Quick chosen again (maybe with another address): ask the server for the
+      // products of the category on screen instead of keeping the old answer.
+      if (type == DeliveryType.quick && _selectedIndex < _categories.length) {
+        _fetchProductsForCategory(_categories[_selectedIndex].id);
+      }
       return;
     }
 
@@ -267,6 +319,16 @@ class _CategoriesPageState extends State<CategoriesPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+    return BlocListener<AddressBloc, AddressState>(
+      listenWhen: (previous, current) =>
+          _addressKey(_selectedAddressOf(previous)) !=
+          _addressKey(_selectedAddressOf(current)),
+      listener: (context, state) => _onSelectedAddressChanged(state),
+      child: _buildPage(context, topPadding),
+    );
+  }
+
+  Widget _buildPage(BuildContext context, double topPadding) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
