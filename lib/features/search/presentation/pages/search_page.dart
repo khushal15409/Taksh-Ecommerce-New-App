@@ -442,6 +442,10 @@ class _SearchResultCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+        if (product.averageRating > 0) ...[
+          const SizedBox(height: 4),
+          _buildRating(theme),
+        ],
         const SizedBox(height: 8),
         Row(
           children: [
@@ -468,6 +472,33 @@ class _SearchResultCard extends StatelessWidget {
             _buildStockChip(context),
           ],
         ),
+      ],
+    );
+  }
+
+  /// Star, average and number of ratings (only drawn once somebody rated it).
+  Widget _buildRating(ThemeData theme) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.star_rounded, size: 15, color: Color(0xFFF7B500)),
+        const SizedBox(width: 2),
+        Text(
+          product.averageRating.toStringAsFixed(1),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: theme.textTheme.bodyMedium?.color,
+          ),
+        ),
+        if (product.totalReviews > 0)
+          Text(
+            ' (${product.totalReviews})',
+            style: TextStyle(
+              fontSize: 12,
+              color: theme.textTheme.bodySmall?.color,
+            ),
+          ),
       ],
     );
   }

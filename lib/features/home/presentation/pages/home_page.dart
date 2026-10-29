@@ -12,6 +12,7 @@ import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_state_
 import 'package:taksh_e_commerce/features/product/domain/entities/category.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/features/reviews/presentation/review_prompt.dart';
 import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
@@ -86,6 +87,15 @@ class _HomePageState extends State<_HomePageContent> {
     _loadDashboard();
     // The Quick dashboard is requested lazily, when the Quick tab is used.
     _loadQuickIfNeeded();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptReview());
+  }
+
+  /// Asks to rate a product that was delivered and is not rated yet (signed-in
+  /// customers only; shows nothing when there is none).
+  void _maybePromptReview() {
+    if (!mounted) return;
+    if (context.read<AuthBloc>().state is! Authenticated) return;
+    ReviewPrompt.maybeShow(context);
   }
 
   /// Addresses currently known to the AddressBloc, or null while they are
@@ -372,6 +382,8 @@ class _HomePageState extends State<_HomePageContent> {
             }
             _ensureAddressesLoaded();
             _loadQuickIfNeeded();
+            WidgetsBinding.instance
+                .addPostFrameCallback((_) => _maybePromptReview());
           },
         ),
         BlocListener<AddressBloc, AddressState>(

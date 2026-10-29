@@ -35,6 +35,7 @@ import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cub
 import 'package:taksh_e_commerce/features/product/presentation/cubit/product_state.dart';
 import 'package:taksh_e_commerce/features/product/presentation/cubit/similar_products_cubit.dart';
 import 'package:taksh_e_commerce/features/product/presentation/widgets/similar_products_section.dart';
+import 'package:taksh_e_commerce/features/reviews/presentation/widgets/product_rate_action.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import 'package:taksh_e_commerce/features/wishlist/presentation/cubit/wishlist_state.dart';
 
@@ -615,6 +616,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   const SizedBox(height: 16),
                   _buildRatingSection(context, product),
                 ],
+                // Only for a signed-in customer (a guest's request would be refused); it
+                // draws nothing unless this product was delivered to them.
+                if (context.read<AuthBloc>().state is Authenticated)
+                  ProductRateAction(
+                    productId: product.id,
+                    productName: product.name,
+                    imageUrl: product.primaryImageUrl,
+                  ),
                 const SizedBox(height: 22),
                 SimilarProductsSection(
                   title: l10n.similarProducts,
