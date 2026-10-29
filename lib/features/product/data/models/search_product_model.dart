@@ -12,6 +12,8 @@ class SearchProductModel extends SearchProduct {
     super.imageUrl,
     required super.inStock,
     super.isExpress30,
+    super.averageRating,
+    super.totalReviews,
   });
 
   factory SearchProductModel.fromJson(DataMap json) {
@@ -24,6 +26,8 @@ class SearchProductModel extends SearchProduct {
       imageUrl: json['image'] as String?,
       inStock: json['in_stock'] as bool? ?? false,
       isExpress30: _asFlag(json['is_express_30']),
+      averageRating: (json['average_rating'] as num?)?.toDouble() ?? 0,
+      totalReviews: (json['total_reviews'] as num?)?.toInt() ?? 0,
     );
   }
 }

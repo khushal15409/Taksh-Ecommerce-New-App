@@ -70,6 +70,11 @@ import 'package:taksh_e_commerce/features/cart/domain/usecases/clear_cart.dart';
 import 'package:taksh_e_commerce/features/cart/domain/usecases/remove_coupon.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 
+// Reviews feature imports
+import 'package:taksh_e_commerce/features/reviews/data/datasources/review_remote_datasource.dart';
+import 'package:taksh_e_commerce/features/reviews/data/repositories/review_repository_impl.dart';
+import 'package:taksh_e_commerce/features/reviews/domain/repositories/review_repository.dart';
+
 // Wishlist feature imports
 import 'package:taksh_e_commerce/features/wishlist/data/datasources/wishlist_remote_datasource.dart';
 import 'package:taksh_e_commerce/features/wishlist/data/repositories/wishlist_repository_impl.dart';
@@ -168,6 +173,7 @@ Future<void> initializeDependencies({
   _registerProductDependencies();
   _registerCartDependencies();
   _registerWishlistDependencies();
+  _registerReviewDependencies();
   _registerNotificationsDependencies();
   registerOrderDependencies(getIt);
   registerCheckoutDependencies(getIt, useMockData: useMockData);
@@ -547,6 +553,19 @@ void _registerNotificationsDependencies() {
   // Lazy singleton: the home bell badge and the notifications page share one
   // unread count (same reason as WishlistCubit).
   getIt.registerLazySingleton(() => NotificationsCubit(getIt()));
+}
+
+/// Register ratings & reviews dependencies
+void _registerReviewDependencies() {
+  getIt.registerLazySingleton<ReviewRemoteDataSource>(
+    () => ReviewRemoteDataSourceImpl(apiClient: getIt()),
+  );
+  getIt.registerLazySingleton<ReviewRepository>(
+    () => ReviewRepositoryImpl(
+      remoteDataSource: getIt(),
+      networkInfo: getIt(),
+    ),
+  );
 }
 
 /// Register wishlist feature dependencies

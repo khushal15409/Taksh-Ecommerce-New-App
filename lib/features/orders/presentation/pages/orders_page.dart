@@ -18,6 +18,7 @@ import 'package:taksh_e_commerce/features/orders/domain/entities/order_address.d
 import 'package:taksh_e_commerce/features/orders/domain/usecases/get_order_details.dart';
 import 'package:taksh_e_commerce/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:taksh_e_commerce/features/orders/presentation/cubit/orders_state.dart';
+import 'package:taksh_e_commerce/features/reviews/presentation/review_prompt.dart';
 import 'package:taksh_e_commerce/features/product/domain/usecases/get_ecommerce_product_details.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
@@ -62,6 +63,10 @@ class _OrdersPageState extends State<OrdersPage> {
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
       context.read<OrdersCubit>().fetchOrders();
+      // A product that was just delivered: ask for its rating.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ReviewPrompt.maybeShow(context);
+      });
     }
   }
 
