@@ -11,11 +11,11 @@ class RecentViewsCubit extends Cubit<RecentViewsState> {
   RecentViewsCubit({required this.getRecentViews})
       : super(const RecentViewsInitial());
 
-  Future<void> loadRecentViews() async {
+  Future<void> loadRecentViews({String? deliveryType}) async {
     _log.infoWithContext('Loading recent views', {});
     emit(const RecentViewsLoading());
 
-    final result = await getRecentViews();
+    final result = await getRecentViews.forType(deliveryType);
 
     if (isClosed) return;
 
@@ -30,7 +30,7 @@ class RecentViewsCubit extends Cubit<RecentViewsState> {
         _log.infoWithContext('Recent views loaded', {
           'count': views.length,
         });
-        emit(RecentViewsLoaded(views));
+        emit(RecentViewsLoaded(views, deliveryType: deliveryType));
       },
     );
   }

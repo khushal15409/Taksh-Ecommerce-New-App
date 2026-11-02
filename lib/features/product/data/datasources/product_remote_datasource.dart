@@ -52,7 +52,7 @@ abstract class ProductRemoteDataSource {
   Future<List<RecentSearchModel>> getRecentSearches();
 
   /// Get recent views
-  Future<List<RecentViewModel>> getRecentViews();
+  Future<List<RecentViewModel>> getRecentViews({String? deliveryType});
 
   /// Check delivery availability for a product at a given pincode
   Future<DeliveryAvailabilityModel> checkDeliveryAvailability({
@@ -241,8 +241,12 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<List<RecentViewModel>> getRecentViews() async {
-    final response = await apiClient.get(ApiConstants.recentViews);
+  Future<List<RecentViewModel>> getRecentViews({String? deliveryType}) async {
+    final response = await apiClient.get(
+      ApiConstants.recentViews,
+      queryParameters:
+          deliveryType != null ? {'delivery_type': deliveryType} : null,
+    );
 
     final responseData = response.data as DataMap;
     final baseResponse = BaseResponse.fromJson(

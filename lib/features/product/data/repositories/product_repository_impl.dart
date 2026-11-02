@@ -201,13 +201,16 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<Either<Failure, List<RecentView>>> getRecentViews() async {
+  Future<Either<Failure, List<RecentView>>> getRecentViews({
+    String? deliveryType,
+  }) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure('No internet connection'));
     }
 
     try {
-      final views = await remoteDataSource.getRecentViews();
+      final views =
+          await remoteDataSource.getRecentViews(deliveryType: deliveryType);
       return Right(views);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

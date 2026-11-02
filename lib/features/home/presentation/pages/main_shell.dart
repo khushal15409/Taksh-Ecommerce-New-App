@@ -14,6 +14,9 @@ import 'package:taksh_e_commerce/features/product/presentation/cubit/product_cub
 
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/bottom_nav_bar.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_state.dart';
+import 'package:taksh_e_commerce/features/reviews/presentation/review_prompt.dart';
 
 /// Main shell widget with bottom navigation bar
 /// Provides a consistent navigation structure across the main app screens
@@ -26,7 +29,7 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
 
   late final CartCubit _cartCubit;
@@ -73,6 +76,28 @@ class _MainShellState extends State<MainShell> {
     _wishlistCubit = getIt<WishlistCubit>();
     _cartCubit.fetchAllCarts();
     _wishlistCubit.fetchWishlist();
+    WidgetsBinding.instance.addObserver(this);
+    _scheduleRatingPrompt();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _scheduleRatingPrompt();
+  }
+
+  /// A product that was just delivered: ask for its rating from any tab.
+  void _scheduleRatingPrompt() {
+    Future<void>.delayed(const Duration(milliseconds: 1500), () {
+      if (!mounted) return;
+      if (context.read<AuthBloc>().state is! Authenticated) return;
+      ReviewPrompt.maybeShow(context);
+    });
   }
 
   @override

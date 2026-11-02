@@ -48,7 +48,7 @@ abstract class ProductRepository {
   ResultFuture<List<RecentSearch>> getRecentSearches();
 
   /// Get recent views
-  ResultFuture<List<RecentView>> getRecentViews();
+  ResultFuture<List<RecentView>> getRecentViews({String? deliveryType});
 
   /// Check delivery availability for a product at a given pincode
   ///

@@ -20,10 +20,14 @@ class RecentViewsLoading extends RecentViewsState {
 class RecentViewsLoaded extends RecentViewsState {
   final List<RecentView> recentViews;
 
-  const RecentViewsLoaded(this.recentViews);
+  /// The delivery type these views were loaded for (null = all), so a screen
+  /// never shows the other part's list while its own is loading.
+  final String? deliveryType;
+
+  const RecentViewsLoaded(this.recentViews, {this.deliveryType});
 
   @override
-  List<Object?> get props => [recentViews];
+  List<Object?> get props => [recentViews, deliveryType];
 }
 
 class RecentViewsError extends RecentViewsState {
