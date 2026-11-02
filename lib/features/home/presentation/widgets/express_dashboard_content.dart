@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_recent_views.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
@@ -150,6 +151,7 @@ class ExpressDashboardContent extends StatelessWidget {
             onChangeAddress: onChangeAddress,
           ),
         if (topBanners != null) topBanners,
+        const QuickRecentViews(),
         ...orderedProducts,
         Padding(
           padding: const EdgeInsets.only(bottom: 8),

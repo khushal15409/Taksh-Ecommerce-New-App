@@ -39,7 +39,9 @@ class _DashboardContentState extends State<DashboardContent> {
     super.initState();
     // Load recent views when dashboard is displayed
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<RecentViewsCubit>().loadRecentViews();
+      context
+          .read<RecentViewsCubit>()
+          .loadRecentViews(deliveryType: 'standard_delivery');
     });
   }
 
@@ -159,7 +161,9 @@ class _DashboardContentState extends State<DashboardContent> {
         // Recent Views Section (moved near top, below banners)
         BlocBuilder<RecentViewsCubit, RecentViewsState>(
           builder: (context, state) {
-            if (state is RecentViewsLoaded && state.recentViews.isNotEmpty) {
+            if (state is RecentViewsLoaded &&
+                state.deliveryType == 'standard_delivery' &&
+                state.recentViews.isNotEmpty) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: RecentViewsSection(

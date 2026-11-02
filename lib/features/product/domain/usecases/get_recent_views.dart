@@ -13,4 +13,10 @@ class GetRecentViews extends UseCaseNoParams<List<RecentView>> {
   ResultFuture<List<RecentView>> call() {
     return _repository.getRecentViews();
   }
+
+  /// Recent views limited to one part of the app: 'standard_delivery' or
+  /// 'express_30' (Quick). Null = all, same as [call].
+  ResultFuture<List<RecentView>> forType(String? deliveryType) {
+    return _repository.getRecentViews(deliveryType: deliveryType);
+  }
 }
