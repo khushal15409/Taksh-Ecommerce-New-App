@@ -273,30 +273,27 @@ class _HomePageState extends State<_HomePageContent> {
         return;
       }
 
-      // Get current selected address from bloc
-      Address? currentAddress;
-      final addressState = context.read<AddressBloc>().state;
-      if (addressState is AddressesLoaded) {
-        currentAddress = addressState.selectedAddress;
+      // The selected (default) address is used as is when it has usable
+      // coordinates; the popup only appears when there is none. The address
+      // can be changed from the address bar in the header.
+      final currentAddress = _addressSnapshot()?.selected;
+      if (quickLocationFromAddress(currentAddress) == null) {
+        final selectedAddress = await AddressSelectionBottomSheet.show(
+          context,
+          currentAddress: currentAddress,
+        );
+
+        if (selectedAddress == null) {
+          return;
+        }
+
+        if (!mounted) return;
+        pickedAddress = selectedAddress;
+        // Dispatch event to update selected address in bloc
+        context.read<AddressBloc>().add(
+          SelectAddressForDeliveryEvent(selectedAddress),
+        );
       }
-
-      // Always show the address selection popup for quick delivery,
-      // even if an address is already saved.
-      final selectedAddress = await AddressSelectionBottomSheet.show(
-        context,
-        currentAddress: currentAddress,
-      );
-
-      if (selectedAddress == null) {
-        return;
-      }
-
-      if (!mounted) return;
-      pickedAddress = selectedAddress;
-      // Dispatch event to update selected address in bloc
-      context.read<AddressBloc>().add(
-        SelectAddressForDeliveryEvent(selectedAddress),
-      );
     }
 
     setState(() {

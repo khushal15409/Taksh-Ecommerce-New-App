@@ -12,6 +12,7 @@ import 'package:taksh_e_commerce/features/address/domain/entities/address.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_state.dart';
+import 'package:taksh_e_commerce/features/home/presentation/widgets/address_header_widget.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/quick_state_views.dart';
 import 'package:taksh_e_commerce/features/address/presentation/widgets/address_selection_bottom_sheet.dart';
 import 'package:taksh_e_commerce/features/categories/presentation/widgets/widgets.dart';
@@ -173,23 +174,22 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void _handleSubcategoryChanged(Category? subcategory) {
-    if (subcategory != null && _selectedSubcategory?.id != subcategory.id) {
-      setState(() => _selectedSubcategory = subcategory);
+    setState(() => _selectedSubcategory = subcategory);
 
-      // Get the parent category
-      final parentCategory = _categories[_selectedIndex];
+    // Get the parent category
+    final parentCategory = _categories[_selectedIndex];
 
-      // Debug logging
-      print(
-        '🏷️ Subcategory changed to: ${subcategory.name} (id: ${subcategory.id})',
-      );
+    print(
+      '🏷️ Subcategory changed to: ${subcategory?.name ?? 'All'} (id: ${subcategory?.id})',
+    );
 
-      // Standard: list only the chosen subcategory. Quick delivery keeps
-      // requesting the parent category, as its API expects.
-      _fetchProductsForCategory(
-        _isQuickDelivery ? parentCategory.id : subcategory.id,
-      );
-    }
+    // Standard: list only the chosen subcategory, or the whole parent
+    // ("All"). Quick delivery keeps requesting the parent category, as its
+    // API expects. Choosing the entry that is already selected requests the
+    // list again, so the products never stay hidden.
+    _fetchProductsForCategory(
+      _isQuickDelivery ? parentCategory.id : (subcategory ?? parentCategory).id,
+    );
   }
 
   void _retryFetchCategories() {
@@ -272,26 +272,29 @@ class _CategoriesPageState extends State<CategoriesPage> {
         return;
       }
 
-      // Always show the address selection popup for quick delivery,
-      // even if an address is already saved.
-      final selectedAddress = await AddressSelectionBottomSheet.show(
-        context,
-        currentAddress: _selectedAddress,
-      );
+      // An already selected (default) address with usable coordinates is used
+      // as is; the address popup is only shown when there is none. The user
+      // can change the address from the address bar above the products.
+      if (quickLocationFromAddress(_effectiveAddress) == null) {
+        final selectedAddress = await AddressSelectionBottomSheet.show(
+          context,
+          currentAddress: _effectiveAddress,
+        );
 
-      if (selectedAddress == null) {
-        return;
+        if (selectedAddress == null) {
+          return;
+        }
+
+        if (!mounted) return;
+        // Same as every other place that picks a delivery address: make it the
+        // app-wide selection too, so Home, the product page and checkout agree.
+        context.read<AddressBloc>().add(
+          SelectAddressForDeliveryEvent(selectedAddress),
+        );
+        setState(() {
+          _selectedAddress = selectedAddress;
+        });
       }
-
-      if (!mounted) return;
-      // Same as every other place that picks a delivery address: make it the
-      // app-wide selection too, so Home, the product page and checkout agree.
-      context.read<AddressBloc>().add(
-        SelectAddressForDeliveryEvent(selectedAddress),
-      );
-      setState(() {
-        _selectedAddress = selectedAddress;
-      });
     }
 
     if (_homeDeliveryType == type && _categories.isNotEmpty) {
@@ -369,6 +372,21 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: _buildModeTabs(context),
               ),
+              if (_isQuickDelivery) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: BlocBuilder<AddressBloc, AddressState>(
+                    builder: (context, _) => Align(
+                      alignment: Alignment.centerLeft,
+                      child: AddressHeaderWidget(
+                        selectedAddress: _effectiveAddress,
+                        onTap: _pickQuickAddress,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               Expanded(
                 child: Container(

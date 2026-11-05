@@ -8,6 +8,9 @@ class SubcategoriesSection extends StatelessWidget {
   final Category? selectedSubcategory;
   final ValueChanged<Category?> onSubcategoryChanged;
 
+  /// Label of the entry that lists the whole parent category again.
+  static const String allLabel = 'All';
+
   const SubcategoriesSection({
     super.key,
     required this.category,
@@ -36,7 +39,9 @@ class SubcategoriesSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // Dropdown for subcategories
-          DropdownButtonFormField<Category>(
+          DropdownButtonFormField<Category?>(
+            // Keyed by the selection so the field always shows the current one.
+            key: ValueKey(selectedSubcategory?.id),
             initialValue: selectedSubcategory,
             isExpanded: true,
             decoration: InputDecoration(
@@ -70,16 +75,22 @@ class SubcategoriesSection extends StatelessWidget {
               fontSize: 13,
               color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
-            items: category.children!.map((sub) {
-              return DropdownMenuItem(
-                value: sub,
-                child: Text(
-                  sub.name,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              );
-            }).toList(),
+            items: [
+              const DropdownMenuItem<Category?>(
+                value: null,
+                child: Text(allLabel, maxLines: 1),
+              ),
+              ...category.children!.map((sub) {
+                return DropdownMenuItem<Category?>(
+                  value: sub,
+                  child: Text(
+                    sub.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                );
+              }),
+            ],
             onChanged: onSubcategoryChanged,
           ),
         ],
