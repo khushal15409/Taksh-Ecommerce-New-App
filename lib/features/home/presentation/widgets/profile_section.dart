@@ -50,8 +50,8 @@ class ProfileSection extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.paddingLG),
                 child: BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
-                    String userName = 'Guest User';
-                    String userContact = 'guest@example.com';
+                    String userName = 'Guest';
+                    String userContact = 'Log in to see your details';
 
                     if (state is Authenticated) {
                       userName = state.user.name ?? 'User';

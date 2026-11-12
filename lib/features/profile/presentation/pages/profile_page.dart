@@ -26,6 +26,9 @@ import 'package:taksh_e_commerce/features/wishlist/presentation/pages/wishlist_p
 import 'package:taksh_e_commerce/features/profile/presentation/pages/your_accounts.dart';
 import 'package:taksh_e_commerce/features/profile/domain/entities/development_request.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
+import 'package:taksh_e_commerce/core/network/api_client.dart';
+import 'package:taksh_e_commerce/core/error/exceptions.dart';
+import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/features/profile/presentation/bloc/callback_bloc.dart';
 import 'package:taksh_e_commerce/features/profile/presentation/bloc/callback_event.dart';
 import 'package:taksh_e_commerce/features/profile/presentation/bloc/callback_state.dart';
@@ -438,7 +441,27 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
+
+                // Delete account (Google Play: in-app account deletion)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => _showDeleteAccountDialog(context),
+                      child: const Text(
+                        'Delete account',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
 
                 Text(
                   AppLocalizations.of(context)!.version('1.0.0'),
@@ -866,6 +889,84 @@ class _ProfilePageState extends State<ProfilePage> {
         Icons.chevron_right,
         color: Theme.of(context).disabledColor,
         size: 24,
+      ),
+    );
+  }
+
+  /// Asks for confirmation, deletes the account on the server, then logs out on this device.
+  void _showDeleteAccountDialog(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+    bool busy = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => StatefulBuilder(
+        builder: (BuildContext ctx, StateSetter setDialogState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(
+            'Delete account?',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'This permanently deletes your Taksh account: your profile, saved '
+            'addresses and sign-ins are removed and you will be logged out. '
+            'Order and invoice records are kept as the law requires, without '
+            'your name.\n\nThis cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: busy ? null : () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: busy
+                  ? null
+                  : () async {
+                      setDialogState(() => busy = true);
+                      try {
+                        await getIt<ApiClient>().post(
+                          ApiConstants.deleteAccount,
+                          data: {'confirm': true},
+                        );
+                        if (dialogContext.mounted) {
+                          Navigator.of(dialogContext).pop();
+                        }
+                        // Ends the session on this device the same way Logout does.
+                        authBloc.add(const AuthLogoutRequested());
+                      } catch (e) {
+                        if (dialogContext.mounted) {
+                          Navigator.of(dialogContext).pop();
+                        }
+                        if (context.mounted) {
+                          AppErrorToast.show(
+                            context,
+                            message: e is AppException ? e.message : null,
+                          );
+                        }
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: busy
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Delete'),
+            ),
+          ],
+        ),
       ),
     );
   }

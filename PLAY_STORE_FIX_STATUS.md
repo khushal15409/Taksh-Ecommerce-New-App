@@ -28,3 +28,16 @@ Account deletion, invoice-route auth, refund cap / double-refund guard (BE-02, P
 - **BE-01 / secrets:** rotate the Firebase service-account key, DB password, APP_KEY, Razorpay key/secret/webhook secret (they were in git history). Checklist: `API/docs/release/secret-rotation-checklist.md`.
 - **FL-05** restrict the Google Maps key (package + SHA-1); **FL-06** stop bundling `.env`; **FL-07** target SDK 36; **FL-04** R8/obfuscation (needs a release build + test).
 - **BE-11** `composer update symfony/*` (8 advisories): needs a staging test run. **BE-06/08/09, BE-13, BE-16, PY-03/05/07/10–13, FL-08, FA-003–005/007/008:** product/legal decisions or larger changes; not started.
+
+## Round 2 (content + account deletion + signing)
+| ID | What was done |
+|---|---|
+| FA-001 / BE-07 | **Account deletion:** Profile > "Delete account" (confirm dialog) calls the new `POST /api/auth/delete-account` (customers only; account anonymised, other logins ended, refused while an order is open or wallet has points), then logs out on the device. Public how-to page: API `/delete-account`. |
+| FA-004 | Public pages on the API host: `/privacy-policy`, `/terms-and-conditions`, `/refund-policy`, `/delete-account` (same text as the app). Use these URLs in Play Console; or proxy them under takshallinone.in. |
+| FA-005 | Privacy text no longer promises analytics/crash-report SDKs; retention text explains what account deletion removes. EN + HI. |
+| FA-007, FA-008 content | Removed unsupported claims ("Trusted by India", "Best Prices", "Made in India", "30-Min Express", "in minutes, not days"), food-template search hint, developer string, robotic splash/refund text; guest placeholder and About tagline fixed; brand name unified to "Taksh All In One" (ARB, generated Dart, EN + HI). |
+| FA-006 | Policy date updated to 13 Nov 2026 (one constant). |
+| FL-01 (prep) | `build.gradle.kts` signs release with `android/key.properties` when that file exists; otherwise debug signing exactly as before. `.gitignore` covers key.properties / *.jks. **You still must create the upload keystore.** |
+
+## Still needs you
+Final applicationId + matching google-services.json (FL-02/03), keystore (FL-01), secret rotation (BE-01), Maps key restriction (FL-05), targetSdk 36 + R8 test build (FL-04/07), Play Console forms (Data Safety, content rating), grievance officer name/phone (legal), real support contacts confirmation.

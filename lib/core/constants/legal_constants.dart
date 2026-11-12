@@ -3,5 +3,5 @@ class LegalConstants {
   LegalConstants._();
 
   /// Shown as "Last updated" on the Terms, Privacy and Refund policy pages.
-  static const String policiesLastUpdated = 'October 28, 2026';
+  static const String policiesLastUpdated = 'November 13, 2026';
 }

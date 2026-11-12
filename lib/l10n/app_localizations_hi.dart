@@ -9,10 +9,10 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get appTitle => 'तक्ष ई-कॉमर्स';
+  String get appTitle => 'Taksh All In One';
 
   @override
-  String get madeInIndia => 'भारत में निर्मित';
+  String get madeInIndia => 'स्थानीय स्टोर्स का साथ';
 
   @override
   String get initializing => 'आरंभ हो रहा है...';
@@ -607,7 +607,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get refundCommitmentContent =>
-      'Taksh E-Commerce में हम चाहते हैं कि आप हर ऑर्डर से खुश रहें। यदि आपके ऑर्डर में कोई समस्या है, तो यह पॉलिसी बताती है कि रिटर्न, रिप्लेसमेंट, कैंसलेशन और रिफंड कैसे काम करते हैं।';
+      'यदि आपके ऑर्डर में कोई समस्या है, तो यह पॉलिसी बताती है कि रिटर्न, रिप्लेसमेंट, कैंसलेशन और रिफंड कैसे काम करते हैं।';
 
   @override
   String get refundReadPolicy =>
@@ -899,7 +899,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get privacyUsageContent =>
-      '• डिवाइस की जानकारी (मॉडल, ऑपरेटिंग सिस्टम, ऐप वर्ज़न)\n• लोकेशन, केवल आपकी अनुमति से, ताकि दिखाया जा सके कि आपके यहाँ क्या डिलीवर हो सकता है\n• समस्याएँ ठीक करने के लिए ऐप गतिविधि और क्रैश रिपोर्ट\n• ऑर्डर अपडेट भेजने के लिए नोटिफ़िकेशन टोकन';
+      '• डिवाइस की जानकारी (मॉडल, ऑपरेटिंग सिस्टम, ऐप वर्ज़न)\n• लोकेशन, केवल आपकी अनुमति से, ताकि दिखाया जा सके कि आपके यहाँ क्या डिलीवर हो सकता है\n• समस्याएँ ठीक करने के लिए तकनीकी लॉग (जैसे ऐप के हमारे सर्वर से बात करते समय की त्रुटियाँ)\n• ऑर्डर अपडेट भेजने के लिए नोटिफ़िकेशन टोकन';
 
   @override
   String get privacyTransactionTitle =>
@@ -967,7 +967,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get privacyProvidersContent =>
-      'पेमेंट गेटवे, SMS और नोटिफ़िकेशन प्रदाता, क्लाउड होस्टिंग और एनालिटिक्स प्रदाता, जो गोपनीयता दायित्वों के तहत हमारी ओर से डेटा प्रोसेस करते हैं।';
+      'पेमेंट गेटवे, SMS और नोटिफ़िकेशन प्रदाता, क्लाउड होस्टिंग प्रदाता, जो गोपनीयता दायित्वों के तहत हमारी ओर से डेटा प्रोसेस करते हैं।';
 
   @override
   String get privacyPartnersTitle =>
@@ -1071,7 +1071,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get privacyRetentionContent =>
-      'हम आपका डेटा तब तक रखते हैं जब तक आपका अकाउंट सक्रिय है और हमारी सेवाएँ देने के लिए ज़रूरी है। उसके बाद हम केवल वही रखते हैं जो कानून के अनुसार आवश्यक है, जैसे इनवॉइस और लेन-देन रिकॉर्ड, या विवाद सुलझाने के लिए ज़रूरी है। फिर उसे हटा या अनाम कर दिया जाता है।';
+      'हम आपका डेटा तब तक रखते हैं जब तक आपका अकाउंट सक्रिय है और हमारी सेवाएँ देने के लिए ज़रूरी है। उसके बाद हम केवल वही रखते हैं जो कानून के अनुसार आवश्यक है, जैसे इनवॉइस और लेन-देन रिकॉर्ड, या विवाद सुलझाने के लिए ज़रूरी है। फिर उसे हटा या अनाम कर दिया जाता है। यदि आप ऐप में अपना अकाउंट हटाते हैं (प्रोफ़ाइल > अकाउंट हटाएँ), तो हम आपकी प्रोफ़ाइल, सेव किए पते और बैंक विवरण हटा देते हैं और आपका नाम व मोबाइल नंबर अनाम कर देते हैं; ऑर्डर और इनवॉइस रिकॉर्ड कानून के अनुसार आपके नाम के बिना रखे जाते हैं।';
 
   @override
   String get privacyInternationalTitle =>
@@ -1139,7 +1139,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get whatWeOfferContent =>
-      '• उत्पादों की विस्तृत श्रृंखला: भरोसेमंद विक्रेताओं से कई श्रेणियों में बढ़ता चयन\n\n• लचीली डिलीवरी: एक्सप्रेस 30-मिनट (चुनिंदा क्षेत्र), नेक्स्ट-डे और स्टैंडर्ड डिलीवरी\n\n• सुरक्षित भुगतान: सुरक्षित पेमेंट गेटवे से ऑनलाइन भुगतान करें, या जहाँ उपलब्ध हो कैश ऑन डिलीवरी चुनें\n\n• आसान रिटर्न: रिटर्न अवधि के भीतर पात्र वस्तुओं के लिए ऐप में रिटर्न करें\n\n• सहायता: हमें कभी भी लिखें, हम आपको जवाब देंगे';
+      '• उत्पादों की विस्तृत श्रृंखला: स्वीकृत विक्रेताओं से कई श्रेणियों में बढ़ता चयन\n\n• लचीली डिलीवरी: त्वरित डिलीवरी चुनिंदा क्षेत्रों में (समय अनुमानित है), नेक्स्ट-डे और स्टैंडर्ड डिलीवरी\n\n• सुरक्षित भुगतान: सुरक्षित पेमेंट गेटवे से ऑनलाइन भुगतान करें, या जहाँ उपलब्ध हो कैश ऑन डिलीवरी चुनें\n\n• आसान रिटर्न: रिटर्न अवधि के भीतर पात्र वस्तुओं के लिए ऐप में रिटर्न करें\n\n• सहायता: हमें कभी भी लिखें, हम आपको जवाब देंगे';
 
   @override
   String get emailLabel => 'ईमेल';
@@ -1544,7 +1544,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aboutHighlightExpress =>
-      '30-मिनट एक्सप्रेस';
+      'चुनिंदा क्षेत्रों में त्वरित डिलीवरी';
 
   @override
   String get happyCustomers => 'खुश ग्राहक';
@@ -1745,7 +1745,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dataAlreadyLoaded =>
-      'डेटा पहले ही लोड हो चुका है - तुरंत प्रदर्शन!';
+      'अद्यतन';
 
   @override
   String get searchSavedAddresses => 'सहेजे गए पते खोजें';
@@ -1754,7 +1754,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get searchCategories => 'श्रेणियां खोजें...';
 
   @override
-  String get searchRestaurantsDishes => 'रेस्तरां, व्यंजन खोजें...';
+  String get searchRestaurantsDishes => 'उत्पाद, ब्रांड और सेवाएँ खोजें...';
 
   @override
   String get searchAreaStreetName => 'क्षेत्र, सड़क का नाम खोजें...';
@@ -2411,21 +2411,21 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get onboardingSubtitle1 =>
-      'स्थानीय स्टोर्स से हज़ारों उत्पाद खोजें, सीधे आपके दरवाज़े तक।';
+      'स्थानीय स्टोर्स से उत्पाद खोजें, सीधे आपके दरवाज़े तक।';
 
   @override
   String get onboardingTitle2 => 'तेज़ और भरोसेमंद डिलीवरी';
 
   @override
   String get onboardingSubtitle2 =>
-      'अपने ऑर्डर को रियल-टाइम में ट्रैक करें और मिनटों में डिलीवरी पाएं।';
+      'अपने ऑर्डर को स्टोर से आपके दरवाज़े तक लाइव ट्रैक करें।';
 
   @override
   String get onboardingTitle3 => 'सुरक्षित भुगतान';
 
   @override
   String get onboardingSubtitle3 =>
-      'भरोसेमंद भुगतान विधियों के साथ निश्चिंत होकर भुगतान करें।';
+      'सुरक्षित रूप से ऑनलाइन भुगतान करें, या जहाँ उपलब्ध हो कैश ऑन डिलीवरी चुनें।';
 
   @override
   String get exitAppSavedNote => 'आपकी शॉपिंग कार्ट और प्रगति सहेज ली जाएगी।';
@@ -2434,7 +2434,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get cartEmptyDescription => 'लगता है आपने अभी तक कुछ नहीं जोड़ा है।\nहमारे उत्पादों की विस्तृत श्रृंखला देखना शुरू करें।';
 
   @override
-  String get splashPreparing => 'आपके लिए सबसे अच्छा शॉपिंग अनुभव तैयार हो रहा है';
+  String get splashPreparing => 'तैयार हो रहा है...';
 
   @override
   String get trustFastDelivery => 'तेज़ डिलीवरी';
@@ -2446,13 +2446,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get trustQualityProducts => 'गुणवत्तापूर्ण उत्पाद';
 
   @override
-  String get trustByIndia => 'भारत का भरोसा';
+  String get trustByIndia => 'आसान शॉपिंग';
 
   @override
   String get trustWideSelection => 'विस्तृत चयन';
 
   @override
-  String get trustBestPrices => 'सर्वोत्तम कीमतें';
+  String get trustBestPrices => 'उचित कीमतें';
 
   @override
   String get trustSecurePayment => 'सुरक्षित भुगतान';

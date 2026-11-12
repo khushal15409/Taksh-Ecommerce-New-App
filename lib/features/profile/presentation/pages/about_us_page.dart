@@ -63,7 +63,7 @@ class AboutUsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Your Trusted Shopping Partner',
+                    'Shopping, delivered to your door',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
