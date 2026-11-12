@@ -18,6 +18,7 @@ import 'package:taksh_e_commerce/features/orders/presentation/cubit/orders_state
 import 'package:taksh_e_commerce/features/orders/presentation/pages/return_request_page.dart';
 import 'package:taksh_e_commerce/features/product/domain/usecases/get_ecommerce_product_details.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 
 /// Order details page - displays detailed information about a specific order
 class OrderDetailsPage extends StatefulWidget {
@@ -953,7 +954,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   /// to support with the order number pre-filled.
   Future<void> _requestAddressChange(Order order) async {
     final emailUrl = Uri.parse(
-      'mailto:support@taksh.com?subject=${Uri.encodeComponent('Change delivery address for order #${order.orderNumber}')}&body=${Uri.encodeComponent('Hi, I would like to change the delivery address for order #${order.orderNumber}.')}',
+      'mailto:${SupportContacts.email}?subject=${Uri.encodeComponent('Change delivery address for order #${order.orderNumber}')}&body=${Uri.encodeComponent('Hi, I would like to change the delivery address for order #${order.orderNumber}.')}',
     );
 
     if (await canLaunchUrl(emailUrl)) {
@@ -1659,7 +1660,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   /// Open WhatsApp chat
   Future<void> _openWhatsApp() async {
     final whatsappUrl = Uri.parse(
-      'https://wa.me/919999999999?text=Hi, I need help with my order',
+      'https://wa.me/${SupportContacts.whatsappNumber}?text=Hi, I need help with my order',
     );
 
     if (await canLaunchUrl(whatsappUrl)) {
@@ -1674,7 +1675,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   /// Open email client
   Future<void> _openEmail() async {
     final emailUrl = Uri.parse(
-      'mailto:support@taksh.com?subject=Order Support Request&body=Hi, I need help with my order',
+      'mailto:${SupportContacts.email}?subject=Order Support Request&body=Hi, I need help with my order',
     );
 
     if (await canLaunchUrl(emailUrl)) {
