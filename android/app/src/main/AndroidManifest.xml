@@ -24,10 +24,10 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/taksh_notification_color" />
 
-        <!-- Google Maps API Key -->
+        <!-- Google Maps API key (Android Maps SDK): injected from MAPS_API_KEY at build time, see app/build.gradle.kts -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCiYPcbfDVB8ezAsj9wasOGdg-XgzXvNwM" />
+            android:value="${MAPS_API_KEY}" />
 
         <activity
             android:name=".MainActivity"
