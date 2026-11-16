@@ -180,6 +180,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                   Icons.delivery_dining_rounded,
                                   Icons.account_balance_wallet_rounded,
                                 ][index % 3],
+                                color: const [
+                                  Color(0xFFE8412C),
+                                  Color(0xFF1FA34A),
+                                  Color(0xFF8B3FE0),
+                                ][index % 3],
                               ),
                             ),
                             // Fade the artwork into the page colour.
@@ -393,8 +398,9 @@ class _PageIndicator extends StatelessWidget {
 /// Large glass medallion with a gently bobbing icon, used as onboarding art.
 class _FloatingHeroIcon extends StatefulWidget {
   final IconData icon;
+  final Color color;
 
-  const _FloatingHeroIcon({required this.icon});
+  const _FloatingHeroIcon({required this.icon, required this.color});
 
   @override
   State<_FloatingHeroIcon> createState() => _FloatingHeroIconState();
@@ -436,7 +442,7 @@ class _FloatingHeroIconState extends State<_FloatingHeroIcon>
             ),
           ],
         ),
-        child: Icon(widget.icon, size: 96, color: const Color(0xFF5B8DEF)),
+        child: Icon(widget.icon, size: 96, color: widget.color),
       ),
     );
   }
