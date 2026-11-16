@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:taksh_e_commerce/features/app_update/data/app_update_service.dart';
+import 'package:taksh_e_commerce/features/app_update/presentation/cubit/app_update_cubit.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/core/network/network_info.dart';
 import 'package:taksh_e_commerce/core/routing/app_router.dart';
@@ -167,6 +169,7 @@ Future<void> initializeDependencies({
   log.debugWithContext(
       'Registering feature dependencies', {'action': 'features'});
   _registerSplashDependencies();
+  _registerAppUpdateDependencies(baseUrl: baseUrl);
   _registerAuthDependencies(useMockData: useMockData);
   _registerDashboardDependencies(useMockData: useMockData);
   registerAddressDependencies(getIt, useMock: useMockData);
@@ -251,6 +254,16 @@ void _registerCoreDependencies(String baseUrl) {
   log.debugWithContext(
     'Core dependencies registered',
     {'count': 3},
+  );
+}
+
+/// Register app update (optional / forced update) dependencies
+void _registerAppUpdateDependencies({required String baseUrl}) {
+  getIt.registerLazySingleton<AppUpdateService>(
+    () => AppUpdateService(baseUrl: baseUrl),
+  );
+  getIt.registerLazySingleton<AppUpdateCubit>(
+    () => AppUpdateCubit(getIt<AppUpdateService>(), getIt<SharedPreferences>()),
   );
 }
 
