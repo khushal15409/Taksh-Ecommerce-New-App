@@ -7,6 +7,8 @@ import 'package:taksh_e_commerce/core/constants/api_constants.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
 import 'package:taksh_e_commerce/core/services/push_notification_service.dart';
+import 'package:taksh_e_commerce/features/app_update/presentation/cubit/app_update_cubit.dart';
+import 'package:taksh_e_commerce/features/app_update/presentation/widgets/app_update_gate.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/routing/app_router.dart';
@@ -144,14 +146,24 @@ class TakshECommerceApp extends material.StatelessWidget {
         BlocProvider<AddressBloc>(
           create: (context) => getIt<AddressBloc>(),
         ),
+        // AppUpdateCubit - optional / forced update prompt (one check per session)
+        BlocProvider<AppUpdateCubit>.value(
+          value: getIt<AppUpdateCubit>(),
+        ),
       ],
       child: BlocListener<SplashCubit, SplashState>(
         // Once the splash (and its location prompt) is done, ask for the notification
         // permission. The service asks only once and only if never decided before.
         listenWhen: (previous, current) =>
             current is SplashCompleted && previous is! SplashCompleted,
-        listener: (context, state) =>
-            PushNotificationService.instance.requestPermissionAtStart(),
+        listener: (context, state) {
+          PushNotificationService.instance.requestPermissionAtStart();
+          // Ask the server whether this build needs an update. Never blocks the
+          // app: a failed check simply shows nothing.
+          if (!config.useMockData) {
+            context.read<AppUpdateCubit>().checkOnce();
+          }
+        },
         child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
@@ -193,6 +205,7 @@ class TakshECommerceApp extends material.StatelessWidget {
               darkTheme: AppTheme.darkTheme(),
               themeMode: themeMode,
               routerConfig: router.router,
+              builder: (context, child) => AppUpdateGate(child: child),
             );
           },
         ),

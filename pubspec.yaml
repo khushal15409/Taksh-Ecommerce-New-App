@@ -52,6 +52,10 @@ dependencies:
   talker_flutter: ^4.0.0
   talker: 4.0.0
   url_launcher: ^6.2.4
+
+  # App update: installed version + Google Play in-app updates
+  package_info_plus: ^8.0.2
+  in_app_update: ^4.2.3
   flutter_svg: ^2.0.10+1
   google_fonts: ^6.1.0
 
