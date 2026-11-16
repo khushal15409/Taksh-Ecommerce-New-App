@@ -39,7 +39,6 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   final _formKey = GlobalKey<FormState>();
   final _otpController = TextEditingController();
   final _otpFocusNode = FocusNode();
-  String? _lastSubmittedOtp;
   bool _isLoading = false;
   int _resendTimer = 30;
   Timer? _timer;
@@ -48,22 +47,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   void initState() {
     super.initState();
     _startResendTimer();
-    _otpController.addListener(_onOtpChanged);
     _otpFocusNode.addListener(() {
       if (mounted) setState(() {});
     });
-  }
-
-  /// Logs in as soon as the last digit is typed; editing the code re-arms it.
-  void _onOtpChanged() {
-    final otp = _otpController.text.trim();
-    if (otp.length < AppConstants.otpLength) {
-      _lastSubmittedOtp = null;
-      return;
-    }
-    if (_isLoading || otp == _lastSubmittedOtp) return;
-    _lastSubmittedOtp = otp;
-    _handleVerifyOtp();
   }
 
   @override
@@ -86,8 +72,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   }
 
   void _handleVerifyOtp() {
+    if (_isLoading) return;
     if (_formKey.currentState!.validate()) {
       final otp = _otpController.text.trim();
+      setState(() => _isLoading = true);
       context.read<AuthBloc>().add(
         AuthVerifyOtpRequested(
           phone: widget.phone,
@@ -131,9 +119,11 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
       extendBodyBehindAppBar: true,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthLoading) {
-            setState(() => _isLoading = true);
-          } else {
+          // Stay in the loading state through Authenticated: the page
+          // navigates away right after, so the button must not flicker back.
+          if (state is AuthLoading || state is Authenticated) {
+            if (!_isLoading) setState(() => _isLoading = true);
+          } else if (_isLoading) {
             setState(() => _isLoading = false);
           }
 

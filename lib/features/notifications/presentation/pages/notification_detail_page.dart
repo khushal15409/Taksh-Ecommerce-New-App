@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -135,12 +136,9 @@ class NotificationDetailPage extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              'assets/images/diwali/home_standard_diwali_bg.jpg',
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-              errorBuilder: (_, __, ___) =>
-                  Container(color: const Color(0xFFB3172B)),
+            const AnimatedBackdrop(
+              palette: BackdropPalette.saffron,
+              coverage: 1.0,
             ),
             Container(
               decoration: BoxDecoration(

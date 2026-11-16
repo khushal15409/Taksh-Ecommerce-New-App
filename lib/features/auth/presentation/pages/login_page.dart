@@ -6,6 +6,7 @@ import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/core/constants/app_constants.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:taksh_e_commerce/core/widgets/app_error_toast.dart';
 import 'package:taksh_e_commerce/core/widgets/festive_auth_background.dart';
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
@@ -53,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
       _log.infoWithContext('Form validated, dispatching send OTP event', {
         'phone_length': phone.length,
       });
+      setState(() => _isLoading = true);
       context.read<AuthBloc>().add(AuthSendOtpRequested(phone));
     } else {
       _log.warnWithContext('Form validation failed', {
@@ -78,9 +80,11 @@ class _LoginPageState extends State<LoginPage> {
             'state': state.runtimeType.toString(),
           });
 
-          if (state is AuthLoading) {
-            setState(() => _isLoading = true);
-          } else {
+          // Keep the loader up until the screen actually changes: send-OTP
+          // emits no AuthLoading, and AuthOtpSent navigates away right after.
+          if (state is AuthLoading || state is AuthOtpSent) {
+            if (!_isLoading) setState(() => _isLoading = true);
+          } else if (_isLoading) {
             setState(() => _isLoading = false);
           }
 
@@ -119,7 +123,9 @@ class _LoginPageState extends State<LoginPage> {
 
                       // App Logo — same as splash screen
                       Center(
-                        child: Container(
+                        child: FadeSlideIn(
+                          offset: -16,
+                          child: Container(
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
                             color: theme.brightness == Brightness.light
@@ -159,6 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                               fit: BoxFit.contain,
                             ),
                           ),
+                        ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -219,11 +226,13 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: AppConstants.largePadding * 2),
 
                       // Login Card
-                      Container(
+                      FadeSlideIn(
+                        delay: const Duration(milliseconds: 250),
+                        child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(28),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
@@ -371,6 +380,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                             ),
                           ],
+                        ),
                         ),
                       ),
 

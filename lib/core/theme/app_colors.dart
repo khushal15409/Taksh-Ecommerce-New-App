@@ -7,17 +7,17 @@ class AppColors {
   AppColors._(); // Private constructor to prevent instantiation
 
   // ============ Primary Colors (Saffron/Orange - Top of Indian Flag) ============
-  static const Color primaryOrange = Color(0xFFFFA340);
-  static const Color primaryOrangeDark = Color(0xFFE38A2E);
-  static const Color primaryOrangeLight = Color(0xFFFFC07A);
+  static const Color primaryOrange = Color(0xFFFF7A1A);
+  static const Color primaryOrangeDark = Color(0xFFE85D04);
+  static const Color primaryOrangeLight = Color(0xFFFFA25C);
   static const Color saffron = Color(0xFFFF9933); // Traditional saffron
   static const Color saffronLight = Color(0xFFFFB366);
   static const Color saffronDark = Color(0xFFE68A00);
 
   // ============ Secondary Colors (Green - Bottom of Indian Flag) ============
-  static const Color secondaryGreen = Color(0xFF3CAE5C);
-  static const Color secondaryGreenDark = Color(0xFF2E8B47);
-  static const Color secondaryGreenLight = Color(0xFF5FC77F);
+  static const Color secondaryGreen = Color(0xFF16A34A);
+  static const Color secondaryGreenDark = Color(0xFF0F7A37);
+  static const Color secondaryGreenLight = Color(0xFF4ADE80);
   static const Color indiaGreen = Color(0xFF138808); // Traditional India green
   static const Color indiaGreenLight = Color(0xFF4CAF50);
   static const Color indiaGreenDark = Color(0xFF0D5F06);
@@ -31,8 +31,8 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
 
-  static const Color grey50 = Color(0xFFFAFAFA);
-  static const Color grey100 = Color(0xFFF5F5F5);
+  static const Color grey50 = Color(0xFFF8F7F5);
+  static const Color grey100 = Color(0xFFF2F0ED);
   static const Color grey200 = Color(0xFFEEEEEE);
   static const Color grey300 = Color(0xFFE0E0E0);
   static const Color grey400 = Color(0xFFBDBDBD);
@@ -40,7 +40,7 @@ class AppColors {
   static const Color grey600 = Color(0xFF757575);
   static const Color grey700 = Color(0xFF616161);
   static const Color grey800 = Color(0xFF424242);
-  static const Color grey900 = Color(0xFF212121);
+  static const Color grey900 = Color(0xFF16181F);
 
   // ============ Semantic Colors ============
   static const Color success = Color(0xFF4CAF50);
@@ -67,7 +67,7 @@ class AppColors {
   static const Color surfaceDark = Color(0xFF1E1E1E);
 
   // ============ Text Colors ============
-  static const Color textPrimaryLight = Color(0xFF212121);
+  static const Color textPrimaryLight = Color(0xFF16181F);
   static const Color textSecondaryLight = Color(0xFF757575);
   static const Color textDisabledLight = Color(0xFFBDBDBD);
 
@@ -76,7 +76,7 @@ class AppColors {
   static const Color textDisabledDark = Color(0xFF666666);
 
   // ============ Border Colors ============
-  static const Color borderLight = Color(0xFFE0E0E0);
+  static const Color borderLight = Color(0xFFEAE6E1);
   static const Color borderDark = Color(0xFF424242);
 
   // ============ Overlay Colors ============
@@ -84,7 +84,7 @@ class AppColors {
   static const Color overlayDark = Color(0x14FFFFFF); // 8% opacity
 
   // ============ E-Commerce Specific Colors ============
-  static const Color discount = Color(0xFFE91E63);
+  static const Color discount = Color(0xFFE11D48);
   static const Color price = Color(0xFF4CAF50);
   static const Color outOfStock = Color(0xFF9E9E9E);
   static const Color inStock = Color(0xFF4CAF50);

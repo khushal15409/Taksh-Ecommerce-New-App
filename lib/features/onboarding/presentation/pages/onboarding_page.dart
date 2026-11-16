@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
@@ -164,11 +165,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.asset(
-                              step.image,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                              gaplessPlayback: true,
+                            AnimatedBackdrop(
+                              palette: const [
+                                BackdropPalette.saffron,
+                                BackdropPalette.emerald,
+                                BackdropPalette.royal,
+                              ][index % 3],
+                              coverage: 1.0,
+                            ),
+                            Center(
+                              child: _FloatingHeroIcon(
+                                icon: const [
+                                  Icons.shopping_bag_rounded,
+                                  Icons.delivery_dining_rounded,
+                                  Icons.account_balance_wallet_rounded,
+                                ][index % 3],
+                              ),
                             ),
                             // Fade the artwork into the page colour.
                             Positioned(
@@ -373,6 +385,59 @@ class _PageIndicator extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+
+/// Large glass medallion with a gently bobbing icon, used as onboarding art.
+class _FloatingHeroIcon extends StatefulWidget {
+  final IconData icon;
+
+  const _FloatingHeroIcon({required this.icon});
+
+  @override
+  State<_FloatingHeroIcon> createState() => _FloatingHeroIconState();
+}
+
+class _FloatingHeroIconState extends State<_FloatingHeroIcon>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 3),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(0, -12 * Curves.easeInOut.transform(_c.value)),
+        child: child,
+      ),
+      child: Container(
+        width: 190,
+        height: 190,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white.withOpacity(0.22),
+          border: Border.all(color: Colors.white.withOpacity(0.55), width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 40,
+              offset: const Offset(0, 18),
+            ),
+          ],
+        ),
+        child: Icon(widget.icon, size: 96, color: Colors.white),
+      ),
     );
   }
 }

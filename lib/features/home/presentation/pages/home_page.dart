@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -413,13 +414,13 @@ class _HomePageState extends State<_HomePageContent> {
                       child: Align(
                         key: ValueKey(_selectedDeliveryType),
                         alignment: Alignment.topCenter,
-                        child: Image.asset(
-                          HomeModeTheme.of(
-                            _selectedDeliveryType,
-                          ).backgroundAsset,
-                          width: double.infinity,
-                          fit: BoxFit.fitWidth,
-                          gaplessPlayback: true,
+                        child: SizedBox.expand(
+                          child: AnimatedBackdrop(
+                            palette: HomeModeTheme.of(
+                              _selectedDeliveryType,
+                            ).palette,
+                            coverage: 0.5,
+                          ),
                         ),
                       ),
                     ),

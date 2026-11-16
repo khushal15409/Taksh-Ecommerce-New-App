@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
@@ -341,11 +342,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
             child: IgnorePointer(
               child: Align(
                 alignment: Alignment.topCenter,
-                child: Image.asset(
-                  'assets/images/diwali/home_categories_diwali_bg.jpg',
-                  width: double.infinity,
-                  fit: BoxFit.fitWidth,
-                  gaplessPlayback: true,
+                child: const SizedBox.expand(
+                  child: AnimatedBackdrop(
+                    palette: BackdropPalette.saffron,
+                    coverage: 0.45,
+                  ),
                 ),
               ),
             ),

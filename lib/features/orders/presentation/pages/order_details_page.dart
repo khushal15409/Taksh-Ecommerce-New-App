@@ -872,11 +872,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       address.addressLine1,
       address.addressLine2,
     ].where((line) => line != null && line.trim().isNotEmpty).join(', ');
-    final canChange = ![
-      'delivered',
-      'cancelled',
-      'returned',
-    ].contains(order.orderStatus.toLowerCase());
     const bodyStyle = TextStyle(
       fontSize: 13,
       color: AppColors.grey800,
@@ -887,31 +882,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       icon: Icons.location_on_rounded,
       iconColor: AppColors.primaryOrange,
       title: AppLocalizations.of(context)!.deliveryAddress,
-      trailing: canChange
-          ? OutlinedButton.icon(
-              onPressed: () => _requestAddressChange(order),
-              icon: const Icon(Icons.edit_note_rounded, size: 14),
-              label: const Text('Change Address'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primaryOrange,
-                side: const BorderSide(color: Color(0xFFFFB067)),
-                backgroundColor: const Color(0xFFFFF6EC),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 7,
-                ),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                textStyle: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                ),
-              ),
-            )
-          : null,
       child: Stack(
         children: [
           const Positioned(
@@ -948,20 +918,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ],
       ),
     );
-  }
-
-  /// There is no change-address API for placed orders, so route the request
-  /// to support with the order number pre-filled.
-  Future<void> _requestAddressChange(Order order) async {
-    final emailUrl = Uri.parse(
-      'mailto:${SupportContacts.email}?subject=${Uri.encodeComponent('Change delivery address for order #${order.orderNumber}')}&body=${Uri.encodeComponent('Hi, I would like to change the delivery address for order #${order.orderNumber}.')}',
-    );
-
-    if (await canLaunchUrl(emailUrl)) {
-      await launchUrl(emailUrl);
-    } else if (mounted) {
-      AppErrorToast.show(context);
-    }
   }
 
   /// Build order summary section

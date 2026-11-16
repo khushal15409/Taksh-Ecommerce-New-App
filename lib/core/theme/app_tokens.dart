@@ -32,12 +32,12 @@ class AppTokens {
       BorderRadius.all(Radius.circular(radiusFull));
 
   // Semantic Border Radius
-  static const BorderRadius buttonRadius = borderRadiusSM;
-  static const BorderRadius cardRadius = borderRadiusMD;
-  static const BorderRadius inputRadius = borderRadiusSM;
-  static const BorderRadius dialogRadius = borderRadiusLG;
+  static const BorderRadius buttonRadius = borderRadiusLG;
+  static const BorderRadius cardRadius = borderRadiusXL;
+  static const BorderRadius inputRadius = borderRadiusLG;
+  static const BorderRadius dialogRadius = borderRadiusXXL;
   static const BorderRadius chipRadius = borderRadiusFull;
-  static const BorderRadius imageRadius = borderRadiusMD;
+  static const BorderRadius imageRadius = borderRadiusLG;
 
   // ============ Border Width ============
   static const double borderWidthNone = 0.0;

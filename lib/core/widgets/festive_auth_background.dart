@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 
 /// Diwali-themed backdrop shared by the login, OTP and guest-wall screens:
 /// festive lanterns/fireworks fading into white, then into soft green.
@@ -20,9 +21,9 @@ class FestiveAuthBackground extends StatelessWidget {
           end: Alignment.bottomCenter,
           stops: [0.0, 0.45, 1.0],
           colors: [
-            Colors.white,
-            Color(0xFFF1F8EC),
-            Color(0xFFA9D9AC),
+            Color(0xFFFFF4EA),
+            Color(0xFFFFF9F4),
+            Color(0xFFFFE9D6),
           ],
         ),
       ),
@@ -32,23 +33,11 @@ class FestiveAuthBackground extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: height * 0.6,
+            height: height * 0.62,
             child: IgnorePointer(
-              child: ShaderMask(
-                blendMode: BlendMode.dstIn,
-                shaderCallback: (rect) => const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 0.6, 1.0],
-                  colors: [Colors.black, Colors.black, Colors.transparent],
-                ).createShader(rect),
-                child: Image.asset(
-                  'assets/images/diwali/home_categories_diwali_bg.jpg',
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  gaplessPlayback: true,
-                ),
+              child: const AnimatedBackdrop(
+                palette: BackdropPalette.saffron,
+                coverage: 1.0,
               ),
             ),
           ),
@@ -60,11 +49,15 @@ class FestiveAuthBackground extends StatelessWidget {
 }
 
 const LinearGradient festiveOrangeGradient = LinearGradient(
-  colors: [Color(0xFFFF9F3A), Color(0xFFFF7A00)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [Color(0xFFFF9A3D), Color(0xFFF2570A)],
 );
 
 const LinearGradient festiveGreenGradient = LinearGradient(
-  colors: [Color(0xFF2E9E4F), Color(0xFF49BC69)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [Color(0xFF16A34A), Color(0xFF34D27B)],
 );
 
 /// Orange gradient CTA used on the auth screens.
@@ -142,14 +135,11 @@ class FestiveHeaderBackdrop extends StatelessWidget {
       children: [
         Positioned.fill(
           child: IgnorePointer(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Image.asset(
-                asset,
-                width: double.infinity,
-                fit: BoxFit.fitWidth,
-                gaplessPlayback: true,
-              ),
+            child: AnimatedBackdrop(
+              palette: asset == festiveGreenAsset
+                  ? BackdropPalette.emerald
+                  : BackdropPalette.saffron,
+              coverage: 0.4,
             ),
           ),
         ),

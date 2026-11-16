@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/features/notifications/domain/entities/app_notification.dart';
 
@@ -68,19 +69,9 @@ class NotificationHeaderBackground extends StatelessWidget {
     return SizedBox(
       height: height,
       width: double.infinity,
-      child: Image.asset(
-        'assets/images/diwali/home_standard_diwali_bg.jpg',
-        fit: BoxFit.cover,
-        alignment: Alignment.topCenter,
-        errorBuilder: (_, __, ___) => Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFE8412C), Color(0xFFFFA340)],
-            ),
-          ),
-        ),
+      child: const AnimatedBackdrop(
+        palette: BackdropPalette.saffron,
+        coverage: 1.0,
       ),
     );
   }

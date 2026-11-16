@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_type_selector.dart';
 
 /// Centralised visual theme for the three Home modes
@@ -12,6 +13,7 @@ class HomeModeTheme {
   final Color accentSoft;
   final IconData tabIcon;
   final Color sparkle;
+  final BackdropPalette palette;
 
   const HomeModeTheme({
     required this.backgroundAsset,
@@ -20,6 +22,7 @@ class HomeModeTheme {
     required this.accentSoft,
     required this.tabIcon,
     required this.sparkle,
+    required this.palette,
   });
 
   static const standard = HomeModeTheme(
@@ -29,6 +32,7 @@ class HomeModeTheme {
     accentSoft: Color(0xFFFFF1E4),
     tabIcon: Icons.local_shipping_rounded,
     sparkle: Color(0xFFFFE08A),
+    palette: BackdropPalette.saffron,
   );
 
   static const quick = HomeModeTheme(
@@ -38,6 +42,7 @@ class HomeModeTheme {
     accentSoft: Color(0xFFE6F6EC),
     tabIcon: Icons.bolt_rounded,
     sparkle: Color(0xFFFFF3B0),
+    palette: BackdropPalette.emerald,
   );
 
   static const services = HomeModeTheme(
@@ -47,6 +52,7 @@ class HomeModeTheme {
     accentSoft: Color(0xFFF1E8FF),
     tabIcon: Icons.home_repair_service_rounded,
     sparkle: Color(0xFFFFD6F0),
+    palette: BackdropPalette.royal,
   );
 
   static HomeModeTheme of(DeliveryType type) {
