@@ -109,7 +109,7 @@ class _OrdersPageState extends State<OrdersPage> {
                     Text(
                       AppLocalizations.of(context)!.myOrders,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Color(0xFF1F2A44),
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -149,7 +149,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 const Text(
                   'Track and manage your orders',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF3D4A6B),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),

@@ -426,7 +426,7 @@ class _FloatingHeroIconState extends State<_FloatingHeroIcon>
         height: 190,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.22),
+          color: Colors.white.withOpacity(0.7),
           border: Border.all(color: Colors.white.withOpacity(0.55), width: 2),
           boxShadow: [
             BoxShadow(
@@ -436,7 +436,7 @@ class _FloatingHeroIconState extends State<_FloatingHeroIcon>
             ),
           ],
         ),
-        child: Icon(widget.icon, size: 96, color: Colors.white),
+        child: Icon(widget.icon, size: 96, color: const Color(0xFF5B8DEF)),
       ),
     );
   }

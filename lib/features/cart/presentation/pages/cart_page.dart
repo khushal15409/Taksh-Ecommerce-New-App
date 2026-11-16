@@ -275,16 +275,14 @@ class _CartPageState extends State<CartPage>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
+                    color: Color(0xFF1F2A44),
                   ),
                 ),
                 Text(
                   '$itemsLabel • ₹${formatRupees(total)}',
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Colors.white,
-                    shadows: [Shadow(color: Colors.black26, blurRadius: 3)],
+                    color: Color(0xFF3D4A6B),
                   ),
                 ),
               ],

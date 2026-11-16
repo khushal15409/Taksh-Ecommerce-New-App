@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -329,11 +330,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: AppLocalizations.of(context)!.liveChat,
                       iconColor: AppColors.black,
                       onTap: () async {
-                        const phoneNumber =
-                            '919518365510'; // India country code + number
-                        final whatsappUrl = Uri.parse(
-                          'https://wa.me/$phoneNumber',
-                        );
+                        // Live-chat number comes from the admin panel.
+                        final whatsappUrl = SupportContacts.whatsappUri();
 
                         if (await canLaunchUrl(whatsappUrl)) {
                           await launchUrl(
@@ -1113,7 +1111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 subtitle: Text(
-                  l10n.emailSupportDescription,
+                  SupportContacts.applyTo(l10n.emailSupportDescription),
                   style: const TextStyle(
                     color: AppColors.grey600,
                     fontSize: 13,
@@ -1122,17 +1120,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   Navigator.of(bottomSheetContext).pop();
-                  final emailUri = Uri(
-                    scheme: 'mailto',
-                    path: 'customersupport@takshallinone.in',
-                    queryParameters: {'subject': 'Support Request'},
+                  final emailUri = SupportContacts.mailtoUri(
+                    subject: 'Support Request',
                   );
                   if (await canLaunchUrl(emailUri)) {
                     await launchUrl(emailUri);
                   } else {
                     if (context.mounted) {
                       AppToastMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.emailAppError)),
+                        SnackBar(
+                          content: Text(
+                            SupportContacts.applyTo(l10n.emailAppError),
+                          ),
+                        ),
                       );
                     }
                   }

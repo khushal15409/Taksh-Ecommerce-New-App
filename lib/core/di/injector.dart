@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 import 'package:taksh_e_commerce/features/app_update/data/app_update_service.dart';
 import 'package:taksh_e_commerce/features/app_update/presentation/cubit/app_update_cubit.dart';
 import 'package:taksh_e_commerce/core/network/api_client.dart';
@@ -170,6 +171,11 @@ Future<void> initializeDependencies({
       'Registering feature dependencies', {'action': 'features'});
   _registerSplashDependencies();
   _registerAppUpdateDependencies(baseUrl: baseUrl);
+  // Support email / phone / live-chat number / address come from the admin
+  // panel; saved copy first, refreshed in the background (never blocks start-up).
+  if (!useMockData) {
+    await SupportContacts.init(baseUrl: baseUrl);
+  }
   _registerAuthDependencies(useMockData: useMockData);
   _registerDashboardDependencies(useMockData: useMockData);
   registerAddressDependencies(getIt, useMock: useMockData);

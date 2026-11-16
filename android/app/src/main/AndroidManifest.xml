@@ -16,7 +16,7 @@
         <!-- Push notifications: channel (created in MainActivity) and small icon -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="taksh_orders" />
+            android:value="taksh_orders_v5" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_notification" />

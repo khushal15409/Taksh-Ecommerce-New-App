@@ -167,7 +167,7 @@ class NotificationDetailPage extends StatelessWidget {
                       height: 1.15,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFFFFE7A3),
+                      color: Color(0xFF1F2A44),
                     ),
                   ),
                   const SizedBox(height: 14),

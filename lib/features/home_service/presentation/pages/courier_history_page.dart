@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -1098,7 +1099,7 @@ class _BookingDetailBody extends StatelessWidget {
                   height: 44,
                   child: ElevatedButton.icon(
                     onPressed: () => launchUrl(
-                      Uri.parse('https://wa.me/919518365510'),
+                      SupportContacts.whatsappUri(),
                       mode: LaunchMode.externalApplication,
                     ),
                     icon: const Icon(
@@ -1121,8 +1122,10 @@ class _BookingDetailBody extends StatelessWidget {
                   height: 44,
                   child: OutlinedButton.icon(
                     onPressed: () => launchUrl(
-                      Uri.parse(
-                        'mailto:customersupport@takshallinone.in?subject=Courier Booking Support&body=Hi, I need help with my courier booking #${booking.bookingNumber}',
+                      SupportContacts.mailtoUri(
+                        subject: 'Courier Booking Support',
+                        body:
+                            'Hi, I need help with my courier booking #${booking.bookingNumber}',
                       ),
                     ),
                     icon: const Icon(Icons.email_outlined, size: 18),

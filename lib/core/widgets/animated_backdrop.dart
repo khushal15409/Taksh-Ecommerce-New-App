@@ -22,51 +22,45 @@ class BackdropPalette {
     required this.blobs,
   });
 
-  /// "Sunset candy": coral, amber, hot pink and a touch of violet.
+  /// "Day sky": pale blue sky, warm sun, soft blue hills.
   static const saffron = BackdropPalette(
-    top: Color(0xFFFF6F61),
-    mid: Color(0xFFFFD2A8),
-    glowA: Color(0xFFFFF1C9),
-    glowB: Color(0xFFFF7EC0),
-    spark: Color(0xFFFFFFFF),
+    top: Color(0xFFA9D9FF),
+    mid: Color(0xFFEEF8FF),
+    glowA: Color(0xFFFFF0B8),
+    glowB: Color(0xFFFFD3E0),
+    spark: Color(0xFF6FB6F5),
     blobs: [
-      Color(0xFFFF7A6B),
-      Color(0xFFFFB45E),
-      Color(0xFFFF5FA8),
-      Color(0xFFB28CFF),
-      Color(0xFFFFE08A),
+      Color(0xFF9CCBFF),
+      Color(0xFFC6E4FF),
+      Color(0xFFFFDCD0),
     ],
   );
 
-  /// "Aurora lagoon": teal, mint, sky blue and indigo.
+  /// "Mint dawn": pale mint sky, cream sun, aqua hills.
   static const emerald = BackdropPalette(
-    top: Color(0xFF0FB5A4),
-    mid: Color(0xFFCFF8E8),
-    glowA: Color(0xFFE6FFF4),
-    glowB: Color(0xFF6CC8FF),
-    spark: Color(0xFFFFFFFF),
+    top: Color(0xFFA0EBD4),
+    mid: Color(0xFFE9FBF5),
+    glowA: Color(0xFFFFF8C4),
+    glowB: Color(0xFFB2E2FF),
+    spark: Color(0xFF3FCFA3),
     blobs: [
-      Color(0xFF12C2B0),
-      Color(0xFF9BF0A8),
-      Color(0xFF5CC6FF),
-      Color(0xFF7C8CFF),
-      Color(0xFFB8FFE0),
+      Color(0xFF8FE3C8),
+      Color(0xFFBEF2E0),
+      Color(0xFFAAD9FF),
     ],
   );
 
-  /// "Cosmic orchid": violet, magenta, cyan and peach.
+  /// "Lilac twilight": pale lavender sky, pink sun, lilac hills.
   static const royal = BackdropPalette(
-    top: Color(0xFF8B6BFF),
-    mid: Color(0xFFEBDDFF),
-    glowA: Color(0xFFF6E4FF),
-    glowB: Color(0xFFF472D0),
-    spark: Color(0xFFFFFFFF),
+    top: Color(0xFFCBBEFF),
+    mid: Color(0xFFF3EEFF),
+    glowA: Color(0xFFFFE2F3),
+    glowB: Color(0xFFFFC4E4),
+    spark: Color(0xFF9A82FF),
     blobs: [
-      Color(0xFF8B6BFF),
-      Color(0xFFF472D0),
-      Color(0xFF6FD3FF),
-      Color(0xFFFFB6A0),
-      Color(0xFFC9B3FF),
+      Color(0xFFB8A8FF),
+      Color(0xFFD9CEFF),
+      Color(0xFFFFCCE5),
     ],
   );
 }
@@ -142,8 +136,7 @@ class _BackdropPainter extends CustomPainter {
     required this.coverage,
   });
 
-  static const int _sparkCount = 22;
-  static const int _ringCount = 6;
+  static const int _starCount = 40;
 
   void _star(Canvas canvas, Offset c, double r, Paint paint) {
     final path = Path()
@@ -166,7 +159,7 @@ class _BackdropPainter extends CustomPainter {
 
     canvas.saveLayer(rect, Paint());
 
-    // Base: strong tint at the very top easing into a soft pastel.
+    // Sky: deep tint at the top melting into a pale horizon.
     canvas.drawRect(
       rect,
       Paint()
@@ -177,126 +170,101 @@ class _BackdropPainter extends CustomPainter {
         ).createShader(rect),
     );
 
-    // Mesh-gradient blobs drifting on slow Lissajous paths.
-    for (var i = 0; i < palette.blobs.length; i++) {
-      final c = palette.blobs[i];
-      final fx = 1 + (i % 3);
-      final fy = 1 + ((i + 1) % 2);
-      final ph = i / palette.blobs.length;
-      final cx = w * (0.15 + 0.7 * ((i * 0.37) % 1.0)) +
-          math.sin((t * fx + ph) * tau) * w * 0.12;
-      final cy = h * (0.12 + 0.7 * ((i * 0.53) % 1.0)) +
-          math.cos((t * fy + ph) * tau) * h * 0.08;
-      final r = w * (0.5 + 0.08 * math.sin((t + ph) * tau));
-      final center = Offset(cx, cy);
-      canvas.drawCircle(
-        center,
-        r,
-        Paint()
-          ..shader = RadialGradient(
-            colors: [c.withOpacity(0.78), c.withOpacity(0)],
-          ).createShader(Rect.fromCircle(center: center, radius: r)),
-      );
-    }
-
-    // Soft top-left sheen so white header text keeps contrast.
-    canvas.drawRect(
-      rect,
+    // Sun / moon orb: slowly breathing glow with a soft halo.
+    final breathe = 0.5 + 0.5 * math.sin(t * tau);
+    final sun = Offset(w * 0.78 + math.sin(t * tau) * 6, h * 0.30);
+    final halo = w * (0.46 + 0.06 * breathe);
+    canvas.drawCircle(
+      sun,
+      halo,
       Paint()
         ..shader = RadialGradient(
-          center: Alignment.topLeft,
-          radius: 1.1,
-          colors: [palette.top.withOpacity(0.35), palette.top.withOpacity(0)],
-        ).createShader(rect),
+          colors: [
+            palette.glowA.withOpacity(0.85),
+            palette.glowA.withOpacity(0),
+          ],
+        ).createShader(Rect.fromCircle(center: sun, radius: halo)),
+    );
+    canvas.drawCircle(
+      sun,
+      w * (0.085 + 0.008 * breathe),
+      Paint()..color = palette.glowA.withOpacity(0.95),
     );
 
-    // Floating glass rings that rise, breathe and fade.
-    for (var i = 0; i < _ringCount; i++) {
-      final r0 = math.Random(i * 131 + 7);
-      final speed = 0.25 + r0.nextDouble() * 0.35;
-      final prog = (t * speed * 2 + r0.nextDouble()) % 1.0;
-      final x = w * (0.08 + r0.nextDouble() * 0.84) +
-          math.sin((t + r0.nextDouble()) * tau) * 10;
-      final y = h * (1.05 - prog * 1.1);
-      final radius = (14 + r0.nextDouble() * 34) * (0.85 + 0.3 * prog);
-      final fade = math.sin(prog * math.pi);
-      final center = Offset(x, y);
-      canvas.drawCircle(
-        center,
-        radius,
-        Paint()..color = Colors.white.withOpacity(0.10 * fade),
-      );
-      canvas.drawCircle(
-        center,
-        radius,
+    // Drifting clouds: blurred pill shapes sliding left to right.
+    for (var i = 0; i < 4; i++) {
+      final r = math.Random(i * 53 + 5);
+      final cw = w * (0.32 + r.nextDouble() * 0.22);
+      final ch = cw * 0.22;
+      final x = ((t + r.nextDouble()) % 1.0) * (w + cw * 2) - cw;
+      final y = h * (0.10 + 0.4 * r.nextDouble());
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(x, y), width: cw, height: ch),
+          Radius.circular(ch),
+        ),
         Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.4
-          ..color = Colors.white.withOpacity(0.55 * fade),
-      );
-      canvas.drawCircle(
-        center.translate(-radius * 0.35, -radius * 0.35),
-        radius * 0.18,
-        Paint()..color = Colors.white.withOpacity(0.55 * fade),
+          ..color = Colors.white.withOpacity(0.6)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14),
       );
     }
 
-    // Light sweep: soft diagonal band travelling across.
-    final sweepX = (t * 1.6 - 0.3) * w;
-    final sweep = Path()
-      ..moveTo(sweepX, 0)
-      ..lineTo(sweepX + w * 0.16, 0)
-      ..lineTo(sweepX + w * 0.16 - h * 0.35, h)
-      ..lineTo(sweepX - h * 0.35, h)
-      ..close();
-    canvas.drawPath(
-      sweep,
-      Paint()
-        ..color = Colors.white.withOpacity(0.14)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20),
-    );
-
-    // Flowing aurora ribbons.
-    for (var k = 0; k < 3; k++) {
-      final base = h * (0.46 + 0.15 * k);
-      final amp = h * (0.05 + 0.02 * k);
+    // Layered rolling hills, each swaying at its own pace.
+    for (var k = 0; k < palette.blobs.length; k++) {
+      final base = h * (0.46 + 0.12 * k);
+      final amp = h * (0.05 + 0.015 * k);
+      final dir = k.isEven ? 1.0 : -1.0;
       final path = Path()..moveTo(0, h);
       for (var x = 0.0; x <= w + 6; x += 6) {
         final y = base +
-            amp *
-                math.sin((x / w) * tau * (1 + k * 0.4) +
-                    (t * (k.isEven ? 1 : -1)) * tau);
+            amp * math.sin((x / w) * tau * (0.9 + 0.35 * k) + dir * t * tau) +
+            amp * 0.35 * math.sin((x / w) * tau * 2.3 - dir * t * tau * 2);
         path.lineTo(x, y);
       }
       path
         ..lineTo(w, h)
         ..close();
+      final hill = Rect.fromLTWH(0, base - amp * 1.4, w, h - base + amp * 1.4);
       canvas.drawPath(
         path,
         Paint()
-          ..color = (k == 1 ? palette.glowB : Colors.white)
-              .withOpacity(k == 1 ? 0.14 : 0.12),
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              palette.blobs[k].withOpacity(0.75),
+              palette.blobs[k].withOpacity(0.25),
+            ],
+          ).createShader(hill),
       );
     }
 
-    // Twinkling four-point stars.
-    for (var i = 0; i < _sparkCount; i++) {
+    // Twinkling stars: dim -> full -> dim, each on its own beat.
+    for (var i = 0; i < _starCount; i++) {
       final r = math.Random(i * 7919 + 13);
       final x = r.nextDouble() * w;
-      final y = r.nextDouble() * h * 0.9;
-      final twinkle = 0.5 + 0.5 * math.sin((t * 3 + r.nextDouble()) * tau);
-      final size0 = 2.0 + r.nextDouble() * 5.5;
+      final y = r.nextDouble() * h * 0.7;
+      final freq = 4 + r.nextInt(7);
+      final wave = 0.5 + 0.5 * math.sin((t * freq + r.nextDouble()) * tau);
+      final twinkle = wave * wave * wave;
+      final base = 2.5 + r.nextDouble() * 5.0;
       final p = Offset(x, y);
+      final a = 0.08 + 0.92 * twinkle;
       canvas.drawCircle(
         p,
-        size0 * 1.6,
-        Paint()..color = palette.spark.withOpacity(0.12 * twinkle),
+        base * (1.2 + 2.2 * twinkle),
+        Paint()..color = palette.spark.withOpacity(0.22 * twinkle),
       );
       _star(
         canvas,
         p,
-        size0 * (0.6 + 0.6 * twinkle),
-        Paint()..color = palette.spark.withOpacity(0.35 + 0.6 * twinkle),
+        base * (0.45 + 1.0 * twinkle),
+        Paint()..color = palette.spark.withOpacity(a),
+      );
+      canvas.drawCircle(
+        p,
+        base * 0.2 * (0.5 + twinkle),
+        Paint()..color = Colors.white.withOpacity(a),
       );
     }
 
@@ -308,7 +276,7 @@ class _BackdropPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.62, 1.0],
           colors: [Colors.black, Colors.black, Colors.transparent],
         ).createShader(rect),
     );

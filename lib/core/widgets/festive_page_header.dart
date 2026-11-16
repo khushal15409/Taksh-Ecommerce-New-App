@@ -80,15 +80,14 @@ class FestivePageHeader extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            color: Colors.white,
+            color: Color(0xFF1F2A44),
             fontSize: 32,
             fontWeight: FontWeight.w800,
-            shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
           ),
         ),
         Text(
           subtitle,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: const TextStyle(color: Color(0xFF3D4A6B), fontSize: 14),
         ),
       ],
     );

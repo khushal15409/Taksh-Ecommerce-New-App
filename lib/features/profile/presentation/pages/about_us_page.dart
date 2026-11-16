@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
@@ -270,18 +271,44 @@ class AboutUsPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _buildContactItem(
-                          context,
-                          Icons.email,
-                          AppLocalizations.of(context)!.emailLabel,
-                          'customersupport@takshallinone.in',
-                        ),
-                        const SizedBox(height: 12),
-                        _buildContactItem(
-                          context,
-                          Icons.location_on,
-                          AppLocalizations.of(context)!.addressLabel,
-                          AppLocalizations.of(context)!.addressValue,
+                        ValueListenableBuilder<int>(
+                          valueListenable: SupportContacts.changes,
+                          builder: (context, _, __) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildContactItem(
+                                context,
+                                Icons.email,
+                                AppLocalizations.of(context)!.emailLabel,
+                                SupportContacts.email,
+                              ),
+                              if (SupportContacts.phone.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                _buildContactItem(
+                                  context,
+                                  Icons.phone,
+                                  'Phone',
+                                  SupportContacts.phone,
+                                ),
+                              ],
+                              const SizedBox(height: 12),
+                              _buildContactItem(
+                                context,
+                                Icons.location_on,
+                                AppLocalizations.of(context)!.addressLabel,
+                                SupportContacts.address,
+                              ),
+                              if (SupportContacts.hours.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                _buildContactItem(
+                                  context,
+                                  Icons.access_time,
+                                  'Support hours',
+                                  SupportContacts.hours,
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -331,7 +358,7 @@ class AboutUsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            content,
+            SupportContacts.applyTo(content),
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).textTheme.bodyMedium?.color,

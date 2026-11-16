@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -1286,16 +1287,16 @@ class _BookingDetailBody extends StatelessWidget {
   }
 
   Future<void> _openWhatsApp(String bookingNumber) async {
-    const phoneNumber = '919518365510';
-    final whatsappUrl = Uri.parse('https://wa.me/$phoneNumber');
+    final whatsappUrl = SupportContacts.whatsappUri();
     if (await canLaunchUrl(whatsappUrl)) {
       await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
     }
   }
 
   Future<void> _openEmail(String bookingNumber) async {
-    final emailUrl = Uri.parse(
-      'mailto:customersupport@takshallinone.in?subject=Service Booking Support&body=Hi, I need help with my service booking #$bookingNumber',
+    final emailUrl = SupportContacts.mailtoUri(
+      subject: 'Service Booking Support',
+      body: 'Hi, I need help with my service booking #$bookingNumber',
     );
     if (await canLaunchUrl(emailUrl)) {
       await launchUrl(emailUrl);

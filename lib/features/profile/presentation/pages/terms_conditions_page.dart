@@ -1,3 +1,4 @@
+import 'package:taksh_e_commerce/core/constants/support_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
@@ -230,7 +231,7 @@ class TermsConditionsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            content,
+            SupportContacts.applyTo(content),
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).textTheme.bodyMedium?.color,
