@@ -44,11 +44,21 @@ jobs:
       # .env is a gitignored Flutter asset; create it so the build doesn't fail.
       # Set the GOOGLE_PLACES_API_KEY repo secret to enable Places suggestions.
       - name: Create .env
+        env:
+          PLACES_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
         run: |
-          cp .env.example .env
-          if [ -n "${{ secrets.GOOGLE_PLACES_API_KEY }}" ]; then
-            echo "GOOGLE_PLACES_API_KEY=${{ secrets.GOOGLE_PLACES_API_KEY }}" > .env
+          set -euo pipefail
+          KEY="${PLACES_KEY:-}"
+          if [ -z "$KEY" ]; then
+            # No secret set: use the Maps key the app already ships in AndroidManifest.xml
+            # (same key, same behaviour as before .env.example was cleaned).
+            KEY=$(grep -o 'AIza[0-9A-Za-z_-]\{30,\}' android/app/src/main/AndroidManifest.xml | sed -n '1p' || true)
           fi
+          if [ -z "$KEY" ]; then
+            echo "::warning::No Places API key available; address suggestions will be disabled"
+          fi
+          # Only this one client-side value is ever written into the bundled .env.
+          printf 'GOOGLE_PLACES_API_KEY=%s\n' "$KEY" > .env
 
       # *.g.dart / *.freezed.dart are gitignored, so they must be generated in CI.
       - name: Generate code (build_runner)
@@ -60,6 +70,9 @@ jobs:
 
       # Production entry point (lib/main.dart). No flavors are defined in this project.
       - name: Build release APK
+        env:
+          # Test APK only: explicitly allowed to be debug-signed (App Bundles never are).
+          TAKSH_ALLOW_DEBUG_SIGNED_APK: "true"
         run: flutter build apk --release -t lib/main.dart
 
       - name: Locate APK
