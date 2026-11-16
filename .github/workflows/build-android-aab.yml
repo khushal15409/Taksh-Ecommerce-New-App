@@ -51,6 +51,21 @@ jobs:
             || { echo "::error::android/app/google-services.json has no client for $EXPECTED_APPLICATION_ID"; exit 1; }
           echo "applicationId and google-services.json OK"
 
+      # Maps (Android SDK) and Places (HTTP) use two different Google keys, each restricted differently.
+      - name: Check client API key secrets
+        env:
+          MAPS_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
+          PLACES_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+        run: |
+          missing=""
+          [ -n "${MAPS_KEY:-}" ]   || missing="$missing GOOGLE_MAPS_ANDROID_API_KEY"
+          [ -n "${PLACES_KEY:-}" ] || missing="$missing GOOGLE_PLACES_API_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing (a release build needs both client keys)"
+            exit 1
+          fi
+          echo "Client API key secrets present"
+
       - name: Prepare upload keystore and key.properties
         env:
           KS_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
@@ -88,28 +103,24 @@ jobs:
         run: flutter pub get
 
       # .env is a gitignored Flutter asset; same handling as the APK workflow.
-      - name: Create .env
+      - name: Create .env (client-side values only)
         env:
           PLACES_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
         run: |
           set -euo pipefail
-          KEY="${PLACES_KEY:-}"
-          if [ -z "$KEY" ]; then
-            # No secret set: use the Maps key the app already ships in AndroidManifest.xml
-            # (same key, same behaviour as before .env.example was cleaned).
-            KEY=$(grep -o 'AIza[0-9A-Za-z_-]\{30,\}' android/app/src/main/AndroidManifest.xml | sed -n '1p' || true)
-          fi
-          if [ -z "$KEY" ]; then
-            echo "::warning::No Places API key available; address suggestions will be disabled"
-          fi
           # Only this one client-side value is ever written into the bundled .env.
-          printf 'GOOGLE_PLACES_API_KEY=%s\n' "$KEY" > .env
+          printf 'GOOGLE_PLACES_API_KEY=%s\n' "$PLACES_KEY" > .env
+
+      - name: Check release inputs (no tracked secrets, client-only .env)
+        run: bash tool/check_release_inputs.sh .
 
       # *.g.dart / *.freezed.dart are gitignored, so they must be generated in CI.
       - name: Generate code (build_runner)
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Build release AAB
+        env:
+          MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
         run: flutter build appbundle --release -t lib/main.dart
 
       - name: Verify AAB
@@ -142,6 +153,10 @@ jobs:
             || { echo "::error::Application id in the AAB is '$APPID', expected $EXPECTED_APPLICATION_ID"; exit 1; }
           echo "Application ID verified"
 
+      # Every 64-bit native library must be ELF-aligned for 16 KB memory pages (Play requirement).
+      - name: Check 16 KB page-size alignment
+        run: bash tool/check_16kb_alignment.sh build/app/outputs/bundle/release/app-release.aab
+
       # Only the bundle is uploaded; never key.properties or the keystore.
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
@@ -150,6 +165,15 @@ jobs:
           path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 14
           if-no-files-found: error
+
+      # R8 mapping file (not a secret): needed to read crash stack traces / upload to Play Console.
+      - name: Upload R8 mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: taksh-release-mapping
+          path: build/app/outputs/mapping/release/mapping.txt
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Summary
         run: |
@@ -168,4 +192,4 @@ jobs:
       - name: Clean up signing files
         if: always()
         run: |
-          rm -f android/key.properties "$RUNNER_TEMP/upload-keystore.jks" "$RUNNER_TEMP/jarsigner.txt"
+          rm -f android/key.properties .env "$RUNNER_TEMP/upload-keystore.jks" "$RUNNER_TEMP/jarsigner.txt"

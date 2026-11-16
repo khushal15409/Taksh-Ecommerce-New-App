@@ -25,6 +25,18 @@ if (keystorePropertiesFile.exists()) {
     FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
 }
 
+// Android Maps SDK key. Kept out of git: read from env MAPS_API_KEY, a Gradle property
+// (-PMAPS_API_KEY=...) or android/local.properties (git-ignored), in that order, and injected into
+// AndroidManifest.xml as ${MAPS_API_KEY}. This is NOT the Places key (that one is GOOGLE_PLACES_API_KEY
+// in .env, used for direct HTTP calls) so each can carry its own Google Cloud restriction.
+val localProperties = Properties().also { p ->
+    rootProject.file("local.properties").takeIf { it.isFile }?.let { f -> FileInputStream(f).use { p.load(it) } }
+}
+val mapsApiKey: String = (System.getenv("MAPS_API_KEY")
+    ?: (project.findProperty("MAPS_API_KEY") as String?)
+    ?: localProperties.getProperty("MAPS_API_KEY")
+    ?: "").trim()
+
 /** Why release signing can't be used, or null when key.properties and the keystore are complete. */
 fun releaseSigningProblem(): String? {
     if (!keystorePropertiesFile.exists()) return "key.properties was not found (android/key.properties, \$TAKSH_KEY_PROPERTIES or ~/.taksh/key.properties)"
@@ -58,9 +70,10 @@ android {
             // You can update the following values to match your application needs.
             // For more information, see: https://flutter.dev/to/review-gradle-config.
             minSdk = 24 // flutter.minSdkVersion
-            targetSdk = flutter.targetSdkVersion
+            targetSdk = 36 // Google Play target API level (was flutter.targetSdkVersion)
             versionCode = 1 // flutter.versionCode
             versionName = "1.0.0" // flutter.versionName
+            manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         }
 
     signingConfigs {
@@ -84,6 +97,13 @@ android {
             // an App Bundle (the check at the end of this file always refuses a debug-signed AAB).
             signingConfig = signingConfigs.findByName("release")
                 ?: if (System.getenv("TAKSH_ALLOW_DEBUG_SIGNED_APK") == "true") signingConfigs.getByName("debug") else null
+
+            // R8 code shrinking + resource shrinking. Keep rules are in proguard-rules.pro (targeted, no
+            // blanket keeps); plugins bring their own consumer rules. mapping.txt is written to
+            // build/app/outputs/mapping/release (needed to read crash traces).
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
@@ -127,25 +147,39 @@ gradle.taskGraph.whenReady {
     }
 }
 
-// .env is bundled into the app as a Flutter asset, so a release build must never carry anything but
-// the client-side keys listed here (no FCM credentials, service-account paths, DB or APP_KEY values).
-// Only key NAMES are reported, never values.
+// Client configuration guard for release builds. .env is bundled into the app as a Flutter asset, so it may
+// hold ONLY the client-side key(s) listed here (never FCM credentials, service-account paths, DB or
+// APP_KEY values). A real release (App Bundle, or an APK that is not the CI test APK) also needs the
+// client keys it depends on. Only key NAMES are ever reported, never values.
 gradle.taskGraph.whenReady {
     val names = allTasks.filter { it.project == project }.map { it.name }
-    val releaseBuild = names.any { it == "bundleRelease" || it == "assembleRelease" }
-    val envFile = rootProject.file("../.env")
-    if (releaseBuild && envFile.isFile) {
+    val bundleBuild = names.any { it == "bundleRelease" }
+    val apkBuild = names.any { it == "assembleRelease" }
+    val testApk = apkBuild && !bundleBuild && System.getenv("TAKSH_ALLOW_DEBUG_SIGNED_APK") == "true"
+    if (bundleBuild || apkBuild) {
+        val envFile = rootProject.file("../.env")
         val allowed = setOf("GOOGLE_PLACES_API_KEY")
-        val extra = envFile.readLines()
-            .map { it.trim() }
-            .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
-            .map { it.substringBefore("=").trim().removePrefix("export ").trim() }
-            .filter { it !in allowed }
+        val entries = if (envFile.isFile) {
+            envFile.readLines().map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+                .associate { it.substringBefore("=").trim().removePrefix("export ").trim() to it.substringAfter("=").trim().trim('"', '\'') }
+        } else emptyMap()
+
+        val extra = entries.keys.filter { it !in allowed }
         if (extra.isNotEmpty()) {
             throw GradleException(
                 ".env would be bundled into the app but contains non client-side keys: ${extra.joinToString(", ")}. " +
                     "Remove them (allowed: ${allowed.joinToString(", ")}) before a release build."
             )
+        }
+
+        val missing = buildList {
+            if (entries["GOOGLE_PLACES_API_KEY"].isNullOrBlank()) add("GOOGLE_PLACES_API_KEY (in .env, used for Places search)")
+            if (mapsApiKey.isBlank()) add("MAPS_API_KEY (env var, -PMAPS_API_KEY or android/local.properties, used for the map)")
+        }
+        if (missing.isNotEmpty()) {
+            val msg = "Client configuration missing for a release build: ${missing.joinToString("; ")}."
+            if (testApk) logger.warn("WARNING (test APK only): $msg Maps/Places will not work in this APK.") else throw GradleException(msg)
         }
     }
 }
