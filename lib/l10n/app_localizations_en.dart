@@ -9,10 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Taksh E-Commerce';
+  String get appTitle => 'Taksh All In One';
 
   @override
-  String get madeInIndia => 'Made in India';
+  String get madeInIndia => 'Support local stores';
 
   @override
   String get initializing => 'Initializing...';
@@ -605,7 +605,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refundCommitmentContent =>
-      'At Taksh E-Commerce we want you to be happy with every order. If something is wrong with your order, this policy explains how returns, replacements, cancellations and refunds work.';
+      'If something is wrong with your order, this policy explains how returns, replacements, cancellations and refunds work.';
 
   @override
   String get refundReadPolicy =>
@@ -897,7 +897,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyUsageContent =>
-      '• Device information (model, operating system, app version)\n• Location, only with your permission, to show what can be delivered to you\n• App activity and crash reports, to fix problems\n• A notification token, to send you order updates';
+      '• Device information (model, operating system, app version)\n• Location, only with your permission, to show what can be delivered to you\n• Technical logs (for example errors when the app talks to our servers), to fix problems\n• A notification token, to send you order updates';
 
   @override
   String get privacyTransactionTitle =>
@@ -965,7 +965,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyProvidersContent =>
-      'Payment gateways, SMS and notification providers, cloud hosting and analytics providers who process data for us under confidentiality obligations.';
+      'Payment gateways, SMS and notification providers, cloud hosting providers who process data for us under confidentiality obligations.';
 
   @override
   String get privacyPartnersTitle =>
@@ -1069,7 +1069,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyRetentionContent =>
-      'We keep your data while your account is active and as long as needed to provide our services. After that we keep only what the law requires, such as invoices and transaction records, or what is needed to resolve disputes. We then delete or anonymise it.';
+      'We keep your data while your account is active and as long as needed to provide our services. After that we keep only what the law requires, such as invoices and transaction records, or what is needed to resolve disputes. We then delete or anonymise it. If you delete your account in the app (Profile > Delete account), we remove your profile, saved addresses and bank details and anonymise your name and mobile number; order and invoice records are kept as the law requires, without your name.';
 
   @override
   String get privacyInternationalTitle =>
@@ -1137,7 +1137,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatWeOfferContent =>
-      '• Wide Range of Products: A growing selection across many categories from trusted sellers\n\n• Flexible Delivery: Express 30-minute (select areas), Next-Day and Standard delivery\n\n• Secure Payments: Pay online through a secure payment gateway, or choose Cash on Delivery where available\n\n• Easy Returns: Raise a return in the app for eligible items within the return window\n\n• Support: Write to us anytime and we will get back to you';
+      '• Wide Range of Products: A growing selection across many categories from approved sellers\n\n• Flexible Delivery: Quick delivery in select areas (times are estimates), Next-Day and Standard delivery\n\n• Secure Payments: Pay online through a secure payment gateway, or choose Cash on Delivery where available\n\n• Easy Returns: Raise a return in the app for eligible items within the return window\n\n• Support: Write to us anytime and we will get back to you';
 
   @override
   String get emailLabel => 'Email';
@@ -1544,7 +1544,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutHighlightExpress =>
-      '30-Min Express';
+      'Quick delivery in select areas';
 
   @override
   String get happyCustomers => 'Happy Customers';
@@ -1742,7 +1742,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get grantLocationPermission => 'Grant Location Permission';
 
   @override
-  String get dataAlreadyLoaded => 'Data already loaded - instant display!';
+  String get dataAlreadyLoaded => 'Up to date';
 
   @override
   String get searchSavedAddresses => 'Search saved addresses';
@@ -1751,7 +1751,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchCategories => 'Search categories...';
 
   @override
-  String get searchRestaurantsDishes => 'Search for restaurants, dishes...';
+  String get searchRestaurantsDishes => 'Search for products, brands and services...';
 
   @override
   String get searchAreaStreetName => 'Search for area, street name...';
@@ -2402,21 +2402,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingSubtitle1 =>
-      'Discover thousands of products from local stores, delivered straight to your door.';
+      'Find products from local stores, delivered to your door.';
 
   @override
   String get onboardingTitle2 => 'Fast & reliable delivery';
 
   @override
   String get onboardingSubtitle2 =>
-      'Track your orders in real-time and get them delivered in minutes, not days.';
+      'Track your order live from the store to your door.';
 
   @override
   String get onboardingTitle3 => 'Safe & secure payments';
 
   @override
   String get onboardingSubtitle3 =>
-      'Pay with confidence using trusted payment methods, every single time.';
+      'Pay securely online, or choose Cash on Delivery where available.';
 
   @override
   String get exitAppSavedNote => 'Your shopping cart and progress will be saved.';
@@ -2425,7 +2425,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartEmptyDescription => 'Looks like you haven\'t added anything yet.\nStart exploring our wide range of products.';
 
   @override
-  String get splashPreparing => 'Preparing the best shopping experience for you';
+  String get splashPreparing => 'Getting things ready...';
 
   @override
   String get trustFastDelivery => 'Fast Delivery';
@@ -2437,13 +2437,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trustQualityProducts => 'Quality Products';
 
   @override
-  String get trustByIndia => 'Trusted by India';
+  String get trustByIndia => 'Shopping made simple';
 
   @override
   String get trustWideSelection => 'Wide Selection';
 
   @override
-  String get trustBestPrices => 'Best Prices';
+  String get trustBestPrices => 'Fair prices';
 
   @override
   String get trustSecurePayment => 'Secure Payment';

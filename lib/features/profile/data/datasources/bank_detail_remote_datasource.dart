@@ -54,16 +54,11 @@ class BankDetailRemoteDataSourceImpl implements BankDetailRemoteDataSource {
         },
       );
 
-      // Print status code to console
-      print('✅ Bank Detail API Response - Status Code: ${response.statusCode}');
-
       // Parse response
       final responseData = response.data;
 
       // Check if response indicates success
       if (responseData['success'] == false) {
-        print(
-            '❌ Bank Detail API Error - Status Code: ${response.statusCode}, Message: ${responseData['message']}');
         log.errorWithContext(
           'API returned unsuccessful response',
           {
@@ -80,8 +75,6 @@ class BankDetailRemoteDataSourceImpl implements BankDetailRemoteDataSource {
       final data = responseData['data'] as Map<String, dynamic>;
       final bankDetail = BankDetailModel.fromJson(data);
 
-      print(
-          '✅ Bank Details Saved Successfully - Status Code: ${response.statusCode}, ID: ${bankDetail.id}');
       log.infoWithContext(
         'Bank details saved successfully',
         {
@@ -94,8 +87,6 @@ class BankDetailRemoteDataSourceImpl implements BankDetailRemoteDataSource {
 
       return bankDetail;
     } on DioException catch (e, stackTrace) {
-      print(
-          '❌ Bank Detail Dio Error - Status Code: ${e.response?.statusCode ?? 'N/A'}, Type: ${e.type}');
       log.errorWithContext(
         'Dio error saving bank details',
         {
@@ -114,7 +105,6 @@ class BankDetailRemoteDataSourceImpl implements BankDetailRemoteDataSource {
       }
       throw const ServerException('Failed to save bank details');
     } catch (e, stackTrace) {
-      print('❌ Bank Detail Unexpected Error - Type: ${e.runtimeType}');
       log.errorWithContext(
         'Unexpected error saving bank details',
         {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 import 'package:taksh_e_commerce/core/theme/app_colors.dart';
+import 'package:taksh_e_commerce/core/constants/legal_constants.dart';
 
 /// Refund Policy page - displays refund and return policy
 class RefundPolicyPage extends StatelessWidget {
@@ -41,7 +42,7 @@ class RefundPolicyPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    AppLocalizations.of(context)!.lastUpdated('October 28, 2026'),
+                    AppLocalizations.of(context)!.lastUpdated(LegalConstants.policiesLastUpdated),
                     style: TextStyle(
                       fontSize: 13,
                       color: Theme.of(context).textTheme.bodyMedium?.color,

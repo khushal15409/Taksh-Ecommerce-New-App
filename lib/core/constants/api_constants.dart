@@ -36,7 +36,7 @@ class ApiConstants {
   static const String profile = '/auth/profile';
   static const String updateProfile = '/auth/update-profile';
   static const String changePassword = '/user/change-password';
-  static const String deleteAccount = '/user/delete';
+  static const String deleteAccount = '/auth/delete-account';
 
   /// Restaurant endpoints
   static const String restaurants = '/restaurants';
