@@ -24,7 +24,11 @@ class ExpressDashboardBloc
     final hasCatalogue = dashboard.sections.any(
       (s) => s.key != 'Logo' && s.key != 'Banners' && s.hasData,
     );
-    if (!dashboard.serviceable && !hasCatalogue) {
+    // Quick banners also keep the page alive: they are shown under the location notice.
+    final hasBanners = dashboard.sections.any(
+      (s) => s.key == 'Banners' && s.hasData,
+    );
+    if (!dashboard.serviceable && !hasCatalogue && !hasBanners) {
       return ExpressDashboardNotServiceable(
         message: dashboard.message,
         code: dashboard.code,

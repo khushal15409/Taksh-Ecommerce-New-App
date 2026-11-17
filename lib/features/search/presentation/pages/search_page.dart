@@ -223,7 +223,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildRecentSearches(List<RecentSearch> searches) {
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

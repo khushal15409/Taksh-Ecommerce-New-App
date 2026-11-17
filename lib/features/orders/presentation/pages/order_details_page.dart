@@ -1756,7 +1756,7 @@ class _OrderItemThumbnailState extends State<_OrderItemThumbnail> {
       width: 49,
       height: 49,
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
