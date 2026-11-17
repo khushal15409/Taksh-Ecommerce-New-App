@@ -1,23 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="360" height="300">
-  <circle cx="180" cy="145" r="124" fill="#E2F4E8"/>
-  <circle cx="300" cy="64" r="9" fill="#CDEBD7"/><circle cx="56" cy="80" r="7" fill="#FFD9B8"/><circle cx="318" cy="210" r="6" fill="#FFD9B8"/>
-  <ellipse cx="180" cy="266" rx="112" ry="9" fill="#000000" fill-opacity="0.12"/>
-  <!-- plant -->
-  <path d="M250 258 L250 200" stroke="#2F7A4B" stroke-width="5" stroke-linecap="round"/>
-  <path d="M250 214 Q214 206 214 170 Q250 176 250 214Z" fill="#4C9A63"/>
-  <path d="M250 200 Q286 194 292 156 Q256 162 250 200Z" fill="#2F7A4B"/>
-  <path d="M250 232 Q222 232 214 206 Q244 206 250 232Z" fill="#6FB383"/>
-  <rect x="232" y="246" width="36" height="18" rx="4" fill="#C2824A"/>
-  <!-- bag -->
-  <path d="M92 108 L220 108 L232 258 L80 258 Z" fill="#1FA34A"/>
-  <path d="M92 108 L220 108 L222 124 L90 124 Z" fill="#168A3D"/>
-  <path d="M130 108 Q130 62 156 62 Q182 62 182 108" fill="none" stroke="#168A3D" stroke-width="9" stroke-linecap="round"/>
-  <rect x="116" y="152" width="80" height="70" rx="12" fill="#F97316"/>
-  <path d="M164 160 L140 190 L154 190 L148 214 L176 182 L162 182 Z" fill="#FFFFFF"/>
-  <!-- small boxes -->
-  <rect x="236" y="214" width="0" height="0" fill="none"/>
-  <rect x="40" y="206" width="48" height="52" rx="6" fill="#F4C28C"/>
-  <rect x="40" y="206" width="48" height="12" rx="4" fill="#E8A560"/>
-  <rect x="60" y="206" width="8" height="52" fill="#E8A560"/>
-  <circle cx="48" cy="60" r="0" fill="none"/>
+  <circle cx="180" cy="148" r="128" fill="#E2F4E8"/>
+  <circle cx="306" cy="60" r="9" fill="#CDEBD7"/><circle cx="52" cy="78" r="7" fill="#FFD9B8"/><circle cx="322" cy="214" r="6" fill="#FFD9B8"/>
+  <ellipse cx="180" cy="270" rx="130" ry="9" fill="#000" fill-opacity="0.10"/>
+  <!-- shopping bag back -->
+  <path d="M96 120 L264 120 L276 266 L84 266 Z" fill="#2F7A4B"/>
+  <path d="M96 120 L264 120 L266 138 L94 138 Z" fill="#256B3F"/>
+  <path d="M142 120 Q142 70 180 70 Q218 70 218 120" fill="none" stroke="#256B3F" stroke-width="10" stroke-linecap="round"/>
+  <!-- smartphone -->
+  <rect x="104" y="64" width="54" height="104" rx="10" fill="#1F2A44"/>
+  <rect x="109" y="72" width="44" height="86" rx="6" fill="#7AB8F5"/>
+  <path d="M109 118 Q131 96 153 124 L153 158 L109 158Z" fill="#F97316"/>
+  <circle cx="131" cy="84" r="4" fill="#FFD27A"/>
+  <rect x="124" y="66" width="14" height="3" rx="1.5" fill="#0E1526"/>
+  <!-- headphones -->
+  <path d="M190 118 Q190 70 228 70 Q266 70 266 118" fill="none" stroke="#1F2A44" stroke-width="9" stroke-linecap="round"/>
+  <rect x="180" y="108" width="20" height="36" rx="9" fill="#F97316"/>
+  <rect x="256" y="108" width="20" height="36" rx="9" fill="#F97316"/>
+  <!-- price tag -->
+  <rect x="158" y="176" width="86" height="34" rx="9" fill="#FFFFFF"/>
+  <circle cx="174" cy="193" r="5" fill="#F97316"/>
+  <rect x="186" y="186" width="46" height="6" rx="3" fill="#2F7A4B"/>
+  <rect x="186" y="197" width="30" height="5" rx="2.5" fill="#CDEBD7"/>
+  <!-- grocery basket -->
+  <path d="M232 214 L292 214 L284 262 L240 262 Z" fill="#C2824A"/>
+  <path d="M232 214 L292 214 L290 224 L234 224 Z" fill="#A86B38"/>
+  <circle cx="246" cy="206" r="11" fill="#E53935"/>
+  <circle cx="266" cy="203" r="11" fill="#FFB300"/>
+  <circle cx="283" cy="208" r="9" fill="#4C9A63"/>
+  <path d="M246 196 q3 -7 8 -8" stroke="#2F7A4B" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- parcel box -->
+  <rect x="52" y="214" width="58" height="52" rx="6" fill="#F4C28C"/>
+  <rect x="52" y="214" width="58" height="13" rx="4" fill="#E8A560"/>
+  <rect x="74" y="214" width="14" height="52" fill="#E8A560"/>
+  <!-- tee shirt -->
+  <path d="M120 232 l14 -10 q10 10 20 0 l14 10 -8 14 -8 -4 0 28 -24 0 0 -28 -8 4z" fill="#7C3AED"/>
 </svg>

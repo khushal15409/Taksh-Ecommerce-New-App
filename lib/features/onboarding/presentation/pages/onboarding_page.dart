@@ -168,12 +168,29 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         bottom: false,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 14),
-                          child: Image.asset(
-                            'assets/images/logo/taksh_logo.png',
-                            height: 44,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                const SizedBox(height: 44),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Image.asset(
+                              'assets/images/logo/taksh_logo_tight.png',
+                              height: 88,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) =>
+                                  const SizedBox(height: 88),
+                            ),
                           ),
                         ),
                       ),

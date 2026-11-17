@@ -1184,7 +1184,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     Widget networkImage(String url) => CachedNetworkImage(
       imageUrl: url,
-      fit: BoxFit.cover,
+      // Whole product, never cropped.
+      fit: BoxFit.contain,
       placeholder: (context, url) => Container(
         color: AppColors.grey100,
         child: const Center(child: CircularProgressIndicator()),
@@ -1197,6 +1198,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     final mainImage = Container(
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(11),
         border: Border.all(color: _accent.withOpacity(0.35)),
         boxShadow: [
@@ -1212,6 +1214,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         child: Stack(
           fit: StackFit.expand,
           children: [
+            const ColoredBox(color: Colors.white),
             PageView.builder(
               controller: _imagePageController,
               itemCount: urls.length,
@@ -1270,7 +1273,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
 
     return SizedBox(
-      height: 177,
+      height: 240,
       child: Row(
         children: [
           Expanded(child: mainImage),
