@@ -30,7 +30,7 @@ class _CartPageState extends State<CartPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
-  static const Color _accent = Color(0xFFFF8A1F);
+  static const Color _accent = Color(0xFFF97316);
 
   String get _selectedDeliveryType => _tabController.index == 0
       ? CartCubit.deliveryTypeExpress
@@ -389,7 +389,7 @@ class _CartPageState extends State<CartPage>
     Widget cell(IconData icon, String label) => Expanded(
       child: Column(
         children: [
-          Icon(icon, size: 24, color: const Color(0xFF2F9E55)),
+          Icon(icon, size: 24, color: const Color(0xFF2F7A4B)),
           const SizedBox(height: 5),
           Text(
             label,
@@ -439,7 +439,7 @@ class _CartPageState extends State<CartPage>
     Widget perk(IconData icon, String label) => Expanded(
       child: Column(
         children: [
-          Icon(icon, size: 28, color: const Color(0xFF2F9E55)),
+          Icon(icon, size: 28, color: const Color(0xFF2F7A4B)),
           const SizedBox(height: 5),
           Text(
             label,
@@ -504,7 +504,7 @@ class _CartPageState extends State<CartPage>
                   width: double.infinity,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFFFA43A), Color(0xFFFF8A1F)],
+                      colors: [Color(0xFFFFA43A), Color(0xFFF97316)],
                     ),
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
@@ -878,7 +878,7 @@ class _CartPageState extends State<CartPage>
               Icon(
                 Icons.receipt_long_outlined,
                 size: 15,
-                color: Color(0xFF2F9E55),
+                color: Color(0xFF2F7A4B),
               ),
               SizedBox(width: 9),
               Text(

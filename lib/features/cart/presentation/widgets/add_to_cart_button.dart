@@ -121,7 +121,7 @@ class AddToCartButton extends StatelessWidget {
     // Round "+" button (compact cards, e.g. cart suggestions).
     if (size == 'icon') {
       return Material(
-        color: const Color(0xFFFF8A1F),
+        color: const Color(0xFFF97316),
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),

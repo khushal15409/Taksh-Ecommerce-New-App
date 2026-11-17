@@ -7,20 +7,20 @@ class AppColors {
   AppColors._(); // Private constructor to prevent instantiation
 
   // ============ Primary Colors (Saffron/Orange - Top of Indian Flag) ============
-  static const Color primaryOrange = Color(0xFFFF7A1A);
-  static const Color primaryOrangeDark = Color(0xFFE85D04);
-  static const Color primaryOrangeLight = Color(0xFFFFA25C);
-  static const Color saffron = Color(0xFFFF9933); // Traditional saffron
-  static const Color saffronLight = Color(0xFFFFB366);
-  static const Color saffronDark = Color(0xFFE68A00);
+  static const Color primaryOrange = Color(0xFFF97316);
+  static const Color primaryOrangeDark = Color(0xFFEA580C);
+  static const Color primaryOrangeLight = Color(0xFFFB923C);
+  static const Color saffron = Color(0xFFF97316); // Traditional saffron
+  static const Color saffronLight = Color(0xFFFDBA74);
+  static const Color saffronDark = Color(0xFFEA580C);
 
   // ============ Secondary Colors (Green - Bottom of Indian Flag) ============
-  static const Color secondaryGreen = Color(0xFF16A34A);
-  static const Color secondaryGreenDark = Color(0xFF0F7A37);
-  static const Color secondaryGreenLight = Color(0xFF4ADE80);
-  static const Color indiaGreen = Color(0xFF138808); // Traditional India green
-  static const Color indiaGreenLight = Color(0xFF4CAF50);
-  static const Color indiaGreenDark = Color(0xFF0D5F06);
+  static const Color secondaryGreen = Color(0xFF2F7A4B);
+  static const Color secondaryGreenDark = Color(0xFF2D5A3D);
+  static const Color secondaryGreenLight = Color(0xFF6FB383);
+  static const Color indiaGreen = Color(0xFF2F7A4B); // Traditional India green
+  static const Color indiaGreenLight = Color(0xFF6FB383);
+  static const Color indiaGreenDark = Color(0xFF2D5A3D);
 
   // ============ Indian Flag White (Middle - Purity) ============
   static const Color pureWhite = Color(0xFFFFFFFF);
@@ -31,8 +31,8 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
 
-  static const Color grey50 = Color(0xFFF8F7F5);
-  static const Color grey100 = Color(0xFFF2F0ED);
+  static const Color grey50 = Color(0xFFF5F7F9);
+  static const Color grey100 = Color(0xFFEEF2F5);
   static const Color grey200 = Color(0xFFEEEEEE);
   static const Color grey300 = Color(0xFFE0E0E0);
   static const Color grey400 = Color(0xFFBDBDBD);
@@ -64,6 +64,8 @@ class AppColors {
   static const Color backgroundDark = Color(0xFF121212);
 
   static const Color surfaceLight = Color(0xFFFFFFFF);
+  /// Light blue-grey page backdrop used behind white cards.
+  static const Color scaffoldLight = Color(0xFFF1F5F8);
   static const Color surfaceDark = Color(0xFF1E1E1E);
 
   // ============ Text Colors ============
@@ -76,7 +78,7 @@ class AppColors {
   static const Color textDisabledDark = Color(0xFF666666);
 
   // ============ Border Colors ============
-  static const Color borderLight = Color(0xFFEAE6E1);
+  static const Color borderLight = Color(0xFFE3E8ED);
   static const Color borderDark = Color(0xFF424242);
 
   // ============ Overlay Colors ============
@@ -85,7 +87,7 @@ class AppColors {
 
   // ============ E-Commerce Specific Colors ============
   static const Color discount = Color(0xFFE11D48);
-  static const Color price = Color(0xFF4CAF50);
+  static const Color price = Color(0xFF2F7A4B);
   static const Color outOfStock = Color(0xFF9E9E9E);
   static const Color inStock = Color(0xFF4CAF50);
   static const Color rating = Color(0xFFFFC107);
@@ -152,13 +154,13 @@ class IndiaGradients {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFFFFE8CC), // Noticeable light orange/peach
-      Color(0xFFFFEFDB), // Softer orange tint
-      Color(0xFFFFFCF8), // Very light warm white
+      Color(0xFFE9EFF3),
+      Color(0xFFEEF3F6),
+      Color(0xFFF3F6F9),
       AppColors.pureWhite, // Pure white (middle)
-      Color(0xFFF1F8E9), // Light green tint starting
-      Color(0xFFC8E6C9), // Medium light green
-      Color(0xFFA5D6A7), // Noticeable green at bottom
+      Color(0xFFF1F5F8),
+      Color(0xFFE3EEE7),
+      Color(0xFFD3E5DA),
     ],
     stops: [0.0, 0.1, 0.2, 0.45, 0.6, 0.8, 1.0],
   );

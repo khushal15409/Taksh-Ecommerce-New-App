@@ -977,7 +977,7 @@ class _CheckoutHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFE8431C), Color(0xFFFF8A1F), Color(0xFFFFB75E)],
+          colors: [Color(0xFFE8431C), Color(0xFFF97316), Color(0xFFFFB75E)],
         ),
       ),
       child: Stack(

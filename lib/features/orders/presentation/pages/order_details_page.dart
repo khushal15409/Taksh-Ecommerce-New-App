@@ -1128,7 +1128,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       label: Text(AppLocalizations.of(context)!.chatWithUs),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        backgroundColor: const Color(0xFFFF8A1F),
+                        backgroundColor: const Color(0xFFF97316),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -1152,10 +1152,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         side: const BorderSide(
-                          color: Color(0xFFFF8A1F),
+                          color: Color(0xFFF97316),
                           width: 1.5,
                         ),
-                        foregroundColor: const Color(0xFFFF8A1F),
+                        foregroundColor: const Color(0xFFF97316),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -1942,7 +1942,7 @@ class _HouseIllustration extends StatelessWidget {
             child: Icon(
               Icons.location_on_rounded,
               size: 26,
-              color: Color(0xFFFF8A1F),
+              color: Color(0xFFF97316),
             ),
           ),
         ],

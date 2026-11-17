@@ -33,7 +33,7 @@ class _HomeServiceContentBody extends StatelessWidget {
   static const _serviceStyles = <String, _ServiceStyle>{
     'courier-booking': _ServiceStyle(
       icon: Icons.local_shipping_rounded,
-      gradient: [Color(0xFFFF6B35), Color(0xFFFF9A62)],
+      gradient: [Color(0xFFF97316), Color(0xFFFF9A62)],
       borderColor: Color(0xFFFFD7C2),
       surfaceColor: Color(0xFFFFF8F3),
     ),
@@ -45,7 +45,7 @@ class _HomeServiceContentBody extends StatelessWidget {
     ),
     'plumber': _ServiceStyle(
       icon: Icons.plumbing_rounded,
-      gradient: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+      gradient: [Color(0xFF2F7A4B), Color(0xFF66BB6A)],
       borderColor: Color(0xFFD7ECD7),
       surfaceColor: Color(0xFFF7FCF7),
     ),

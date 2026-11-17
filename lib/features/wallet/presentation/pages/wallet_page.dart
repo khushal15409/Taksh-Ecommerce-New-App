@@ -429,14 +429,14 @@ class _BalanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFF6B35), Color(0xFFFF8F5E), Color(0xFFFFA726)],
+          colors: [Color(0xFFF97316), Color(0xFFF97316), Color(0xFFFFA726)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF6B35).withOpacity(0.35),
+            color: const Color(0xFFF97316).withOpacity(0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -825,7 +825,7 @@ class _WithdrawButton extends StatelessWidget {
             ? null
             : () => _showWithdrawBottomSheet(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: const Color(0xFF2F7A4B),
           disabledBackgroundColor: AppColors.grey300,
           foregroundColor: Colors.white,
           disabledForegroundColor: AppColors.grey500,
@@ -833,7 +833,7 @@ class _WithdrawButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
           ),
           elevation: canWithdraw ? 3 : 0,
-          shadowColor: const Color(0xFF2E7D32).withOpacity(0.3),
+          shadowColor: const Color(0xFF2F7A4B).withOpacity(0.3),
         ),
         child: isWithdrawing
             ? const Row(
@@ -1056,12 +1056,12 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2E7D32).withOpacity(0.1),
+                          color: const Color(0xFF2F7A4B).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
                           Icons.account_balance_rounded,
-                          color: Color(0xFF2E7D32),
+                          color: Color(0xFF2F7A4B),
                           size: 20,
                         ),
                       ),
@@ -1162,7 +1162,7 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
                         padding: EdgeInsets.only(left: 14, right: 8),
                         child: Icon(
                           Icons.stars_rounded,
-                          color: Color(0xFFFF6B35),
+                          color: Color(0xFFF97316),
                           size: 22,
                         ),
                       ),
@@ -1188,7 +1188,7 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: const BorderSide(
-                          color: Color(0xFF2E7D32),
+                          color: Color(0xFF2F7A4B),
                           width: 2,
                         ),
                       ),
@@ -1239,14 +1239,14 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
                           ? null
                           : _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E7D32),
+                        backgroundColor: const Color(0xFF2F7A4B),
                         disabledBackgroundColor: AppColors.grey300,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 2,
-                        shadowColor: const Color(0xFF2E7D32).withOpacity(0.3),
+                        shadowColor: const Color(0xFF2F7A4B).withOpacity(0.3),
                       ),
                       child: _isSubmitting
                           ? const SizedBox(
@@ -1362,7 +1362,7 @@ class _BankAccountDropdown extends StatelessWidget {
           enabledBorder: InputBorder.none,
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 2),
+            borderSide: const BorderSide(color: Color(0xFF2F7A4B), width: 2),
           ),
         ),
         icon: const Icon(

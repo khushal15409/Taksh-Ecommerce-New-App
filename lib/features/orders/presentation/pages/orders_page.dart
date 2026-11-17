@@ -795,7 +795,7 @@ class _OrdersPageState extends State<OrdersPage> {
         break;
       case 'delivered':
         backgroundColor = const Color(0xFFE8F5E9);
-        textColor = const Color(0xFF2E7D32);
+        textColor = const Color(0xFF2F7A4B);
         break;
       case 'cancelled':
         backgroundColor = const Color(0xFFFFEBEE);
@@ -832,7 +832,7 @@ class _OrdersPageState extends State<OrdersPage> {
         ? const Color(0xFFE8F5E9)
         : const Color(0xFFFFF3E0);
     Color textColor = isPaid
-        ? const Color(0xFF2E7D32)
+        ? const Color(0xFF2F7A4B)
         : const Color(0xFFEF6C00);
 
     return Container(

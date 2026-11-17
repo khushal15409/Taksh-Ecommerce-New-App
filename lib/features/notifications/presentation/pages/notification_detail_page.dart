@@ -7,7 +7,7 @@ import 'package:taksh_e_commerce/features/notifications/domain/entities/app_noti
 import 'package:taksh_e_commerce/features/notifications/presentation/widgets/notification_visuals.dart';
 import 'package:taksh_e_commerce/l10n/app_localizations.dart';
 
-const Color _accent = Color(0xFFFF7A00);
+const Color _accent = Color(0xFFF97316);
 
 /// Notification detail screen: the title, time and full message of the notification the
 /// customer opened (sent from the admin panel).

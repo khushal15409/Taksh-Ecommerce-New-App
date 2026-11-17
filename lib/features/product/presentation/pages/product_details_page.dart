@@ -1540,7 +1540,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ? Icons.delivery_dining_rounded
                   : Icons.local_shipping_outlined,
               size: 26,
-              color: const Color(0xFFFF8A1F),
+              color: const Color(0xFFF97316),
             ),
             if (isQuick) ...[
             const SizedBox(width: 4),

@@ -50,7 +50,7 @@ Color _statusColor(String status) {
   switch (status.toLowerCase()) {
     case 'completed':
     case 'paid':
-      return const Color(0xFF2E7D32);
+      return const Color(0xFF2F7A4B);
     case 'pending':
       return const Color(0xFFF57F17);
     case 'confirmed':
@@ -87,11 +87,11 @@ String _serviceSlugFromName(String name) {
 List<Color> _serviceGradient(String slug) {
   switch (slug) {
     case 'courier-booking':
-      return [const Color(0xFFFF6B35), const Color(0xFFFF8F5E)];
+      return [const Color(0xFFF97316), const Color(0xFFF97316)];
     case 'electrician':
       return [const Color(0xFF1976D2), const Color(0xFF42A5F5)];
     case 'plumber':
-      return [const Color(0xFF2E7D32), const Color(0xFF66BB6A)];
+      return [const Color(0xFF2F7A4B), const Color(0xFF66BB6A)];
     case 'salon-parlor':
       return [const Color(0xFFC2185B), const Color(0xFFEC407A)];
     default:
@@ -220,7 +220,7 @@ class _ServiceHistoryBody extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+              colors: [Color(0xFFF97316), Color(0xFFFFA726)],
             ),
           ),
         ),
@@ -250,7 +250,7 @@ class _ServiceHistoryBody extends StatelessWidget {
             AppToastMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Booking cancelled successfully'),
-                backgroundColor: Color(0xFF2E7D32),
+                backgroundColor: Color(0xFF2F7A4B),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -345,7 +345,7 @@ class _ServiceHistoryBody extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+                colors: [Color(0xFFF97316), Color(0xFFFFA726)],
               ),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -775,7 +775,7 @@ class _BookingDetailBody extends StatelessWidget {
           AppToastMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Booking cancelled successfully'),
-              backgroundColor: Color(0xFF2E7D32),
+              backgroundColor: Color(0xFF2F7A4B),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -802,7 +802,7 @@ class _BookingDetailBody extends StatelessWidget {
               flexibleSpace: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+                    colors: [Color(0xFFF97316), Color(0xFFFFA726)],
                   ),
                 ),
               ),
@@ -1439,7 +1439,7 @@ class _PriceRow extends StatelessWidget {
               fontWeight: isBold ? FontWeight.w800 : FontWeight.w500,
               fontSize: isBold ? 16 : 13,
               color: isDiscount
-                  ? const Color(0xFF2E7D32)
+                  ? const Color(0xFF2F7A4B)
                   : (color ?? Colors.grey[800]),
             ),
           ),

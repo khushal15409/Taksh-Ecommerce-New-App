@@ -34,7 +34,7 @@ class CourierHistoryPage extends StatelessWidget {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
-const _gradient = [Color(0xFFFF6B35), Color(0xFFFF8F5E)];
+const _gradient = [Color(0xFFF97316), Color(0xFFF97316)];
 final _dateFormat = DateFormat('dd MMM yyyy, hh:mm a');
 
 String _formatDate(DateTime? date) =>
@@ -49,7 +49,7 @@ Color _statusColor(String status) {
   switch (status.toLowerCase().replaceAll(' ', '_')) {
     case 'delivered':
     case 'paid':
-      return const Color(0xFF2E7D32);
+      return const Color(0xFF2F7A4B);
     case 'pending':
     case 'payment_pending':
       return const Color(0xFFF57F17);
@@ -174,7 +174,7 @@ PreferredSizeWidget _gradientAppBar(String title, {List<Widget>? actions}) {
     flexibleSpace: Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+          colors: [Color(0xFFF97316), Color(0xFFFFA726)],
         ),
       ),
     ),
@@ -188,7 +188,7 @@ void _toast(BuildContext context, String message, {bool error = false}) {
   AppToastMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: error ? AppColors.error : const Color(0xFF2E7D32),
+      backgroundColor: error ? AppColors.error : const Color(0xFF2F7A4B),
       behavior: SnackBarBehavior.floating,
     ),
   );
@@ -317,7 +317,7 @@ class _CourierHistoryBody extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+                colors: [Color(0xFFF97316), Color(0xFFFFA726)],
               ),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -1279,7 +1279,7 @@ class _PriceRow extends StatelessWidget {
               fontWeight: isBold ? FontWeight.w800 : FontWeight.w500,
               fontSize: isBold ? 16 : 13,
               color: isDiscount
-                  ? const Color(0xFF2E7D32)
+                  ? const Color(0xFF2F7A4B)
                   : (color ?? Colors.grey[800]),
             ),
           ),
@@ -1309,7 +1309,7 @@ class _TimelineRow extends StatelessWidget {
                 width: 12,
                 height: 12,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFFF6B35),
+                  color: Color(0xFFF97316),
                   shape: BoxShape.circle,
                 ),
               ),

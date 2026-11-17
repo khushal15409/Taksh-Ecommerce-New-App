@@ -9,7 +9,7 @@ import 'package:taksh_e_commerce/features/notifications/presentation/cubit/notif
 import 'package:taksh_e_commerce/features/notifications/domain/entities/app_notification.dart';
 import 'package:taksh_e_commerce/features/notifications/presentation/widgets/notification_visuals.dart';
 
-const Color _accent = Color(0xFFFF7A00);
+const Color _accent = Color(0xFFF97316);
 
 /// Notifications list with All / Unread / Offers / Orders tabs, backed by the
 /// customer notification API (created from the admin panel).

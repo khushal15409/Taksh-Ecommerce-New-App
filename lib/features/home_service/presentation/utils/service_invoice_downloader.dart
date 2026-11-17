@@ -84,7 +84,7 @@ Future<void> downloadServiceInvoice(
       messenger.showSnackBar(
         SnackBar(
           content: Text('Invoice for booking #$bookingNumber downloaded'),
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: const Color(0xFF2F7A4B),
           behavior: SnackBarBehavior.floating,
           action: SnackBarAction(
             label: 'OPEN',

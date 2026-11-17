@@ -791,20 +791,20 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isOutlinedGreen
-              ? const [Color(0xFF43A047), Color(0xFF2E7D32)]
+              ? const [Color(0xFF43A047), Color(0xFF2F7A4B)]
               : [AppColors.primaryOrange, AppColors.primaryOrangeDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(isOutlinedGreen ? 17 : 12),
         border: isOutlinedGreen
-            ? Border.all(color: const Color(0xFF2E7D32), width: 1.5)
+            ? Border.all(color: const Color(0xFF2F7A4B), width: 1.5)
             : null,
         boxShadow: [
           BoxShadow(
             color:
                 (isOutlinedGreen
-                        ? const Color(0xFF2E7D32)
+                        ? const Color(0xFF2F7A4B)
                         : AppColors.primaryOrange)
                     .withValues(alpha: 0.35),
             blurRadius: 6,
@@ -895,20 +895,20 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isOutlinedGreen
-                ? const [Color(0xFF43A047), Color(0xFF2E7D32)]
+                ? const [Color(0xFF43A047), Color(0xFF2F7A4B)]
                 : [AppColors.primaryOrange, AppColors.primaryOrangeDark],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(isOutlinedGreen ? 17 : 12),
           border: isOutlinedGreen
-              ? Border.all(color: const Color(0xFF2E7D32), width: 1.5)
+              ? Border.all(color: const Color(0xFF2F7A4B), width: 1.5)
               : null,
           boxShadow: [
             BoxShadow(
               color:
                   (isOutlinedGreen
-                          ? const Color(0xFF2E7D32)
+                          ? const Color(0xFF2F7A4B)
                           : AppColors.primaryOrange)
                       .withValues(alpha: 0.35),
               blurRadius: 6,

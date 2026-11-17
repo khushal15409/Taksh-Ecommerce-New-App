@@ -61,7 +61,7 @@ const _serviceThemes = <String, _ServiceTheme>{
   ),
   'plumber': _ServiceTheme(
     icon: Icons.plumbing_rounded,
-    gradient: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+    gradient: [Color(0xFF2F7A4B), Color(0xFF66BB6A)],
     bgLight: Color(0xFFE8F5E9),
     borderColor: Color(0xFFB9DFB9),
   ),
@@ -75,7 +75,7 @@ const _serviceThemes = <String, _ServiceTheme>{
 
 const _defaultTheme = _ServiceTheme(
   icon: Icons.home_repair_service_rounded,
-  gradient: [Color(0xFFFF6B35), Color(0xFFFF8F5E)],
+  gradient: [Color(0xFFF97316), Color(0xFFF97316)],
   bgLight: Color(0xFFFFF3ED),
   borderColor: Color(0xFFFFD4BC),
 );
@@ -707,7 +707,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF2E7D32),
+                              color: Color(0xFF2F7A4B),
                             ),
                           ),
                         ),

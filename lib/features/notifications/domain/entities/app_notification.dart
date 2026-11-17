@@ -24,7 +24,7 @@ class AppNotification {
     required this.message,
     required this.timeAgo,
     this.isUnread = false,
-    this.dotColor = const Color(0xFFFF7A00),
+    this.dotColor = const Color(0xFFF97316),
     this.sentAt,
   });
 
@@ -42,7 +42,7 @@ class AppNotification {
       isUnread: json['is_read'] != true,
       dotColor: type == NotificationType.delivery
           ? const Color(0xFF3CAE5C)
-          : const Color(0xFFFF7A00),
+          : const Color(0xFFF97316),
       sentAt: sentAt,
     );
   }

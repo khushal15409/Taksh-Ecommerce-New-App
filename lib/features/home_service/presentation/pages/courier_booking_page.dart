@@ -551,7 +551,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: selected
-                              ? const Color(0xFF2E7D32)
+                              ? const Color(0xFF2F7A4B)
                               : Colors.grey[300]!,
                           width: selected ? 1.5 : 1,
                         ),
@@ -565,12 +565,12 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: selected
-                                    ? const Color(0xFF2E7D32)
+                                    ? const Color(0xFF2F7A4B)
                                     : Colors.grey[400]!,
                                 width: 2,
                               ),
                               color: selected
-                                  ? const Color(0xFF2E7D32)
+                                  ? const Color(0xFF2F7A4B)
                                   : Colors.transparent,
                             ),
                             child: selected
@@ -592,7 +592,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
                                     color: selected
-                                        ? const Color(0xFF2E7D32)
+                                        ? const Color(0xFF2F7A4B)
                                         : Colors.grey[800],
                                   ),
                                 ),
@@ -614,7 +614,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                               fontWeight: FontWeight.w800,
                               fontSize: 16,
                               color: selected
-                                  ? const Color(0xFF2E7D32)
+                                  ? const Color(0xFF2F7A4B)
                                   : AppColors.primaryOrange,
                             ),
                           ),
@@ -825,7 +825,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
               _FormSection(
                 title: l10n.customerAndPickupDetails,
                 icon: Icons.assignment_ind_rounded,
-                gradient: const [Color(0xFF5E35B1), Color(0xFFFF8F5E)],
+                gradient: const [Color(0xFF5E35B1), Color(0xFFF97316)],
                 children: [
                   _textField(
                     fieldKey: _nameKey,
@@ -883,7 +883,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
               _FormSection(
                 title: l10n.deliveryDetails,
                 icon: Icons.local_shipping_rounded,
-                gradient: const [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                gradient: const [Color(0xFF2F7A4B), Color(0xFF66BB6A)],
                 children: [
                   _textField(
                     fieldKey: _deliveryNameKey,
@@ -1172,12 +1172,12 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                 height: 56,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+                    colors: [Color(0xFFF97316), Color(0xFFFFA726)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF6B35).withValues(alpha: 0.35),
+                      color: const Color(0xFFF97316).withValues(alpha: 0.35),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -1236,13 +1236,13 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                         height: 56,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                            colors: [Color(0xFF2F7A4B), Color(0xFF66BB6A)],
                           ),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFF2E7D32,
+                                0xFF2F7A4B,
                               ).withValues(alpha: 0.35),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
@@ -1407,12 +1407,12 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                 height: 72,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                    colors: [Color(0xFF2F7A4B), Color(0xFF66BB6A)],
                   ),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF2E7D32).withValues(alpha: 0.3),
+                      color: const Color(0xFF2F7A4B).withValues(alpha: 0.3),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -1492,7 +1492,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                         _StatusChip(
                           label: 'PAYMENT ${paymentStatus.toUpperCase()}',
                           backgroundColor: const Color(0xFFE8F5E9),
-                          textColor: const Color(0xFF2E7D32),
+                          textColor: const Color(0xFF2F7A4B),
                         ),
                       ],
                     ),
@@ -1523,7 +1523,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFFF6B35), Color(0xFFFFA726)],
+                          colors: [Color(0xFFF97316), Color(0xFFFFA726)],
                         ),
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -1992,7 +1992,7 @@ class _WeightRow extends StatelessWidget {
             style: TextStyle(
               fontWeight: isHigher ? FontWeight.w700 : FontWeight.w500,
               fontSize: 13,
-              color: isHigher ? const Color(0xFF2E7D32) : Colors.grey[700],
+              color: isHigher ? const Color(0xFF2F7A4B) : Colors.grey[700],
             ),
           ),
         ),

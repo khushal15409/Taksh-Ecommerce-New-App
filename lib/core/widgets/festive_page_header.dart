@@ -67,7 +67,7 @@ class FestivePageHeader extends StatelessWidget {
     this.artOpacity = 0.55,
   });
 
-  static const Color _accent = Color(0xFFFF8A1F);
+  static const Color _accent = Color(0xFFF97316);
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +105,7 @@ class FestivePageHeader extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFE8431C), Color(0xFFFF8A1F)],
+          colors: [Color(0xFFE8431C), Color(0xFFF97316)],
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
         boxShadow: [

@@ -378,7 +378,7 @@ class _VariantTile extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 72),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF43A047), Color(0xFF2E7D32)],
+          colors: [Color(0xFF43A047), Color(0xFF2F7A4B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

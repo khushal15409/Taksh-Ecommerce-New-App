@@ -94,7 +94,7 @@ class _CouponSectionState extends State<CouponSection> {
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
           children: [
-            const Icon(Icons.local_offer_outlined, size: 16, color: Color(0xFF2F9E55)),
+            const Icon(Icons.local_offer_outlined, size: 16, color: Color(0xFF2F7A4B)),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -102,7 +102,7 @@ class _CouponSectionState extends State<CouponSection> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF2F9E55),
+                  color: Color(0xFF2F7A4B),
                 ),
               ),
             ),

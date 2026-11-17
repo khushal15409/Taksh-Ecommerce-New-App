@@ -21,9 +21,9 @@ class FestiveAuthBackground extends StatelessWidget {
           end: Alignment.bottomCenter,
           stops: [0.0, 0.45, 1.0],
           colors: [
-            Color(0xFFFFF4EA),
-            Color(0xFFFFF9F4),
-            Color(0xFFFFE9D6),
+            Color(0xFFE9EFF3),
+            Color(0xFFF3F6F9),
+            Color(0xFFF1F5F8),
           ],
         ),
       ),
@@ -51,13 +51,13 @@ class FestiveAuthBackground extends StatelessWidget {
 const LinearGradient festiveOrangeGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFFFF9A3D), Color(0xFFF2570A)],
+  colors: [Color(0xFFFB923C), Color(0xFFEA580C)],
 );
 
 const LinearGradient festiveGreenGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFF16A34A), Color(0xFF34D27B)],
+  colors: [Color(0xFF2F7A4B), Color(0xFF4C9A63)],
 );
 
 /// Orange gradient CTA used on the auth screens.

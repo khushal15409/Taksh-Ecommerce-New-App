@@ -259,7 +259,7 @@ class _ToastViewState extends State<_ToastView> with TickerProviderStateMixin {
       case AppToastType.error:
         return const Color(0xFFE53935);
       case AppToastType.warning:
-        return const Color(0xFFFF8A1F);
+        return const Color(0xFFF97316);
       case AppToastType.info:
         return const Color(0xFF2F80ED);
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
@@ -94,19 +95,32 @@ class _SplashPageState extends State<SplashPage> {
       // Branding: festive light backdrop, the Taksh logo, a short promise and
       // three highlights. Navigation logic above is unchanged.
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF7EA),
+        backgroundColor: AppColors.primaryOrange,
         body: Stack(
           fit: StackFit.expand,
           children: [
-            const AnimatedBackdrop(
-              palette: BackdropPalette.saffron,
-              coverage: 1.0,
-              fadeBottom: false,
-            ),
             SafeArea(
               child: Column(
                 children: [
-                  const Spacer(flex: 3),
+                  const Spacer(flex: 1),
+                  Flexible(
+                    flex: 6,
+                    child: FadeSlideIn(
+                      duration: const Duration(milliseconds: 700),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: SvgPicture.asset(
+                            'assets/images/splash/splash_hero.svg',
+                            width: 360,
+                            height: 290,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   FadeSlideIn(
                     offset: -20,
                     duration: const Duration(milliseconds: 800),
@@ -121,7 +135,7 @@ class _SplashPageState extends State<SplashPage> {
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryOrange.withOpacity(0.25),
+                            color: Colors.black.withOpacity(0.12),
                             blurRadius: 36,
                             offset: const Offset(0, 14),
                           ),
@@ -143,7 +157,7 @@ class _SplashPageState extends State<SplashPage> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1F2A44),
+                        color: Colors.white,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -157,7 +171,7 @@ class _SplashPageState extends State<SplashPage> {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF5A4630),
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -175,14 +189,14 @@ class _SplashPageState extends State<SplashPage> {
                       ],
                     ),
                   ),
-                  const Spacer(flex: 3),
+                  const Spacer(flex: 1),
                   const SizedBox(
                     width: 28,
                     height: 28,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primaryOrange,
+                        Colors.white,
                       ),
                     ),
                   ),
@@ -192,7 +206,7 @@ class _SplashPageState extends State<SplashPage> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF5A4630),
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 20),

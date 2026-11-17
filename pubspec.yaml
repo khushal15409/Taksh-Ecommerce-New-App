@@ -111,6 +111,7 @@ flutter:
     - assets/images/onboarding/
     - assets/images/redesign/
     - assets/images/logo/
+    - assets/images/splash/
     # - assets/icons/
 
   # fonts:

@@ -23,7 +23,7 @@ class FestiveConfirmDialog extends StatelessWidget {
     required this.confirmLabel,
   });
 
-  static const Color _accent = Color(0xFFFF8A1F);
+  static const Color _accent = Color(0xFFF97316);
 
   @override
   Widget build(BuildContext context) {
