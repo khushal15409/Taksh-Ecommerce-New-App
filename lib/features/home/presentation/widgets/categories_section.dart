@@ -88,7 +88,7 @@ class CategoriesSection extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),

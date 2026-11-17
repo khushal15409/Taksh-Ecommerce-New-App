@@ -202,7 +202,7 @@ class _CourierHistoryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: _gradientAppBar(
         'Courier History',
         actions: [
@@ -686,7 +686,7 @@ class _BookingDetailBody extends StatelessWidget {
             return _buildDetail(context, state.booking);
           }
           return Scaffold(
-            backgroundColor: Colors.grey[50],
+            backgroundColor: Colors.transparent,
             appBar: _gradientAppBar('Booking Details'),
             body: state is CourierBookingDetailError
                 ? _ErrorView(
@@ -720,7 +720,7 @@ class _BookingDetailBody extends StatelessWidget {
     final unit = booking.dimensionUnit;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: _gradientAppBar('Booking #${booking.bookingNumber}'),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPaddingHorizontal),

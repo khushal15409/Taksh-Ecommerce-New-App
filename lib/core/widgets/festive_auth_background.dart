@@ -15,18 +15,7 @@ class FestiveAuthBackground extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [0.0, 0.45, 1.0],
-          colors: [
-            Color(0xFFE9EFF3),
-            Color(0xFFF3F6F9),
-            Color(0xFFF1F5F8),
-          ],
-        ),
-      ),
+      // Transparent: the app-wide AppBackground image shows through.
       child: Stack(
         children: [
           Positioned(

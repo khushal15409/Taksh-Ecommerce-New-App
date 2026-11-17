@@ -20,8 +20,8 @@ class BackdropPalette {
 
   /// Standard: light blue-grey with a faint warm tint.
   static const saffron = BackdropPalette(
-    top: Color(0xFFE9EEF2),
-    mid: Color(0xFFF1F5F8),
+    top: Color(0x40FFFFFF),
+    mid: Color(0x00FFFFFF),
     glowA: Color(0xFFFFEDDD),
     glowB: Color(0xFFFFEDDD),
     spark: Color(0xFFF97316),
@@ -30,8 +30,8 @@ class BackdropPalette {
 
   /// Quick: light blue-grey with a faint eco-green tint.
   static const emerald = BackdropPalette(
-    top: Color(0xFFE3EEE7),
-    mid: Color(0xFFF1F5F8),
+    top: Color(0x382F7A4B),
+    mid: Color(0x002F7A4B),
     glowA: Color(0xFFDCEBE1),
     glowB: Color(0xFFDCEBE1),
     spark: Color(0xFF2F7A4B),
@@ -40,8 +40,8 @@ class BackdropPalette {
 
   /// Services: light blue-grey, cool tint.
   static const royal = BackdropPalette(
-    top: Color(0xFFE6ECF2),
-    mid: Color(0xFFF1F5F8),
+    top: Color(0x40FFFFFF),
+    mid: Color(0x00FFFFFF),
     glowA: Color(0xFFE6ECF2),
     glowB: Color(0xFFE6ECF2),
     spark: Color(0xFF2D5A3D),

@@ -38,7 +38,7 @@ class NotificationDetailPage extends StatelessWidget {
     final visual = NotificationVisual.of(n.type);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFEFD9),
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           const Positioned(

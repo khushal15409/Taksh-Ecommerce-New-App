@@ -1,4 +1,3 @@
-import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -402,25 +401,26 @@ class _HomePageState extends State<_HomePageContent> {
           }
 
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
             body: Stack(
               children: [
-                // Festive artwork, always edge-to-edge (full width) and
-                // fading into white below the header.
+                // Full-page background of the selected mode (Standard / Quick /
+                // Services). Static image; only a short cross-fade when switching.
                 Positioned.fill(
                   child: IgnorePointer(
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 350),
-                      child: Align(
+                      child: SizedBox.expand(
                         key: ValueKey(_selectedDeliveryType),
-                        alignment: Alignment.topCenter,
-                        child: SizedBox.expand(
-                          child: AnimatedBackdrop(
-                            palette: HomeModeTheme.of(
-                              _selectedDeliveryType,
-                            ).palette,
-                            coverage: 0.5,
-                          ),
+                        child: Image.asset(
+                          HomeModeTheme.of(_selectedDeliveryType)
+                              .pageBackground,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                          gaplessPlayback: true,
+                          excludeFromSemantics: true,
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox.shrink(),
                         ),
                       ),
                     ),

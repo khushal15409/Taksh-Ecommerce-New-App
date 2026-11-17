@@ -76,7 +76,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         final unread = state.items.where((n) => n.isUnread).length;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFFFEFD9),
+          backgroundColor: Colors.transparent,
           body: Stack(
             children: [
               const Positioned(

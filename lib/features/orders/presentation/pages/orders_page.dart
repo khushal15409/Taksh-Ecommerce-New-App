@@ -88,7 +88,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Widget _buildOrdersContent(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,

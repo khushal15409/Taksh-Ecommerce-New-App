@@ -759,7 +759,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(widget.service.name),
         actions: [

@@ -17,8 +17,8 @@ import 'package:taksh_e_commerce/features/profile/presentation/pages/about_us_pa
 import 'package:taksh_e_commerce/features/profile/presentation/pages/privacy_policy_page.dart';
 import 'package:taksh_e_commerce/features/profile/presentation/pages/refund_policy_page.dart';
 import 'package:taksh_e_commerce/features/profile/presentation/pages/update_profile_details_page.dart';
-import 'package:taksh_e_commerce/features/profile/presentation/pages/delivery_boy_join_page.dart';
-import 'package:taksh_e_commerce/features/profile/presentation/pages/vendor_join_page.dart';
+// import 'package:taksh_e_commerce/features/profile/presentation/pages/delivery_boy_join_page.dart';  // hidden menu items
+// import 'package:taksh_e_commerce/features/profile/presentation/pages/vendor_join_page.dart';  // hidden menu items
 import 'package:taksh_e_commerce/features/profile/presentation/pages/development_request_page.dart';
 import 'package:taksh_e_commerce/features/wallet/presentation/pages/wallet_page.dart';
 import 'package:taksh_e_commerce/features/wallet/presentation/cubit/wallet_cubit.dart';
@@ -245,33 +245,34 @@ class _ProfilePageState extends State<ProfilePage> {
                   context,
                   title: AppLocalizations.of(context)!.earnings,
                   items: [
-                    _MenuItemData(
-                      icon: Icons.delivery_dining,
-                      title: AppLocalizations.of(context)!.joinAsDeliveryMan,
-                      iconColor: AppColors.black,
-                      onTap: () {
-                        // Navigate to delivery boy join form
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DeliveryBoyJoinPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    _MenuItemData(
-                      icon: Icons.store_outlined,
-                      title: AppLocalizations.of(context)!.openVendor,
-                      iconColor: AppColors.black,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const VendorJoinPage(),
-                          ),
-                        );
-                      },
-                    ),
+                    // TEMPORARILY HIDDEN: "Join as delivery man" and "Open vendor" menu items (commented out, not removed).
+//                    _MenuItemData(
+//                      icon: Icons.delivery_dining,
+//                      title: AppLocalizations.of(context)!.joinAsDeliveryMan,
+//                      iconColor: AppColors.black,
+//                      onTap: () {
+//                        // Navigate to delivery boy join form
+//                        Navigator.push(
+//                          context,
+//                          MaterialPageRoute(
+//                            builder: (context) => const DeliveryBoyJoinPage(),
+//                          ),
+//                        );
+//                      },
+//                    ),
+//                    _MenuItemData(
+//                      icon: Icons.store_outlined,
+//                      title: AppLocalizations.of(context)!.openVendor,
+//                      iconColor: AppColors.black,
+//                      onTap: () {
+//                        Navigator.push(
+//                          context,
+//                          MaterialPageRoute(
+//                            builder: (context) => const VendorJoinPage(),
+//                          ),
+//                        );
+//                      },
+//                    ),
                     _MenuItemData(
                       icon: Icons.phone_android_outlined,
                       title: AppLocalizations.of(context)!.createApplication,

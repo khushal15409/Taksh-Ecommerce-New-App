@@ -112,6 +112,7 @@ flutter:
     - assets/images/redesign/
     - assets/images/logo/
     - assets/images/splash/
+    - assets/images/backgrounds/
     # - assets/icons/
 
   # fonts:

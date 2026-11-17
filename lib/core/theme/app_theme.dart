@@ -3,6 +3,7 @@ import 'package:taksh_e_commerce/core/theme/app_colors.dart';
 import 'package:taksh_e_commerce/core/theme/app_typography.dart';
 import 'package:taksh_e_commerce/core/theme/app_tokens.dart';
 import 'package:taksh_e_commerce/core/theme/app_spacing.dart';
+import 'package:taksh_e_commerce/core/widgets/app_background.dart';
 
 /// Main theme configuration for the app
 /// Combines all design system tokens into cohesive themes
@@ -14,7 +15,16 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.scaffoldLight,
+      // Transparent: the app-wide AppBackground image shows through every page.
+      scaffoldBackgroundColor: Colors.transparent,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android:
+              BackgroundPageTransitionsBuilder(ZoomPageTransitionsBuilder()),
+          TargetPlatform.iOS:
+              BackgroundPageTransitionsBuilder(CupertinoPageTransitionsBuilder()),
+        },
+      ),
 
       // Color Scheme
       colorScheme: ColorScheme.light(
@@ -51,8 +61,9 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
-        scrolledUnderElevation: 2,
-        backgroundColor: LightColors.surface,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
         foregroundColor: LightColors.onSurface,
         iconTheme: const IconThemeData(
           color: LightColors.onSurface,

@@ -17,7 +17,7 @@ class WalletPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
           'My Wallet',

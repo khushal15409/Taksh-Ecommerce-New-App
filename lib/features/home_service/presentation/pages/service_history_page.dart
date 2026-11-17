@@ -214,7 +214,7 @@ class _ServiceHistoryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Service History'),
         flexibleSpace: Container(
@@ -796,7 +796,7 @@ class _BookingDetailBody extends StatelessWidget {
             return _buildDetail(context, state.booking);
           }
           return Scaffold(
-            backgroundColor: Colors.grey[50],
+            backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: const Text('Booking Details'),
               flexibleSpace: Container(
@@ -834,7 +834,7 @@ class _BookingDetailBody extends StatelessWidget {
     final showCancel = _canCancel(booking);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text('Booking #${booking.bookingNumber}'),
         flexibleSpace: Container(

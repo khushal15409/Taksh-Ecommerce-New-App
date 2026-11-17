@@ -334,7 +334,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   Widget _buildPage(BuildContext context, double topPadding) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           // Festive artwork: always edge-to-edge, fading into white.

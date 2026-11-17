@@ -111,7 +111,7 @@ class _CartPageState extends State<CartPage>
 
   Widget _buildCartContent(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

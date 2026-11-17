@@ -294,7 +294,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
     final payableCharge = widget.service.serviceCharge;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(widget.service.name),
         actions: [

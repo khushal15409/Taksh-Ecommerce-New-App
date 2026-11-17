@@ -131,7 +131,7 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           widget.args.categoryName,

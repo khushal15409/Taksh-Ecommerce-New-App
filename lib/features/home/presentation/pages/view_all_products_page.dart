@@ -70,7 +70,7 @@ class _ViewAllProductsPageState extends State<ViewAllProductsPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           children: [

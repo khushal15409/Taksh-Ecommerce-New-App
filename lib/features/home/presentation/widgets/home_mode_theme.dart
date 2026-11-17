@@ -8,6 +8,9 @@ import 'package:taksh_e_commerce/features/home/presentation/widgets/delivery_typ
 /// Presentation only — no data or business logic lives here.
 class HomeModeTheme {
   final String backgroundAsset;
+
+  /// Full-page background image of this mode (static, light, slightly tinted).
+  final String pageBackground;
   final Color accent;
   final Color accentDark;
   final Color accentSoft;
@@ -17,6 +20,7 @@ class HomeModeTheme {
 
   const HomeModeTheme({
     required this.backgroundAsset,
+    required this.pageBackground,
     required this.accent,
     required this.accentDark,
     required this.accentSoft,
@@ -27,6 +31,7 @@ class HomeModeTheme {
 
   static const standard = HomeModeTheme(
     backgroundAsset: 'assets/images/diwali/home_standard_diwali_bg.jpg',
+    pageBackground: 'assets/images/backgrounds/home_standard_bg.jpg',
     accent: Color(0xFFF26A0E),
     accentDark: Color(0xFFD94F00),
     accentSoft: Color(0xFFFFF1E4),
@@ -37,6 +42,7 @@ class HomeModeTheme {
 
   static const quick = HomeModeTheme(
     backgroundAsset: 'assets/images/diwali/home_quick_diwali_bg.jpg',
+    pageBackground: 'assets/images/backgrounds/home_quick_bg.jpg',
     accent: Color(0xFF138A4A),
     accentDark: Color(0xFF0B6B38),
     accentSoft: Color(0xFFE6F6EC),
@@ -47,6 +53,7 @@ class HomeModeTheme {
 
   static const services = HomeModeTheme(
     backgroundAsset: 'assets/images/diwali/home_services_diwali_bg.jpg',
+    pageBackground: 'assets/images/backgrounds/home_services_bg.jpg',
     accent: Color(0xFF6A1FD0),
     accentDark: Color(0xFF4F13A8),
     accentSoft: Color(0xFFF1E8FF),

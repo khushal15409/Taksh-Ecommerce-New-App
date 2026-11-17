@@ -13,6 +13,7 @@ import 'package:taksh_e_commerce/features/cart/presentation/cubit/cart_cubit.dar
 import 'package:taksh_e_commerce/core/utils/logger/logger.dart';
 import 'package:taksh_e_commerce/core/routing/app_router.dart';
 import 'package:taksh_e_commerce/core/theme/theme.dart';
+import 'package:taksh_e_commerce/core/widgets/app_background.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_bloc.dart';
 import 'package:taksh_e_commerce/features/address/presentation/bloc/address_event.dart';
 import 'package:taksh_e_commerce/features/auth/presentation/bloc/auth_bloc.dart';
@@ -205,7 +206,8 @@ class TakshECommerceApp extends material.StatelessWidget {
               darkTheme: AppTheme.darkTheme(),
               themeMode: themeMode,
               routerConfig: router.router,
-              builder: (context, child) => AppUpdateGate(child: child),
+              builder: (context, child) =>
+                  AppBackground(child: AppUpdateGate(child: child)),
             );
           },
         ),
