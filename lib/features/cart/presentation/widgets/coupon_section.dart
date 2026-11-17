@@ -94,7 +94,7 @@ class _CouponSectionState extends State<CouponSection> {
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
           children: [
-            const Icon(Icons.local_offer_outlined, size: 16, color: Color(0xFF2F7A4B)),
+            const Icon(Icons.local_offer_rounded, size: 16, color: Color(0xFF2F7A4B)),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -132,7 +132,7 @@ class _CouponSectionState extends State<CouponSection> {
                   decoration: const InputDecoration(
                     isDense: true,
                     hintText: 'Have a coupon code?',
-                    prefixIcon: Icon(Icons.local_offer_outlined, size: 18),
+                    prefixIcon: Icon(Icons.local_offer_rounded, size: 18),
                     border: OutlineInputBorder(),
                   ),
                 ),

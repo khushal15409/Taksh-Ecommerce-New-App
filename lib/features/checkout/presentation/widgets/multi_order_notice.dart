@@ -68,7 +68,7 @@ class MultiOrderNotice extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(
-                Icons.call_split,
+                Icons.call_split_rounded,
                 size: 18,
                 color: AppColors.primaryOrange,
               ),

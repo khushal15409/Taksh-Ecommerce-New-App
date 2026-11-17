@@ -317,13 +317,13 @@ class _SubcategoryTile extends StatelessWidget {
                               ),
                             ),
                             errorWidget: (context, url, error) => const Icon(
-                              Icons.image_not_supported_outlined,
+                              Icons.image_not_supported_rounded,
                               color: AppColors.grey300,
                               size: 22,
                             ),
                           )
                         : const Icon(
-                            Icons.category_outlined,
+                            Icons.category_rounded,
                             color: AppColors.grey300,
                             size: 26,
                           ),

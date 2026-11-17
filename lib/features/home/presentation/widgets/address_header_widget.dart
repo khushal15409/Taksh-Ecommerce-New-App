@@ -6,8 +6,12 @@ class AddressHeaderWidget extends StatelessWidget {
   final Address? selectedAddress;
   final VoidCallback onTap;
 
+  /// Stretch to the full available width (otherwise hugs its content).
+  final bool expand;
+
   const AddressHeaderWidget({
     super.key,
+    this.expand = false,
     this.selectedAddress,
     required this.onTap,
   });
@@ -18,13 +22,13 @@ class AddressHeaderWidget extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: expand ? 14 : 10, vertical: expand ? 8 : 4),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
           children: [
             const Icon(
               Icons.location_on_rounded,
@@ -33,6 +37,7 @@ class AddressHeaderWidget extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Flexible(
+              fit: expand ? FlexFit.tight : FlexFit.loose,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,

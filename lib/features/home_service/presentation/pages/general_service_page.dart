@@ -348,7 +348,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Customer Name',
                       hint: 'Enter your full name',
-                      prefixIcon: Icons.person_outline,
+                      prefixIcon: Icons.person_outline_rounded,
                     ),
                     textCapitalization: TextCapitalization.words,
                     validator: (v) =>
@@ -361,7 +361,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Mobile Number',
                       hint: '10-digit mobile number',
-                      prefixIcon: Icons.phone_outlined,
+                      prefixIcon: Icons.phone_rounded,
                     ),
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
@@ -385,7 +385,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Full Address',
                       hint: 'House / flat, street, area',
-                      prefixIcon: Icons.home_outlined,
+                      prefixIcon: Icons.home_rounded,
                       alignLabelWithHint: true,
                     ),
                     maxLines: 3,
@@ -398,7 +398,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Landmark (Optional)',
                       hint: 'Nearby landmark',
-                      prefixIcon: Icons.place_outlined,
+                      prefixIcon: Icons.place_rounded,
                     ),
                     textCapitalization: TextCapitalization.words,
                   ),
@@ -446,7 +446,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Pincode',
                       hint: '6-digit pincode',
-                      prefixIcon: Icons.pin_drop_outlined,
+                      prefixIcon: Icons.pin_drop_rounded,
                     ),
                     keyboardType: TextInputType.number,
                     maxLength: 6,
@@ -470,7 +470,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Describe the service you need',
                       hint: 'e.g. Need to fix a leaking pipe in the kitchen',
-                      prefixIcon: Icons.notes_outlined,
+                      prefixIcon: Icons.notes_rounded,
                       alignLabelWithHint: true,
                     ),
                     maxLines: 4,
@@ -485,7 +485,7 @@ class _GeneralServiceFormState extends State<_GeneralServiceForm> {
                     decoration: _inputDecoration(
                       label: 'Additional Notes (Optional)',
                       hint: 'Any extra instructions for the service provider',
-                      prefixIcon: Icons.sticky_note_2_outlined,
+                      prefixIcon: Icons.sticky_note_2_rounded,
                       alignLabelWithHint: true,
                     ),
                     maxLines: 3,

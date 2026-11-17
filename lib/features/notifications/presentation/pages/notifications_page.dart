@@ -94,7 +94,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       children: [
                         IconButton(
                           onPressed: () => context.pop(),
-                          icon: const Icon(Icons.arrow_back, size: 26),
+                          icon: const Icon(Icons.arrow_back_rounded, size: 26),
                           color: Colors.black87,
                         ),
                         const Expanded(

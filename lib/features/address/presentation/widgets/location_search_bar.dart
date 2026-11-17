@@ -91,7 +91,7 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
             focusNode: _focusNode,
             decoration: InputDecoration(
               hintText: AppLocalizations.of(context)!.searchAreaStreetName,
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search_rounded),
               suffixIcon: widget.isLoading
                   ? const Padding(
                       padding: EdgeInsets.all(12),
@@ -103,7 +103,7 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
                     )
                   : _controller.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: const Icon(Icons.clear_rounded),
                           onPressed: () {
                             _controller.clear();
                             setState(() {
@@ -164,7 +164,7 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
                 final s = widget.suggestions[index];
                 return ListTile(
                   dense: true,
-                  leading: const Icon(Icons.location_on_outlined),
+                  leading: const Icon(Icons.location_on_rounded),
                   title: Text.rich(
                     TextSpan(
                       children: [
@@ -222,7 +222,7 @@ class _LocationSearchBarState extends State<LocationSearchBar> {
               itemBuilder: (context, index) {
                 final location = widget.searchResults[index];
                 return ListTile(
-                  leading: const Icon(Icons.location_on_outlined),
+                  leading: const Icon(Icons.location_on_rounded),
                   title: Text(
                     location.formattedAddress ?? 'Unknown location',
                     maxLines: 1,

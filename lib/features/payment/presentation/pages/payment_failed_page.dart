@@ -91,7 +91,7 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                       ],
                     ),
                     child: const Icon(
-                      Icons.close,
+                      Icons.close_rounded,
                       color: Colors.white,
                       size: 60,
                     ),
@@ -128,7 +128,7 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.timer_outlined,
+                        Icon(Icons.timer_rounded,
                             color: Colors.orange[700], size: 18),
                         const SizedBox(width: 6),
                         Text(
@@ -154,7 +154,7 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.info_outline,
+                          Icon(Icons.info_outline_rounded,
                               color: Colors.red[700], size: 20),
                           const SizedBox(width: 8),
                           Text(
@@ -183,7 +183,7 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                           context.go(AppRoutes.cart);
                         }
                       },
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh_rounded),
                       label: Text(AppLocalizations.of(context)!.retry),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryOrange,
@@ -202,7 +202,7 @@ class _PaymentFailedPageState extends State<PaymentFailedPage> {
                       onPressed: () {
                         context.go(AppRoutes.orders);
                       },
-                      icon: const Icon(Icons.receipt_long),
+                      icon: const Icon(Icons.receipt_long_rounded),
                       label: Text(AppLocalizations.of(context)!.myOrders),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),

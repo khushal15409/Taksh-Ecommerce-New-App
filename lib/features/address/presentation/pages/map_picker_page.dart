@@ -109,7 +109,7 @@ class _MapPickerViewState extends State<_MapPickerView> {
                               ],
                             ),
                             child: IconButton(
-                              icon: const Icon(Icons.arrow_back),
+                              icon: const Icon(Icons.arrow_back_rounded),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                           ),
@@ -189,7 +189,7 @@ class _MapPickerViewState extends State<_MapPickerView> {
                           Row(
                             children: [
                               Icon(
-                                Icons.location_on,
+                                Icons.location_on_rounded,
                                 color: Theme.of(context).primaryColor,
                                 size: 24,
                               ),

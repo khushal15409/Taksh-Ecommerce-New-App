@@ -46,7 +46,7 @@ class LocationPermissionPrompt extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.location_on,
+              Icons.location_on_rounded,
               size: 32,
               color: Theme.of(context).primaryColor,
             ),
@@ -132,7 +132,7 @@ class LocationPermissionBanner extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Icon(Icons.location_off, color: Theme.of(context).primaryColor),
+              Icon(Icons.location_off_rounded, color: Theme.of(context).primaryColor),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -156,7 +156,7 @@ class LocationPermissionBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios,
+              Icon(Icons.arrow_forward_ios_rounded,
                   size: 16, color: Theme.of(context).disabledColor),
             ],
           ),
@@ -179,7 +179,7 @@ class LocationPermissionFAB extends StatelessWidget {
           LocationPermissionHandler.showLocationStatus(context, true);
         }
       },
-      icon: const Icon(Icons.my_location),
+      icon: const Icon(Icons.my_location_rounded),
       label: Text(AppLocalizations.of(context)!.enableLocation),
       backgroundColor: Theme.of(context).primaryColor,
     );

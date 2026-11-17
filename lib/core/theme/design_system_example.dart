@@ -93,7 +93,7 @@ class DesignSystemExample extends StatelessWidget {
                 const SizedBox(height: AppSpacing.gapMD),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.shopping_cart),
+                  icon: const Icon(Icons.shopping_cart_rounded),
                   label: const Text('Add to Cart'),
                 ),
               ],
@@ -139,7 +139,7 @@ class DesignSystemExample extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     hintText: 'Enter your email',
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: Icon(Icons.email_rounded),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.formFieldGap),
@@ -147,8 +147,8 @@ class DesignSystemExample extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: Icon(Icons.visibility),
+                    prefixIcon: Icon(Icons.lock_rounded),
+                    suffixIcon: Icon(Icons.visibility_rounded),
                   ),
                   obscureText: true,
                 ),
@@ -171,15 +171,15 @@ class DesignSystemExample extends StatelessWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.home, size: AppTokens.iconXS),
+                    Icon(Icons.home_rounded, size: AppTokens.iconXS),
                     SizedBox(width: AppSpacing.gapSM),
-                    Icon(Icons.search, size: AppTokens.iconSM),
+                    Icon(Icons.search_rounded, size: AppTokens.iconSM),
                     SizedBox(width: AppSpacing.gapSM),
-                    Icon(Icons.shopping_cart, size: AppTokens.iconMD),
+                    Icon(Icons.shopping_cart_rounded, size: AppTokens.iconMD),
                     SizedBox(width: AppSpacing.gapSM),
-                    Icon(Icons.favorite, size: AppTokens.iconLG),
+                    Icon(Icons.favorite_rounded, size: AppTokens.iconLG),
                     SizedBox(width: AppSpacing.gapSM),
-                    Icon(Icons.person, size: AppTokens.iconXL),
+                    Icon(Icons.person_rounded, size: AppTokens.iconXL),
                   ],
                 ),
               ],
@@ -197,20 +197,20 @@ class DesignSystemExample extends StatelessWidget {
                   children: [
                     const Chip(
                       label: Text('Electronics'),
-                      avatar: Icon(Icons.phone_android, size: 16),
+                      avatar: Icon(Icons.phone_android_rounded, size: 16),
                     ),
                     const Chip(
                       label: Text('Fashion'),
-                      avatar: Icon(Icons.checkroom, size: 16),
+                      avatar: Icon(Icons.checkroom_rounded, size: 16),
                     ),
                     const Chip(
                       label: Text('Home'),
-                      avatar: Icon(Icons.home, size: 16),
+                      avatar: Icon(Icons.home_rounded, size: 16),
                     ),
                     ActionChip(
                       label: const Text('Filter'),
                       onPressed: () {},
-                      avatar: const Icon(Icons.filter_list, size: 16),
+                      avatar: const Icon(Icons.filter_list_rounded, size: 16),
                     ),
                   ],
                 ),
@@ -226,25 +226,25 @@ class DesignSystemExample extends StatelessWidget {
                 _buildStatusMessage(
                   'Success! Your order has been placed.',
                   AppColors.success,
-                  Icons.check_circle,
+                  Icons.check_circle_rounded,
                 ),
                 const SizedBox(height: AppSpacing.gapMD),
                 _buildStatusMessage(
                   'Error! Something went wrong.',
                   AppColors.error,
-                  Icons.error,
+                  Icons.error_rounded,
                 ),
                 const SizedBox(height: AppSpacing.gapMD),
                 _buildStatusMessage(
                   'Warning! Low stock available.',
                   AppColors.warning,
-                  Icons.warning,
+                  Icons.warning_rounded,
                 ),
                 const SizedBox(height: AppSpacing.gapMD),
                 _buildStatusMessage(
                   'Info: Free shipping on orders above ₹500.',
                   AppColors.info,
-                  Icons.info,
+                  Icons.info_rounded,
                 ),
               ],
             ),
@@ -322,7 +322,7 @@ class DesignSystemExample extends StatelessWidget {
             ),
             child: const Center(
               child: Icon(
-                Icons.image,
+                Icons.image_rounded,
                 size: AppTokens.iconXXL,
                 color: AppColors.grey400,
               ),
@@ -343,7 +343,7 @@ class DesignSystemExample extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.star,
+                Icons.star_rounded,
                 size: AppTokens.iconSM,
                 color: AppColors.rating,
               ),

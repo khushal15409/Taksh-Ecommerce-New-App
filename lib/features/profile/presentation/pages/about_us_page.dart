@@ -48,7 +48,7 @@ class AboutUsPage extends StatelessWidget {
                       ],
                     ),
                     child: const Icon(
-                      Icons.shopping_bag,
+                      Icons.shopping_bag_rounded,
                       size: 60,
                       color: AppColors.primaryOrange,
                     ),
@@ -114,7 +114,7 @@ class AboutUsPage extends StatelessWidget {
 
                   _buildValueCard(
                     context,
-                    icon: Icons.verified_user,
+                    icon: Icons.verified_user_rounded,
                     title: AppLocalizations.of(context)!.trustTransparency,
                     description:
                         AppLocalizations.of(context)!.trustTransparencyDesc,
@@ -123,7 +123,7 @@ class AboutUsPage extends StatelessWidget {
 
                   _buildValueCard(
                     context,
-                    icon: Icons.stars,
+                    icon: Icons.stars_rounded,
                     title: AppLocalizations.of(context)!.qualityFirst,
                     description: AppLocalizations.of(context)!.qualityFirstDesc,
                     color: AppColors.secondaryGreen,
@@ -131,7 +131,7 @@ class AboutUsPage extends StatelessWidget {
 
                   _buildValueCard(
                     context,
-                    icon: Icons.people,
+                    icon: Icons.people_rounded,
                     title: AppLocalizations.of(context)!.customerCentricity,
                     description:
                         AppLocalizations.of(context)!.customerCentricityDesc,
@@ -140,7 +140,7 @@ class AboutUsPage extends StatelessWidget {
 
                   _buildValueCard(
                     context,
-                    icon: Icons.storefront,
+                    icon: Icons.storefront_rounded,
                     title: AppLocalizations.of(context)!.sustainability,
                     description:
                         AppLocalizations.of(context)!.sustainabilityDesc,
@@ -149,7 +149,7 @@ class AboutUsPage extends StatelessWidget {
 
                   _buildValueCard(
                     context,
-                    icon: Icons.rocket_launch,
+                    icon: Icons.rocket_launch_rounded,
                     title: AppLocalizations.of(context)!.innovation,
                     description: AppLocalizations.of(context)!.innovationDesc,
                     color: AppColors.primaryOrange,
@@ -193,7 +193,7 @@ class AboutUsPage extends StatelessWidget {
                             Expanded(
                               child: _buildHighlight(
                                 context,
-                                Icons.bolt,
+                                Icons.bolt_rounded,
                                 AppLocalizations.of(context)!
                                     .aboutHighlightExpress,
                               ),
@@ -201,7 +201,7 @@ class AboutUsPage extends StatelessWidget {
                             Expanded(
                               child: _buildHighlight(
                                 context,
-                                Icons.local_shipping_outlined,
+                                Icons.local_shipping_rounded,
                                 AppLocalizations.of(context)!
                                     .aboutHighlightDelivery,
                               ),
@@ -209,7 +209,7 @@ class AboutUsPage extends StatelessWidget {
                             Expanded(
                               child: _buildHighlight(
                                 context,
-                                Icons.lock_outline,
+                                Icons.lock_outline_rounded,
                                 AppLocalizations.of(context)!
                                     .aboutHighlightPayments,
                               ),
@@ -222,7 +222,7 @@ class AboutUsPage extends StatelessWidget {
                             Expanded(
                               child: _buildHighlight(
                                 context,
-                                Icons.payments_outlined,
+                                Icons.payments_rounded,
                                 AppLocalizations.of(context)!
                                     .aboutHighlightCod,
                               ),
@@ -230,7 +230,7 @@ class AboutUsPage extends StatelessWidget {
                             Expanded(
                               child: _buildHighlight(
                                 context,
-                                Icons.assignment_return_outlined,
+                                Icons.assignment_return_rounded,
                                 AppLocalizations.of(context)!
                                     .aboutHighlightReturns,
                               ),
@@ -238,7 +238,7 @@ class AboutUsPage extends StatelessWidget {
                             Expanded(
                               child: _buildHighlight(
                                 context,
-                                Icons.storefront_outlined,
+                                Icons.storefront_rounded,
                                 AppLocalizations.of(context)!
                                     .aboutHighlightLocal,
                               ),
@@ -278,7 +278,7 @@ class AboutUsPage extends StatelessWidget {
                             children: [
                               _buildContactItem(
                                 context,
-                                Icons.email,
+                                Icons.email_rounded,
                                 AppLocalizations.of(context)!.emailLabel,
                                 SupportContacts.email,
                               ),
@@ -286,7 +286,7 @@ class AboutUsPage extends StatelessWidget {
                                 const SizedBox(height: 12),
                                 _buildContactItem(
                                   context,
-                                  Icons.phone,
+                                  Icons.phone_rounded,
                                   'Phone',
                                   SupportContacts.phone,
                                 ),
@@ -294,7 +294,7 @@ class AboutUsPage extends StatelessWidget {
                               const SizedBox(height: 12),
                               _buildContactItem(
                                 context,
-                                Icons.location_on,
+                                Icons.location_on_rounded,
                                 AppLocalizations.of(context)!.addressLabel,
                                 SupportContacts.address,
                               ),
@@ -302,7 +302,7 @@ class AboutUsPage extends StatelessWidget {
                                 const SizedBox(height: 12),
                                 _buildContactItem(
                                   context,
-                                  Icons.access_time,
+                                  Icons.access_time_rounded,
                                   'Support hours',
                                   SupportContacts.hours,
                                 ),

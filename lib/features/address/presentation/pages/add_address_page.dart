@@ -176,7 +176,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
-                                Icons.location_on,
+                                Icons.location_on_rounded,
                                 color: Theme.of(context).primaryColor,
                                 size: 28,
                               ),
@@ -214,7 +214,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               ),
                             ),
                             Icon(
-                              Icons.arrow_forward_ios,
+                              Icons.arrow_forward_ios_rounded,
                               size: 16,
                               color: Theme.of(context).disabledColor,
                             ),
@@ -251,7 +251,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                       hintText: AppLocalizations.of(
                         context,
                       )!.enterRecipientName,
-                      prefixIcon: const Icon(Icons.person_outline),
+                      prefixIcon: const Icon(Icons.person_outline_rounded),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -274,7 +274,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.labelOther,
                         hintText: AppLocalizations.of(context)!.enterLabel,
-                        prefixIcon: const Icon(Icons.label_outline),
+                        prefixIcon: const Icon(Icons.label_outline_rounded),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -296,7 +296,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.houseFlatNo,
                       hintText: AppLocalizations.of(context)!.enterHouseNo,
-                      prefixIcon: const Icon(Icons.home_outlined),
+                      prefixIcon: const Icon(Icons.home_rounded),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -316,7 +316,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.landmarkOptional,
                       hintText: AppLocalizations.of(context)!.landmarkHint,
-                      prefixIcon: const Icon(Icons.location_city_outlined),
+                      prefixIcon: const Icon(Icons.location_city_rounded),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -333,7 +333,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                           decoration: InputDecoration(
                             labelText: AppLocalizations.of(context)!.city,
                             hintText: AppLocalizations.of(context)!.enterCity,
-                            prefixIcon: const Icon(Icons.location_city),
+                            prefixIcon: const Icon(Icons.location_city_rounded),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -353,7 +353,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                           decoration: InputDecoration(
                             labelText: AppLocalizations.of(context)!.state,
                             hintText: AppLocalizations.of(context)!.enterState,
-                            prefixIcon: const Icon(Icons.map_outlined),
+                            prefixIcon: const Icon(Icons.map_rounded),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -376,7 +376,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.pincode,
                       hintText: AppLocalizations.of(context)!.enterPincode,
-                      prefixIcon: const Icon(Icons.pin_outlined),
+                      prefixIcon: const Icon(Icons.pin_rounded),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

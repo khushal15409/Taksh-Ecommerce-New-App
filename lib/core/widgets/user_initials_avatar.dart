@@ -157,7 +157,7 @@ class UserInitialsAvatar extends StatelessWidget {
                   ),
                 )
               : Icon(
-                  Icons.person,
+                  Icons.person_rounded,
                   size: _iconSize(),
                   color: fgColor,
                 ),

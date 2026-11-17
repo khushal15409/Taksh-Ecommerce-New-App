@@ -309,7 +309,7 @@ class _LoginPageState extends State<LoginPage> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: const Icon(
-                                        Icons.phone,
+                                        Icons.phone_rounded,
                                         color: Colors.white,
                                         size: 18,
                                       ),
@@ -410,7 +410,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: AppConstants.smallPadding),
                         OutlinedButton.icon(
                           onPressed: () => _handleBrowseAsGuest(context),
-                          icon: const Icon(Icons.explore_outlined),
+                          icon: const Icon(Icons.explore_rounded),
                           label: const Text('Browse as Guest'),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.grey700,

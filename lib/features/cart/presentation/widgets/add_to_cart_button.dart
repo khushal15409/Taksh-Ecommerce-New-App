@@ -210,7 +210,7 @@ class AddToCartButton extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shopping_cart_outlined, size: 14),
+                      Icon(Icons.shopping_cart_rounded, size: 14),
                       SizedBox(width: 6),
                       Text(
                         'Add to Cart',
@@ -250,7 +250,7 @@ class AddToCartButton extends StatelessWidget {
             : const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shopping_cart_outlined),
+                  Icon(Icons.shopping_cart_rounded),
                   SizedBox(width: 8),
                   Text(
                     'Add to Cart',
@@ -282,7 +282,7 @@ class AddToCartButton extends StatelessWidget {
           children: [
             _buildControlButton(
               context,
-              icon: quantity == 1 ? Icons.delete_outline : Icons.remove,
+              icon: quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
               onTap: isLoading
                   ? null
                   : () => _decrementQuantity(context, quantity, cartItemId),
@@ -311,7 +311,7 @@ class AddToCartButton extends StatelessWidget {
             ),
             _buildControlButton(
               context,
-              icon: Icons.add,
+              icon: Icons.add_rounded,
               onTap: isLoading
                   ? null
                   : () => _incrementQuantity(context, quantity, cartItemId),
@@ -335,7 +335,7 @@ class AddToCartButton extends StatelessWidget {
         children: [
           _buildControlButton(
             context,
-            icon: quantity == 1 ? Icons.delete_outline : Icons.remove,
+            icon: quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
             onTap: isLoading
                 ? null
                 : () => _decrementQuantity(context, quantity, cartItemId),
@@ -366,7 +366,7 @@ class AddToCartButton extends StatelessWidget {
           ),
           _buildControlButton(
             context,
-            icon: Icons.add,
+            icon: Icons.add_rounded,
             onTap: isLoading
                 ? null
                 : () => _incrementQuantity(context, quantity, cartItemId),

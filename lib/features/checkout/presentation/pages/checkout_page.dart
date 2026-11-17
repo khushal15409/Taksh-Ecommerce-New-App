@@ -493,7 +493,7 @@ class _OrderItemsSectionState extends State<_OrderItemsSection> {
                 child: Column(
                   children: [
                     Icon(
-                      Icons.location_off,
+                      Icons.location_off_rounded,
                       size: 48,
                       color: Theme.of(context).disabledColor,
                     ),
@@ -692,7 +692,7 @@ class _OrderItemsSectionState extends State<_OrderItemsSection> {
       height: 60,
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Icon(
-        Icons.image_not_supported,
+        Icons.image_not_supported_rounded,
         size: 22,
         color: Theme.of(context).disabledColor,
       ),

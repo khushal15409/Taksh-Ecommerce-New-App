@@ -299,7 +299,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
                 ),
                 TextButton.icon(
                   onPressed: _isSubmitting ? null : _showImageSourceDialog,
-                  icon: const Icon(Icons.add_photo_alternate_outlined),
+                  icon: const Icon(Icons.add_photo_alternate_rounded),
                   label: const Text('Add'),
                 ),
               ],
@@ -354,7 +354,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
                             ),
                             padding: const EdgeInsets.all(4),
                             child: const Icon(
-                              Icons.close,
+                              Icons.close_rounded,
                               size: 14,
                               color: Colors.white,
                             ),
@@ -384,7 +384,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Icon(
-            Icons.account_balance_wallet_outlined,
+            Icons.account_balance_wallet_rounded,
             size: 20,
             color: AppColors.primaryOrange,
           ),
@@ -438,7 +438,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt_outlined),
+              leading: const Icon(Icons.camera_alt_rounded),
               title: const Text('Take Photo'),
               onTap: () {
                 Navigator.pop(ctx);
@@ -446,7 +446,7 @@ class _ReturnRequestPageState extends State<ReturnRequestPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
+              leading: const Icon(Icons.photo_library_rounded),
               title: const Text('Choose from Gallery'),
               onTap: () {
                 Navigator.pop(ctx);

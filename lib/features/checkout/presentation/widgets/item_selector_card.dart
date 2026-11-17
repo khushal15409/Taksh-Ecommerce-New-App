@@ -55,7 +55,7 @@ class ItemSelectorCard extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .surfaceContainerHighest,
-                        child: Icon(Icons.image_not_supported,
+                        child: Icon(Icons.image_not_supported_rounded,
                             color: Theme.of(context).disabledColor),
                       );
                     },

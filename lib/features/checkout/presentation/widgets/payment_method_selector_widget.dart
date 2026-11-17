@@ -107,7 +107,7 @@ class _PaymentMethodSelectorWidgetState
               if (codOn)
               _buildPaymentMethodTile(
                 method: PaymentMethodSelection.cod,
-                icon: Icons.payments_outlined,
+                icon: Icons.payments_rounded,
                 title: PaymentMethodType.cod.displayName,
                 subtitle: PaymentMethodSelection.cod.description,
                 isSelected: _selectedMethod.type == PaymentMethodType.cod,
@@ -236,10 +236,10 @@ class _PaymentMethodSelectorWidgetState
       runSpacing: 6,
       children: [
         _buildPaymentLogo('Razorpay', Icons.bolt_rounded, Colors.blue.shade700),
-        _buildPaymentLogo('Cards', Icons.credit_card, Colors.green.shade700),
+        _buildPaymentLogo('Cards', Icons.credit_card_rounded, Colors.green.shade700),
         _buildPaymentLogo(
           'UPI',
-          Icons.account_balance_outlined,
+          Icons.account_balance_rounded,
           Colors.orange.shade700,
         ),
         _buildPaymentLogo(

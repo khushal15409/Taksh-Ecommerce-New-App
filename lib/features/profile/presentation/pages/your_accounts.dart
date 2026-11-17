@@ -169,7 +169,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.check_circle,
+                Icons.check_circle_rounded,
                 color: AppColors.secondaryGreen,
                 size: 64,
               ),
@@ -249,7 +249,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             decoration: InputDecoration(
               labelText: 'Account Holder Name *',
               hintText: 'Enter full name as per bank account',
-              prefixIcon: const Icon(Icons.person_outline),
+              prefixIcon: const Icon(Icons.person_outline_rounded),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -273,7 +273,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             decoration: InputDecoration(
               labelText: 'Account Number *',
               hintText: 'Enter your account number',
-              prefixIcon: const Icon(Icons.account_balance_outlined),
+              prefixIcon: const Icon(Icons.account_balance_rounded),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -297,7 +297,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             decoration: InputDecoration(
               labelText: 'IFSC Code *',
               hintText: 'Enter IFSC code (e.g., SBIN0001234)',
-              prefixIcon: const Icon(Icons.code_outlined),
+              prefixIcon: const Icon(Icons.code_rounded),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -325,7 +325,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             decoration: InputDecoration(
               labelText: 'Bank Name *',
               hintText: 'Enter your bank name',
-              prefixIcon: const Icon(Icons.account_balance),
+              prefixIcon: const Icon(Icons.account_balance_rounded),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -346,7 +346,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             decoration: InputDecoration(
               labelText: 'Branch Name *',
               hintText: 'Enter your branch name',
-              prefixIcon: const Icon(Icons.location_on_outlined),
+              prefixIcon: const Icon(Icons.location_on_rounded),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -386,7 +386,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             decoration: InputDecoration(
               labelText: 'UPI ID',
               hintText: 'username@bankname',
-              prefixIcon: const Icon(Icons.payment_outlined),
+              prefixIcon: const Icon(Icons.payment_rounded),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -412,7 +412,7 @@ class _YourAccountsPageState extends State<YourAccountsPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                Icon(Icons.info_outline_rounded, color: Colors.blue[700], size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

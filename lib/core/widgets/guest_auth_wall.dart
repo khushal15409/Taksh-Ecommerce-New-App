@@ -167,7 +167,7 @@ class GuestAuthWall extends StatelessWidget {
                 TextButton.icon(
                   onPressed: () => context.go(AppRoutes.home),
                   icon: Icon(
-                    Icons.explore_outlined,
+                    Icons.explore_rounded,
                     size: 18,
                     color: isDark ? AppColors.grey400 : AppColors.grey600,
                   ),

@@ -87,7 +87,7 @@ class DeliveryOptionsWidget extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.info_outline,
+                          Icons.info_outline_rounded,
                           size: 16,
                           color: Colors.amber.shade700,
                         ),
@@ -137,7 +137,7 @@ class DeliveryOptionsWidget extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.info_outline,
+                          Icons.info_outline_rounded,
                           size: 16,
                           color: Colors.red.shade700,
                         ),
@@ -168,7 +168,7 @@ class DeliveryOptionsWidget extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.info_outline,
+                          Icons.info_outline_rounded,
                           size: 16,
                           color: Colors.red.shade700,
                         ),
@@ -275,7 +275,7 @@ class _DeliveryOptionTile extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.access_time,
+                        Icons.access_time_rounded,
                         size: 16,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),

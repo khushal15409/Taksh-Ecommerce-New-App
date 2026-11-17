@@ -226,7 +226,7 @@ class _ProductCardState extends State<ProductCard>
                                 ),
                               ),
                               errorWidget: (context, url, error) => Icon(
-                                Icons.image_outlined,
+                                Icons.image_rounded,
                                 size: isCompact ? 26 : 30,
                                 color: AppColors.grey400,
                               ),
@@ -242,7 +242,7 @@ class _ProductCardState extends State<ProductCard>
                               ),
                             )
                           : Icon(
-                              Icons.image_outlined,
+                              Icons.image_rounded,
                               size: isCompact ? 26 : 30,
                               color: AppColors.grey400,
                             ),

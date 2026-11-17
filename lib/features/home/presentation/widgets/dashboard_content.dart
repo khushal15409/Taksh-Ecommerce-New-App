@@ -10,7 +10,6 @@ import 'package:taksh_e_commerce/features/home/presentation/bloc/recent_views_cu
 import 'package:taksh_e_commerce/features/home/presentation/bloc/recent_views_state.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
-import 'package:taksh_e_commerce/features/home/presentation/widgets/category_catalog_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/designed_product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/pages/view_all_products_page.dart';
@@ -182,13 +181,8 @@ class _DashboardContentState extends State<DashboardContent> {
           },
         ),
         ...orderedProducts,
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: CategoryCatalogSection(
-            categories: categoryData,
-            deliveryType: 'standard',
-          ),
-        ),
+        // Parent categories are no longer shown as a dashboard section: only the
+        // sections created in the admin panel appear here.
         if (bottomBanners != null) bottomBanners,
         const SizedBox(height: 32),
       ],

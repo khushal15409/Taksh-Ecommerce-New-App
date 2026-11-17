@@ -165,13 +165,13 @@ class _CategoryProductCardState extends State<CategoryProductCard>
                                 ),
                               ),
                               errorWidget: (_, __, ___) => const Icon(
-                                Icons.image_outlined,
+                                Icons.image_rounded,
                                 size: 30,
                                 color: AppColors.grey400,
                               ),
                             )
                           : const Icon(
-                              Icons.image_outlined,
+                              Icons.image_rounded,
                               size: 30,
                               color: AppColors.grey400,
                             ),

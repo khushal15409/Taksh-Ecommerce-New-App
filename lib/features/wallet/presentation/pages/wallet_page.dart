@@ -144,7 +144,7 @@ class WalletPage extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.schedule, size: 14, color: Colors.amber[800]),
+                    Icon(Icons.schedule_rounded, size: 14, color: Colors.amber[800]),
                     const SizedBox(width: 6),
                     Text(
                       'Status: ${withdrawal.status.toUpperCase()}',
@@ -1297,7 +1297,7 @@ class _NoBankAccountsCard extends StatelessWidget {
       child: Column(
         children: [
           Icon(
-            Icons.account_balance_outlined,
+            Icons.account_balance_rounded,
             size: 36,
             color: Colors.amber[800],
           ),

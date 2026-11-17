@@ -121,7 +121,7 @@ class _DeliveryBoyJoinPageState extends State<DeliveryBoyJoinPage> {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.info_outline,
+                              Icons.info_outline_rounded,
                               color: AppColors.primaryOrange,
                               size: 24,
                             ),

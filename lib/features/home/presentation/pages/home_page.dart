@@ -580,7 +580,7 @@ class _HomePageState extends State<_HomePageContent> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+            Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Oops! Something went wrong',
@@ -608,7 +608,7 @@ class _HomePageState extends State<_HomePageContent> {
               ),
               child: ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh, color: Colors.white),
+                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
                 label: const Text(
                   'Try Again',
                   style: TextStyle(color: Colors.white),

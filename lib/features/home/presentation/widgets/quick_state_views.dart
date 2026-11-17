@@ -13,7 +13,7 @@ class QuickLocationNeededView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return _QuickMessageView(
-      icon: Icons.location_on_outlined,
+      icon: Icons.location_on_rounded,
       title: l10n.quickLocationNeededTitle,
       message: l10n.quickLocationNeededBody,
       actionLabel: l10n.selectAddress,
@@ -41,7 +41,7 @@ class QuickNotServiceableView extends StatelessWidget {
         ? message!
         : l10n.quickNotServiceableDefault;
     return _QuickMessageView(
-      icon: Icons.location_off_outlined,
+      icon: Icons.location_off_rounded,
       title: l10n.quickNotServiceableTitle,
       message: text,
       actionLabel: l10n.changeAddress,

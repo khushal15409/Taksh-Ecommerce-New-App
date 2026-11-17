@@ -19,7 +19,7 @@ class _CartSectionState extends State<CartSection> {
       restaurant: 'Pizza Palace',
       price: 299,
       quantity: 2,
-      imageIcon: Icons.local_pizza,
+      imageIcon: Icons.local_pizza_rounded,
     ),
     _CartItem(
       id: '2',
@@ -27,7 +27,7 @@ class _CartSectionState extends State<CartSection> {
       restaurant: 'Burger King',
       price: 199,
       quantity: 1,
-      imageIcon: Icons.fastfood,
+      imageIcon: Icons.fastfood_rounded,
     ),
     _CartItem(
       id: '3',
@@ -35,7 +35,7 @@ class _CartSectionState extends State<CartSection> {
       restaurant: 'Sweet Treats',
       price: 149,
       quantity: 1,
-      imageIcon: Icons.cake,
+      imageIcon: Icons.cake_rounded,
     ),
   ];
 
@@ -92,7 +92,7 @@ class _CartSectionState extends State<CartSection> {
                             _cartItems.clear();
                           });
                         },
-                        icon: const Icon(Icons.delete_outline),
+                        icon: const Icon(Icons.delete_outline_rounded),
                         label: const Text('Clear'),
                       ),
                   ],
@@ -239,7 +239,7 @@ class _EmptyCart extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.shopping_cart_outlined,
+            Icons.shopping_cart_rounded,
             size: 120,
             color: colorScheme.onSurface.withOpacity(0.3),
           ),
@@ -341,7 +341,7 @@ class _CartItemCard extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.remove),
+                    icon: const Icon(Icons.remove_rounded),
                     onPressed: () => onQuantityChanged(-1),
                     iconSize: 20,
                     constraints: const BoxConstraints(
@@ -356,7 +356,7 @@ class _CartItemCard extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(Icons.add_rounded),
                     onPressed: () => onQuantityChanged(1),
                     iconSize: 20,
                     constraints: const BoxConstraints(

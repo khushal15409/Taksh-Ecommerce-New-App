@@ -447,7 +447,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 color: Colors.black.withOpacity(0.08),
               ),
               infoCell(
-                Icons.account_balance_wallet_outlined,
+                Icons.account_balance_wallet_rounded,
                 AppColors.primaryOrange,
                 order.paymentStatus.toUpperCase(),
                 l10n.paymentStatus,
@@ -460,7 +460,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           if (order.estimatedDeliveryTime != null) ...[
             const SizedBox(height: 10),
             _buildInfoRow(
-              Icons.access_time,
+              Icons.access_time_rounded,
               l10n.estimatedDelivery,
               _formatDate(order.estimatedDeliveryTime!),
             ),
@@ -585,7 +585,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     border: Border.all(color: indicatorColor, width: 2),
                   ),
                   child: step.isCompleted
-                      ? const Icon(Icons.check, size: 11, color: Colors.white)
+                      ? const Icon(Icons.check_rounded, size: 11, color: Colors.white)
                       : null,
                 ),
                 if (!isLast)
@@ -847,7 +847,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () => _showReturnRequest(item),
-                icon: const Icon(Icons.keyboard_return, size: 18),
+                icon: const Icon(Icons.keyboard_return_rounded, size: 18),
                 label: Text(AppLocalizations.of(context)!.returnItem),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1088,7 +1088,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               onPressed: () {
                 _openReturnRequestPage(order: order);
               },
-              icon: const Icon(Icons.keyboard_return),
+              icon: const Icon(Icons.keyboard_return_rounded),
               label: Text(AppLocalizations.of(context)!.returnOrder),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1472,7 +1472,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
-                        Icons.receipt_long,
+                        Icons.receipt_long_rounded,
                         size: 48,
                         color: AppColors.primaryOrange,
                       ),
@@ -1767,13 +1767,13 @@ class _OrderItemThumbnailState extends State<_OrderItemThumbnail> {
                 _resolvedImageUrl!,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Icon(
-                  Icons.shopping_bag_outlined,
+                  Icons.shopping_bag_rounded,
                   color: Theme.of(context).disabledColor,
                   size: 22,
                 ),
               )
             : Icon(
-                Icons.shopping_bag_outlined,
+                Icons.shopping_bag_rounded,
                 color: Theme.of(context).disabledColor,
                 size: 30,
               ),

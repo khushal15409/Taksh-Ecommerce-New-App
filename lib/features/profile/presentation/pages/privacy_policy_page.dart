@@ -37,7 +37,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.update,
+                    Icons.update_rounded,
                     size: 18,
                     color: AppColors.info,
                   ),
@@ -75,7 +75,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.info_outline,
+                    Icons.info_outline_rounded,
                     size: 20,
                     color: AppColors.primaryOrange,
                   ),
@@ -189,7 +189,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.security,
+                    Icons.security_rounded,
                     size: 20,
                     color: AppColors.warning,
                   ),
@@ -285,7 +285,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.shield_outlined,
+                    Icons.shield_rounded,
                     color: AppColors.secondaryGreen,
                     size: 32,
                   ),

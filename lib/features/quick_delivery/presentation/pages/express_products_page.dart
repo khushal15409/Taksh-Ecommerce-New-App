@@ -234,7 +234,7 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline,
+                  Icon(Icons.error_outline_rounded,
                       size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 16),
                   Text(
@@ -276,7 +276,7 @@ class _ExpressProductsContentState extends State<_ExpressProductsContent> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.inventory_2_outlined,
+                Icon(Icons.inventory_2_rounded,
                     size: 64, color: Colors.grey.shade400),
                 const SizedBox(height: 16),
                 Text(

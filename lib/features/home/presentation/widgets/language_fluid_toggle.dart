@@ -41,7 +41,7 @@ class LanguageFluidToggle extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
-                  Icons.translate,
+                  Icons.translate_rounded,
                   color: Colors.white,
                   size: 16,
                 ),

@@ -822,7 +822,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
         children: [
           _buildControlButton(
             context,
-            icon: quantity == 1 ? Icons.delete_outline : Icons.remove,
+            icon: quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
             isOutlinedGreen: isOutlinedGreen,
             onTap: isLoading
                 ? null
@@ -851,7 +851,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
           ),
           _buildControlButton(
             context,
-            icon: Icons.add,
+            icon: Icons.add_rounded,
             isOutlinedGreen: isOutlinedGreen,
             onTap: isLoading
                 ? null
@@ -928,7 +928,7 @@ class _ProductAddToCartButtonState extends State<ProductAddToCartButton> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.shopping_cart, size: 11, color: Colors.white),
+                const Icon(Icons.shopping_cart_rounded, size: 11, color: Colors.white),
                 const SizedBox(width: 3),
                 Text(
                   '$totalQty',

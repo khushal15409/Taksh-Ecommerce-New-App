@@ -159,7 +159,7 @@ class _WishlistPageState extends State<WishlistPage> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () => context.go(AppRoutes.home),
-                icon: const Icon(Icons.shopping_bag_outlined),
+                icon: const Icon(Icons.shopping_bag_rounded),
                 label: Text(l10n.startShopping),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryOrange,
@@ -332,7 +332,7 @@ class _WishlistItemCard extends StatelessWidget {
                 errorWidget: (_, __, ___) => Container(
                   color: AppColors.grey100,
                   child: const Icon(
-                    Icons.image_not_supported_outlined,
+                    Icons.image_not_supported_rounded,
                     color: AppColors.grey400,
                     size: 32,
                   ),
@@ -341,7 +341,7 @@ class _WishlistItemCard extends StatelessWidget {
             : Container(
                 color: AppColors.grey100,
                 child: const Icon(
-                  Icons.shopping_bag_outlined,
+                  Icons.shopping_bag_rounded,
                   color: AppColors.grey400,
                   size: 32,
                 ),

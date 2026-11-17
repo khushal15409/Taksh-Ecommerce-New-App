@@ -41,7 +41,7 @@ class RecentViewsSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
-                    Icons.history,
+                    Icons.history_rounded,
                     size: 18,
                     color: AppColors.primaryOrange,
                   ),
@@ -219,7 +219,7 @@ class _RecentViewCard extends StatelessWidget {
           height: 85,
           color: isDark ? Colors.grey.withOpacity(0.2) : AppColors.grey100,
           child: const Icon(
-            Icons.image_not_supported_outlined,
+            Icons.image_not_supported_rounded,
             size: 32,
             color: AppColors.grey400,
           ),

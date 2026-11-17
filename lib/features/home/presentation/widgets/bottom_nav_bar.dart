@@ -43,21 +43,21 @@ class CustomBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _NavBarItem(
-                icon: currentIndex == 0 ? Icons.home_rounded : Icons.home_outlined,
+                icon: currentIndex == 0 ? Icons.home_rounded : Icons.home_rounded,
                 label: l10n.homeTab,
                 isSelected: currentIndex == 0,
                 onTap: () => onTap(0),
                 colorScheme: colorScheme,
               ),
               _NavBarItem(
-                icon: currentIndex == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
+                icon: currentIndex == 1 ? Icons.grid_view_rounded : Icons.grid_view_rounded,
                 label: l10n.categoriesTab,
                 isSelected: currentIndex == 1,
                 onTap: () => onTap(1),
                 colorScheme: colorScheme,
               ),
               _NavBarItem(
-                icon: currentIndex == 2 ? Icons.shopping_cart_rounded : Icons.shopping_cart_outlined,
+                icon: currentIndex == 2 ? Icons.shopping_cart_rounded : Icons.shopping_cart_rounded,
                 label: l10n.cartTab,
                 isSelected: currentIndex == 2,
                 onTap: () => onTap(2),
@@ -65,14 +65,14 @@ class CustomBottomNavBar extends StatelessWidget {
                 badgeCount: cartItemCount,
               ),
               _NavBarItem(
-                icon: currentIndex == 3 ? Icons.receipt_long : Icons.receipt_long_outlined,
+                icon: currentIndex == 3 ? Icons.receipt_long_rounded : Icons.receipt_long_rounded,
                 label: l10n.ordersTab,
                 isSelected: currentIndex == 3,
                 onTap: () => onTap(3),
                 colorScheme: colorScheme,
               ),
               _NavBarItem(
-                icon: currentIndex == 4 ? Icons.person_rounded : Icons.person_outline,
+                icon: currentIndex == 4 ? Icons.person_rounded : Icons.person_outline_rounded,
                 label: l10n.profileTab,
                 isSelected: currentIndex == 4,
                 onTap: () => onTap(4),

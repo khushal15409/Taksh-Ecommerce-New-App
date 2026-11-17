@@ -46,7 +46,7 @@ class PaymentSuccessPage extends StatelessWidget {
                       ],
                     ),
                     child: const Icon(
-                      Icons.check,
+                      Icons.check_rounded,
                       color: Colors.white,
                       size: 60,
                     ),
@@ -115,7 +115,7 @@ class PaymentSuccessPage extends StatelessWidget {
                       onPressed: () {
                         context.push(AppRoutes.orderDetails(orderId));
                       },
-                      icon: const Icon(Icons.receipt_long),
+                      icon: const Icon(Icons.receipt_long_rounded),
                       label: Text(AppLocalizations.of(context)!.viewOrder),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryOrange,
@@ -134,7 +134,7 @@ class PaymentSuccessPage extends StatelessWidget {
                       onPressed: () {
                         context.go(AppRoutes.home);
                       },
-                      icon: const Icon(Icons.home),
+                      icon: const Icon(Icons.home_rounded),
                       label: Text(AppLocalizations.of(context)!.continueShopping),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),

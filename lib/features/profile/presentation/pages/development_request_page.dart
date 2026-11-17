@@ -127,8 +127,8 @@ class _DevelopmentRequestPageState extends State<DevelopmentRequestPage> {
                             Icon(
                               widget.requestType ==
                                       DevelopmentRequestType.appDevelopment
-                                  ? Icons.phone_android
-                                  : Icons.web,
+                                  ? Icons.phone_android_rounded
+                                  : Icons.web_rounded,
                               color: AppColors.primaryOrange,
                               size: 24,
                             ),

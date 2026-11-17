@@ -216,7 +216,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         style: _appBarButtonStyle,
                         color: AppColors.grey900,
                         icon: const Icon(
-                          Icons.shopping_cart_outlined,
+                          Icons.shopping_cart_rounded,
                           size: 18,
                         ),
                       ),
@@ -417,8 +417,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             tone = const Color(0xFFB71C1C);
             background = const Color(0xFFFFEBEE);
             icon = availability.status.isLocationLevel
-                ? Icons.location_off_outlined
-                : Icons.remove_shopping_cart_outlined;
+                ? Icons.location_off_rounded
+                : Icons.remove_shopping_cart_rounded;
             text = _unavailableText(availability, l10n);
             showChangeAddress = availability.status.isLocationLevel;
           }
@@ -493,7 +493,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     icon: Icon(
                       showRetry
                           ? Icons.refresh_rounded
-                          : Icons.edit_location_alt_outlined,
+                          : Icons.edit_location_alt_rounded,
                       size: 16,
                     ),
                     label: Text(
@@ -660,7 +660,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           children: [
             Icon(
               returnable
-                  ? Icons.assignment_return_outlined
+                  ? Icons.assignment_return_rounded
                   : Icons.block_rounded,
               size: 15,
               color: color,
@@ -1175,7 +1175,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           color: AppColors.grey100,
           borderRadius: BorderRadius.circular(11),
         ),
-        child: const Center(child: Icon(Icons.image_not_supported, size: 48)),
+        child: const Center(child: Icon(Icons.image_not_supported_rounded, size: 48)),
       );
     }
 
@@ -1191,7 +1191,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ),
       errorWidget: (context, url, error) => Container(
         color: AppColors.grey100,
-        child: const Icon(Icons.broken_image, size: 48),
+        child: const Icon(Icons.broken_image_rounded, size: 48),
       ),
     );
 
@@ -1409,8 +1409,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           // Only Quick products are delivered in minutes; Standard ones say so.
           Icon(
             product.isExpress30
-                ? Icons.timer_outlined
-                : Icons.local_shipping_outlined,
+                ? Icons.timer_rounded
+                : Icons.local_shipping_rounded,
             color: const Color(0xFFE4B800),
             size: 14,
           ),
@@ -1538,7 +1538,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             Icon(
               isQuick
                   ? Icons.delivery_dining_rounded
-                  : Icons.local_shipping_outlined,
+                  : Icons.local_shipping_rounded,
               size: 26,
               color: const Color(0xFFF97316),
             ),
@@ -1858,7 +1858,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-          Icons.description_outlined,
+          Icons.description_rounded,
           AppLocalizations.of(context)!.description,
           trailing: isLong
               ? GestureDetector(
@@ -2029,7 +2029,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-          Icons.inventory_2_outlined,
+          Icons.inventory_2_rounded,
           AppLocalizations.of(context)!.selectVariant,
         ),
         const SizedBox(height: 7),
@@ -2240,7 +2240,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       title: AppLocalizations.of(context)!.ratings,
       child: Row(
         children: [
-          const Icon(Icons.star, color: Colors.amber, size: 20),
+          const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
           const SizedBox(width: 4),
           Text(
             '${rating.averageRating} (${rating.totalReviews} reviews)',
@@ -2309,7 +2309,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+            Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.failedToLoadProduct,
@@ -2328,7 +2328,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               onPressed: () {
                 context.read<ProductCubit>().fetchEcommerceProductDetails(1);
               },
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh_rounded),
               label: Text(AppLocalizations.of(context)!.retry),
             ),
           ],

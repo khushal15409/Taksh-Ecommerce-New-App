@@ -149,7 +149,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
         ),
         IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close_rounded),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
         ),
@@ -170,7 +170,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.shopping_bag_outlined, color: AppColors.grey600),
+          const Icon(Icons.shopping_bag_rounded, color: AppColors.grey600),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -246,7 +246,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
       decoration: InputDecoration(
         labelText: 'Detailed Reason',
         hintText: 'Please describe the issue in detail',
-        prefixIcon: const Icon(Icons.description_outlined),
+        prefixIcon: const Icon(Icons.description_rounded),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       maxLines: 3,
@@ -275,7 +275,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
             ),
             TextButton.icon(
               onPressed: _isSubmitting ? null : _showImageSourceDialog,
-              icon: const Icon(Icons.add_photo_alternate_outlined, size: 20),
+              icon: const Icon(Icons.add_photo_alternate_rounded, size: 20),
               label: const Text('Add'),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryOrange,
@@ -294,7 +294,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
             ),
             child: const Column(
               children: [
-                Icon(Icons.image_outlined, size: 48, color: AppColors.grey400),
+                Icon(Icons.image_rounded, size: 48, color: AppColors.grey400),
                 SizedBox(height: 8),
                 Text(
                   'Add photos to support your return request',
@@ -346,7 +346,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 16),
+                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 16),
                 ),
               ),
             ),
@@ -393,7 +393,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt),
+              leading: const Icon(Icons.camera_alt_rounded),
               title: const Text('Take Photo'),
               onTap: () {
                 Navigator.pop(context);
@@ -401,7 +401,7 @@ class _ReturnRequestBottomSheetState extends State<ReturnRequestBottomSheet> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library),
+              leading: const Icon(Icons.photo_library_rounded),
               title: const Text('Choose from Gallery'),
               onTap: () {
                 Navigator.pop(context);

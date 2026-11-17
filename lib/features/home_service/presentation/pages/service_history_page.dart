@@ -230,7 +230,7 @@ class _ServiceHistoryBody extends StatelessWidget {
           TextButton.icon(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(
-              Icons.add_circle_outline,
+              Icons.add_circle_outline_rounded,
               size: 20,
               color: Colors.white,
             ),
@@ -640,7 +640,7 @@ class _BookingCard extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: onCancel,
                           icon: Icon(
-                            Icons.cancel_outlined,
+                            Icons.cancel_rounded,
                             size: 16,
                             color: Colors.red[400],
                           ),
@@ -1122,7 +1122,7 @@ class _BookingDetailBody extends StatelessWidget {
                         booking.id,
                       ),
                       icon: Icon(
-                        Icons.cancel_outlined,
+                        Icons.cancel_rounded,
                         size: 18,
                         color: Colors.red[400],
                       ),
@@ -1229,7 +1229,7 @@ class _BookingDetailBody extends StatelessWidget {
                   height: 44,
                   child: OutlinedButton.icon(
                     onPressed: () => _openEmail(booking.bookingNumber),
-                    icon: const Icon(Icons.email_outlined, size: 18),
+                    icon: const Icon(Icons.email_rounded, size: 18),
                     label: const Text('Send us an email'),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryOrange),

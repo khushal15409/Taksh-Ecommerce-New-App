@@ -121,7 +121,7 @@ class VariantSelectionBottomSheet extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, size: 22),
+                  icon: const Icon(Icons.close_rounded, size: 22),
                   splashRadius: 20,
                   color: AppColors.grey600,
                 ),
@@ -391,7 +391,7 @@ class _VariantTile extends StatelessWidget {
         children: [
           _buildControlBtn(
             context,
-            icon: quantity == 1 ? Icons.delete_outline : Icons.remove,
+            icon: quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
             onTap: isLoading
                 ? null
                 : () => _decrementQuantity(context, quantity, cartItemId),
@@ -419,7 +419,7 @@ class _VariantTile extends StatelessWidget {
           ),
           _buildControlBtn(
             context,
-            icon: Icons.add,
+            icon: Icons.add_rounded,
             onTap: isLoading || !canIncrement
                 ? null
                 : () => _incrementQuantity(context, quantity, cartItemId),

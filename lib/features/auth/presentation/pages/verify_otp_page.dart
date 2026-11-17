@@ -111,7 +111,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
             ],
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primaryOrange),
+            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.primaryOrange),
             onPressed: () => context.go(AppRoutes.login),
           ),
         ),
@@ -186,7 +186,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                             ],
                           ),
                           child: Icon(
-                            Icons.phonelink_ring_outlined,
+                            Icons.phonelink_ring_rounded,
                             size: 32,
                             color: Theme.of(context).primaryColor,
                           ),

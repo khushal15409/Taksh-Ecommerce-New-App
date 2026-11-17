@@ -117,7 +117,7 @@ class DeliveryAddressSelector extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.add_location_alt,
+              Icons.add_location_alt_rounded,
               color: Theme.of(context).primaryColor,
               size: 24,
             ),
@@ -144,7 +144,7 @@ class DeliveryAddressSelector extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.arrow_forward_ios,
+              Icons.arrow_forward_ios_rounded,
               size: 16,
               color: Colors.grey[400],
             ),
@@ -238,7 +238,7 @@ class DeliveryAddressSelector extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Icon(
-              Icons.keyboard_arrow_down,
+              Icons.keyboard_arrow_down_rounded,
               color: Colors.grey[600],
               size: 20,
             ),
@@ -261,7 +261,7 @@ class DeliveryAddressSelector extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.red[700], size: 20),
+            Icon(Icons.error_outline_rounded, color: Colors.red[700], size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -287,11 +287,11 @@ class DeliveryAddressSelector extends StatelessWidget {
   IconData _getAddressIcon(Address address) {
     switch (address.type) {
       case AddressType.home:
-        return Icons.home;
+        return Icons.home_rounded;
       case AddressType.work:
-        return Icons.work;
+        return Icons.work_rounded;
       case AddressType.other:
-        return Icons.location_on;
+        return Icons.location_on_rounded;
     }
   }
 

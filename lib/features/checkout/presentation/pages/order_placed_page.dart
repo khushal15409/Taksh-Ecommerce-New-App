@@ -55,7 +55,7 @@ class OrderPlacedPage extends StatelessWidget {
           centerTitle: true,
           automaticallyImplyLeading: false,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_rounded),
             tooltip: AppLocalizations.of(context)!.back,
             onPressed: () => _navigateToOrders(context),
           ),
@@ -122,7 +122,7 @@ class OrderPlacedPage extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () => _navigateToOrders(context),
-                        icon: const Icon(Icons.receipt_long),
+                        icon: const Icon(Icons.receipt_long_rounded),
                         label: Text(
                           AppLocalizations.of(context)!.viewMyOrders,
                         ),
@@ -142,7 +142,7 @@ class OrderPlacedPage extends StatelessWidget {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () => context.go(AppRoutes.home),
-                        icon: const Icon(Icons.home),
+                        icon: const Icon(Icons.home_rounded),
                         label: Text(
                           AppLocalizations.of(context)!.continueShopping,
                         ),
@@ -187,7 +187,7 @@ class OrderPlacedPage extends StatelessWidget {
         ],
       ),
       child: const Icon(
-        Icons.check,
+        Icons.check_rounded,
         color: Colors.white,
         size: 60,
       ),
@@ -286,7 +286,7 @@ class OrderPlacedPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-              const Icon(Icons.chevron_right),
+              const Icon(Icons.chevron_right_rounded),
             ],
           ),
         ),

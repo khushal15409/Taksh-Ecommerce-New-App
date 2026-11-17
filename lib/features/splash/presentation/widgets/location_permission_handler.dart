@@ -31,7 +31,7 @@ class LocationPermissionHandler extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.location_on, color: Theme.of(context).primaryColor),
+            Icon(Icons.location_on_rounded, color: Theme.of(context).primaryColor),
             const SizedBox(width: 12),
             Text(AppLocalizations.of(context)!.locationAccess),
           ],
@@ -196,7 +196,7 @@ class LocationPermissionHandler extends StatelessWidget {
         content: Row(
           children: [
               Icon(
-                granted ? Icons.check_circle : Icons.error,
+                granted ? Icons.check_circle_rounded : Icons.error_rounded,
                 color: Colors.white,
               ),
             const SizedBox(width: 12),
@@ -249,7 +249,7 @@ class LocationPermissionBottomSheet extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.location_on,
+              Icons.location_on_rounded,
               size: 48,
               color: Theme.of(context).primaryColor,
             ),
@@ -275,11 +275,11 @@ class LocationPermissionBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           // Benefits list
-          _buildBenefit(context, Icons.store, AppLocalizations.of(context)!.findNearbyStores),
+          _buildBenefit(context, Icons.store_rounded, AppLocalizations.of(context)!.findNearbyStores),
           const SizedBox(height: 12),
-          _buildBenefit(context, Icons.local_shipping, 'Accurate delivery time'),
+          _buildBenefit(context, Icons.local_shipping_rounded, 'Accurate delivery time'),
           const SizedBox(height: 12),
-          _buildBenefit(context, Icons.local_offer, 'Local deals & offers'),
+          _buildBenefit(context, Icons.local_offer_rounded, 'Local deals & offers'),
           const SizedBox(height: 32),
           // Buttons
           SizedBox(

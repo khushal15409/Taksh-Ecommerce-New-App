@@ -133,7 +133,7 @@ class SimilarProductCard extends StatelessWidget {
       return Container(
         color: Colors.grey[200],
         child: const Center(
-          child: Icon(Icons.image_not_supported, size: 32),
+          child: Icon(Icons.image_not_supported_rounded, size: 32),
         ),
       );
     }
@@ -152,7 +152,7 @@ class SimilarProductCard extends StatelessWidget {
       errorWidget: (context, url, error) => Container(
         color: Colors.grey[200],
         child: const Center(
-          child: Icon(Icons.broken_image, size: 32),
+          child: Icon(Icons.broken_image_rounded, size: 32),
         ),
       ),
     );

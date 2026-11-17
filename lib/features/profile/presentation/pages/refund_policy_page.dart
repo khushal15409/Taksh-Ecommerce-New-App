@@ -37,7 +37,7 @@ class RefundPolicyPage extends StatelessWidget {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.update,
+                    Icons.update_rounded,
                     size: 18,
                     color: AppColors.secondaryGreen,
                   ),
@@ -75,7 +75,7 @@ class RefundPolicyPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.info_outline,
+                    Icons.info_outline_rounded,
                     size: 20,
                     color: AppColors.info,
                   ),
@@ -141,7 +141,7 @@ class RefundPolicyPage extends StatelessWidget {
               step: '1',
               title: AppLocalizations.of(context)!.refundStep1Title,
               description: AppLocalizations.of(context)!.refundStep1Desc,
-              icon: Icons.assignment_return,
+              icon: Icons.assignment_return_rounded,
               color: AppColors.primaryOrange,
             ),
 
@@ -150,7 +150,7 @@ class RefundPolicyPage extends StatelessWidget {
               step: '2',
               title: AppLocalizations.of(context)!.refundStep2Title,
               description: AppLocalizations.of(context)!.refundStep2Desc,
-              icon: Icons.check_circle_outline,
+              icon: Icons.check_circle_outline_rounded,
               color: AppColors.info,
             ),
 
@@ -159,7 +159,7 @@ class RefundPolicyPage extends StatelessWidget {
               step: '3',
               title: AppLocalizations.of(context)!.refundStep3Title,
               description: AppLocalizations.of(context)!.refundStep3Desc,
-              icon: Icons.inventory_2_outlined,
+              icon: Icons.inventory_2_rounded,
               color: AppColors.warning,
             ),
 
@@ -168,7 +168,7 @@ class RefundPolicyPage extends StatelessWidget {
               step: '4',
               title: AppLocalizations.of(context)!.refundStep4Title,
               description: AppLocalizations.of(context)!.refundStep4Desc,
-              icon: Icons.local_shipping_outlined,
+              icon: Icons.local_shipping_rounded,
               color: AppColors.secondaryGreen,
             ),
 
@@ -212,7 +212,7 @@ class RefundPolicyPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.access_time,
+                    Icons.access_time_rounded,
                     size: 20,
                     color: AppColors.warning,
                   ),
@@ -238,7 +238,7 @@ class RefundPolicyPage extends StatelessWidget {
 
             _buildRefundMethodCard(
               context,
-              icon: Icons.account_balance_wallet,
+              icon: Icons.account_balance_wallet_rounded,
               title: AppLocalizations.of(context)!.refundMethodOriginalTitle,
               description: AppLocalizations.of(context)!.refundMethodOriginalDesc,
               days: AppLocalizations.of(context)!.refundMethodOriginalDays,
@@ -246,7 +246,7 @@ class RefundPolicyPage extends StatelessWidget {
 
             _buildRefundMethodCard(
               context,
-              icon: Icons.swap_horiz,
+              icon: Icons.swap_horiz_rounded,
               title: AppLocalizations.of(context)!.refundMethodCreditTitle,
               description: AppLocalizations.of(context)!.refundMethodCreditDesc,
               days: AppLocalizations.of(context)!.refundMethodCreditDays,
@@ -254,7 +254,7 @@ class RefundPolicyPage extends StatelessWidget {
 
             _buildRefundMethodCard(
               context,
-              icon: Icons.credit_card,
+              icon: Icons.credit_card_rounded,
               title: AppLocalizations.of(context)!.refundMethodBankTitle,
               description: AppLocalizations.of(context)!.refundMethodBankDesc,
               days: AppLocalizations.of(context)!.refundMethodBankDays,
@@ -326,7 +326,7 @@ class RefundPolicyPage extends StatelessWidget {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.thumb_up_outlined,
+                    Icons.thumb_up_rounded,
                     color: AppColors.primaryOrange,
                     size: 32,
                   ),

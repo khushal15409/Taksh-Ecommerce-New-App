@@ -125,7 +125,7 @@ class _MapWidgetState extends State<MapWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.location_on,
+                Icons.location_on_rounded,
                 size: 48,
                 color: _isMapMoving
                     ? Theme.of(context).primaryColor.withOpacity(0.7)
@@ -165,7 +165,7 @@ class _MapWidgetState extends State<MapWidget> {
               backgroundColor: Colors.white,
               onPressed: widget.onCurrentLocationPressed,
               child: Icon(
-                Icons.my_location,
+                Icons.my_location_rounded,
                 color: Theme.of(context).primaryColor,
               ),
             ),

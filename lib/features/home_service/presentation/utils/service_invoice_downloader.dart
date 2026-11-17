@@ -34,7 +34,7 @@ Future<void> downloadServiceInvoice(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
-                Icons.receipt_long,
+                Icons.receipt_long_rounded,
                 size: 48,
                 color: AppColors.primaryOrange,
               ),

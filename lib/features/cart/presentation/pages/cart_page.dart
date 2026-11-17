@@ -102,7 +102,7 @@ class _CartPageState extends State<CartPage>
           return const GuestAuthWall(
             redirectToRoute: AppRoutes.cart,
             contentLabel: 'your cart',
-            icon: Icons.shopping_cart_outlined,
+            icon: Icons.shopping_cart_rounded,
           );
         }
         return _buildCartContent(context);
@@ -217,7 +217,7 @@ class _CartPageState extends State<CartPage>
                         Expanded(
                           child: _buildDeliveryChip(
                             index: 1,
-                            icon: Icons.local_shipping_outlined,
+                            icon: Icons.local_shipping_rounded,
                             label:
                                 '${AppLocalizations.of(context)!.standardDelivery} (${standardCart.totalItems})',
                           ),
@@ -258,12 +258,7 @@ class _CartPageState extends State<CartPage>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/images/cart_header_bg.png',
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.topCenter,
-            gaplessPlayback: true,
-          ),
+          // Same app-wide background as the dashboard shows through (no own artwork).
           Positioned(
             left: 21,
             top: topPadding + 30,
@@ -554,13 +549,13 @@ class _CartPageState extends State<CartPage>
                 ),
                 child: Row(
                   children: [
-                    perk(Icons.shopping_bag_outlined, l10n.trustWideSelection),
+                    perk(Icons.shopping_bag_rounded, l10n.trustWideSelection),
                     divider(),
-                    perk(Icons.local_offer_outlined, l10n.trustBestPrices),
+                    perk(Icons.local_offer_rounded, l10n.trustBestPrices),
                     divider(),
-                    perk(Icons.local_shipping_outlined, l10n.trustFastDelivery),
+                    perk(Icons.local_shipping_rounded, l10n.trustFastDelivery),
                     divider(),
-                    perk(Icons.verified_user_outlined, l10n.trustSecurePayment),
+                    perk(Icons.verified_user_rounded, l10n.trustSecurePayment),
                   ],
                 ),
               ),
@@ -737,7 +732,7 @@ class _CartPageState extends State<CartPage>
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
-        Icons.image,
+        Icons.image_rounded,
         size: 30,
         color: Theme.of(context).disabledColor,
       ),
@@ -764,7 +759,7 @@ class _CartPageState extends State<CartPage>
       mainAxisSize: MainAxisSize.min,
       children: [
         segment(
-          item.qty == 1 ? Icons.delete_outline : Icons.remove_rounded,
+          item.qty == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
           () => _decrementQuantity(context, item),
         ),
         Container(
@@ -876,7 +871,7 @@ class _CartPageState extends State<CartPage>
           const Row(
             children: [
               Icon(
-                Icons.receipt_long_outlined,
+                Icons.receipt_long_rounded,
                 size: 15,
                 color: Color(0xFF2F7A4B),
               ),

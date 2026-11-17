@@ -56,7 +56,7 @@ class NotificationDetailPage extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () => context.pop(),
-                      icon: const Icon(Icons.arrow_back, size: 26),
+                      icon: const Icon(Icons.arrow_back_rounded, size: 26),
                       color: Colors.black87,
                     ),
                     const Expanded(
@@ -194,7 +194,7 @@ class NotificationDetailPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 6),
-                          Icon(Icons.arrow_forward,
+                          Icon(Icons.arrow_forward_rounded,
                               size: 16, color: Colors.black87),
                         ],
                       ),
@@ -352,7 +352,7 @@ class NotificationDetailPage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.arrow_forward, size: 20, color: Colors.white),
+            const Icon(Icons.arrow_forward_rounded, size: 20, color: Colors.white),
           ],
         ),
       ),

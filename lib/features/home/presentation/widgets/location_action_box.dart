@@ -36,7 +36,7 @@ class LocationActionBox extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      Icons.my_location,
+                      Icons.my_location_rounded,
                       color: Theme.of(context).primaryColor,
                       size: 20,
                     ),
@@ -65,7 +65,7 @@ class LocationActionBox extends StatelessWidget {
                     ),
                   ),
                   Icon(
-                    Icons.chevron_right,
+                    Icons.chevron_right_rounded,
                     color: Colors.grey[400],
                   ),
                 ],
@@ -97,7 +97,7 @@ class LocationActionBox extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      Icons.add_location_alt,
+                      Icons.add_location_alt_rounded,
                       color: Colors.green,
                       size: 20,
                     ),
@@ -126,7 +126,7 @@ class LocationActionBox extends StatelessWidget {
                     ),
                   ),
                   Icon(
-                    Icons.chevron_right,
+                    Icons.chevron_right_rounded,
                     color: Colors.grey[400],
                   ),
                 ],

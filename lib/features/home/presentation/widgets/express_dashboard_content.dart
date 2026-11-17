@@ -9,7 +9,6 @@ import 'package:taksh_e_commerce/features/home/data/models/dashboard_section_mod
 import 'package:taksh_e_commerce/features/home/domain/entities/express_dashboard_entity.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_carousel.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/banner_slots.dart';
-import 'package:taksh_e_commerce/features/home/presentation/widgets/category_catalog_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/designed_product_section.dart';
 import 'package:taksh_e_commerce/features/home/presentation/widgets/product_section.dart';
 import 'package:taksh_e_commerce/features/home/data/models/product_model.dart';
@@ -153,13 +152,8 @@ class ExpressDashboardContent extends StatelessWidget {
         if (topBanners != null) topBanners,
         const QuickRecentViews(),
         ...orderedProducts,
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: CategoryCatalogSection(
-            categories: categoryData,
-            deliveryType: 'quick',
-          ),
-        ),
+        // Parent categories are no longer shown as a dashboard section: only the
+        // sections created in the admin panel appear here.
         if (bottomBanners != null) bottomBanners,
         const SizedBox(height: 32),
       ],
@@ -207,7 +201,7 @@ class _LocationNotice extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.location_off_outlined, color: Color(0xFFB45309)),
+          const Icon(Icons.location_off_rounded, color: Color(0xFFB45309)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

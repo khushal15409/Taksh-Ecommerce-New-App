@@ -87,7 +87,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.location_on,
+                      Icons.location_on_rounded,
                       color: AppColors.primaryOrange,
                       size: 24,
                     ),
@@ -100,7 +100,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(Icons.close_rounded),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -159,7 +159,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.error_outline,
+                              Icons.error_outline_rounded,
                               size: 64,
                               color: Colors.red[300],
                             ),
@@ -185,7 +185,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                                   const LoadAddressesEvent(),
                                 );
                               },
-                              icon: const Icon(Icons.refresh),
+                              icon: const Icon(Icons.refresh_rounded),
                               label: const Text('Retry'),
                             ),
                           ],
@@ -248,7 +248,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () => _navigateToAddAddress(context),
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(Icons.add_rounded),
                       label: const Text('Add New Address'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryOrange,
@@ -380,7 +380,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
             // Selection indicator
             if (isSelected)
               const Icon(
-                Icons.check_circle,
+                Icons.check_circle_rounded,
                 color: AppColors.primaryOrange,
                 size: 24,
               ),
@@ -395,7 +395,7 @@ class AddressSelectionBottomSheet extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.location_off_outlined, size: 80, color: Colors.grey[400]),
+          Icon(Icons.location_off_rounded, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 24),
           Text(
             'No addresses saved',
@@ -416,11 +416,11 @@ class AddressSelectionBottomSheet extends StatelessWidget {
   IconData _getAddressIcon(Address address) {
     switch (address.type.name) {
       case 'home':
-        return Icons.home;
+        return Icons.home_rounded;
       case 'work':
-        return Icons.work;
+        return Icons.work_rounded;
       default:
-        return Icons.location_on;
+        return Icons.location_on_rounded;
     }
   }
 

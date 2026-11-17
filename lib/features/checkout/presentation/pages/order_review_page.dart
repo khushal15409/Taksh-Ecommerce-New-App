@@ -90,7 +90,7 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
             ? Colors.white
             : Theme.of(context).appBarTheme.foregroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: _handleBack,
         ),
       ),
@@ -115,13 +115,13 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                     const SizedBox(height: 16),
                     _SectionCard(
                       title: AppLocalizations.of(context)!.deliveryAddress,
-                      icon: Icons.location_on_outlined,
+                      icon: Icons.location_on_rounded,
                       child: _buildAddress(context, data.address),
                     ),
                     const SizedBox(height: 16),
                     _SectionCard(
                       title: AppLocalizations.of(context)!.deliveryType,
-                      icon: Icons.local_shipping_outlined,
+                      icon: Icons.local_shipping_rounded,
                       child: _buildDelivery(context, data.deliveryOption),
                     ),
                     const SizedBox(height: 16),
@@ -129,21 +129,21 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                       title: AppLocalizations.of(context)!.itemsCount(
                         data.items.length,
                       ),
-                      icon: Icons.shopping_bag_outlined,
+                      icon: Icons.shopping_bag_rounded,
                       child: _buildItems(context, data.items),
                     ),
                     const SizedBox(height: 16),
                     _SectionCard(
                       title: AppLocalizations.of(context)!.payment,
                       icon: data.paymentMethod.type == PaymentMethodType.cod
-                          ? Icons.money_outlined
-                          : Icons.payment_outlined,
+                          ? Icons.money_rounded
+                          : Icons.payment_rounded,
                       child: _buildPayment(context, data.paymentMethod),
                     ),
                     const SizedBox(height: 16),
                     _SectionCard(
                       title: AppLocalizations.of(context)!.orderSummaryTitle,
-                      icon: Icons.summarize_outlined,
+                      icon: Icons.summarize_rounded,
                       child: _PriceBreakdownView(
                         priceBreakdown: data.priceBreakdown,
                         extraCharges: data.extraCharges,
@@ -183,7 +183,7 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
-              Icons.receipt_long_outlined,
+              Icons.receipt_long_rounded,
               color: AppColors.primaryOrange,
             ),
           ),
@@ -306,7 +306,7 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
           ),
         ),
         const Icon(
-          Icons.check_circle,
+          Icons.check_circle_rounded,
           color: AppColors.secondaryGreen,
           size: 20,
         ),
@@ -374,7 +374,7 @@ class _OrderReviewPageState extends State<OrderReviewPage> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Icon(Icons.check_circle_outline, size: 18),
+                      : const Icon(Icons.check_circle_outline_rounded, size: 18),
                   label: Text(
                     isProcessing
                         ? AppLocalizations.of(context)!.confirmingOrder

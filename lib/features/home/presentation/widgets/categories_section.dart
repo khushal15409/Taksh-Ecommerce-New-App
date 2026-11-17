@@ -14,73 +14,73 @@ class CategoriesSection extends StatelessWidget {
 
     final categories = [
       _CategoryData(
-        icon: Icons.fastfood,
+        icon: Icons.fastfood_rounded,
         name: 'Fast Food',
         itemCount: 120,
         color: colorScheme.primary,
       ),
       _CategoryData(
-        icon: Icons.local_pizza,
+        icon: Icons.local_pizza_rounded,
         name: 'Pizza',
         itemCount: 85,
         color: colorScheme.secondary,
       ),
       _CategoryData(
-        icon: Icons.restaurant,
+        icon: Icons.restaurant_rounded,
         name: 'Fine Dining',
         itemCount: 45,
         color: colorScheme.tertiary,
       ),
       _CategoryData(
-        icon: Icons.cake,
+        icon: Icons.cake_rounded,
         name: 'Desserts',
         itemCount: 95,
         color: colorScheme.error,
       ),
       _CategoryData(
-        icon: Icons.local_cafe,
+        icon: Icons.local_cafe_rounded,
         name: 'Beverages',
         itemCount: 110,
         color: Colors.brown,
       ),
       _CategoryData(
-        icon: Icons.breakfast_dining,
+        icon: Icons.breakfast_dining_rounded,
         name: 'Breakfast',
         itemCount: 75,
         color: Colors.orange,
       ),
       _CategoryData(
-        icon: Icons.lunch_dining,
+        icon: Icons.lunch_dining_rounded,
         name: 'Lunch',
         itemCount: 130,
         color: Colors.green,
       ),
       _CategoryData(
-        icon: Icons.dinner_dining,
+        icon: Icons.dinner_dining_rounded,
         name: 'Dinner',
         itemCount: 140,
         color: Colors.deepPurple,
       ),
       _CategoryData(
-        icon: Icons.icecream,
+        icon: Icons.icecream_rounded,
         name: 'Ice Cream',
         itemCount: 60,
         color: Colors.pink,
       ),
       _CategoryData(
-        icon: Icons.ramen_dining,
+        icon: Icons.ramen_dining_rounded,
         name: 'Asian',
         itemCount: 90,
         color: Colors.red,
       ),
       _CategoryData(
-        icon: Icons.local_bar,
+        icon: Icons.local_bar_rounded,
         name: 'Bar & Grill',
         itemCount: 55,
         color: Colors.amber,
       ),
       _CategoryData(
-        icon: Icons.bakery_dining,
+        icon: Icons.bakery_dining_rounded,
         name: 'Bakery',
         itemCount: 70,
         color: Colors.deepOrange,
@@ -107,7 +107,7 @@ class CategoriesSection extends StatelessWidget {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search_rounded),
                   onPressed: () {
                     // TODO: Implement search
                   },
@@ -122,7 +122,7 @@ class CategoriesSection extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: AppLocalizations.of(context)!.searchCategories,
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search_rounded),
                     filled: true,
                     fillColor: colorScheme.surfaceContainerHighest,
                     border: OutlineInputBorder(

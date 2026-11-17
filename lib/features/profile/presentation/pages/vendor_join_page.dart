@@ -113,12 +113,12 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt_outlined),
+              leading: const Icon(Icons.camera_alt_rounded),
               title: const Text('Camera'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
+              leading: const Icon(Icons.photo_library_rounded),
               title: const Text('Gallery'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
@@ -510,28 +510,28 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
 
                 // Document rows
                 _buildDocumentRow(
-                  icon: Icons.badge_outlined,
+                  icon: Icons.badge_rounded,
                   title: l10n.vendorAadharCard,
                   isSaved: _aadharSaved,
                   onTap: () => _showAadharSheet(l10n),
                 ),
                 const SizedBox(height: 12),
                 _buildDocumentRow(
-                  icon: Icons.credit_card_outlined,
+                  icon: Icons.credit_card_rounded,
                   title: l10n.vendorPanCard,
                   isSaved: _panSaved,
                   onTap: () => _showPanSheet(l10n),
                 ),
                 const SizedBox(height: 12),
                 _buildDocumentRow(
-                  icon: Icons.account_balance_outlined,
+                  icon: Icons.account_balance_rounded,
                   title: l10n.vendorBankAccount,
                   isSaved: _bankSaved,
                   onTap: () => _showBankSheet(l10n),
                 ),
                 const SizedBox(height: 12),
                 _buildDocumentRow(
-                  icon: Icons.receipt_long_outlined,
+                  icon: Icons.receipt_long_rounded,
                   title: l10n.vendorGstNumber,
                   isSaved: _gstSaved,
                   onTap: () => _showGstSheet(l10n),
@@ -669,7 +669,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildSheetHeader(
-                  icon: Icons.badge_outlined,
+                  icon: Icons.badge_rounded,
                   title: l10n.vendorAadharDetails,
                 ),
                 const SizedBox(height: 20),
@@ -777,7 +777,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildSheetHeader(
-                  icon: Icons.credit_card_outlined,
+                  icon: Icons.credit_card_rounded,
                   title: l10n.vendorPanDetails,
                 ),
                 const SizedBox(height: 20),
@@ -889,7 +889,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildSheetHeader(
-                  icon: Icons.account_balance_outlined,
+                  icon: Icons.account_balance_rounded,
                   title: l10n.vendorBankDetails,
                 ),
                 const SizedBox(height: 20),
@@ -1037,7 +1037,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildSheetHeader(
-                  icon: Icons.receipt_long_outlined,
+                  icon: Icons.receipt_long_rounded,
                   title: l10n.vendorGstDetails,
                 ),
                 const SizedBox(height: 20),
@@ -1128,7 +1128,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: AppColors.primaryOrange, size: 24),
+          const Icon(Icons.info_outline_rounded, color: AppColors.primaryOrange, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -1272,7 +1272,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
             child: Row(
               children: [
                 Icon(
-                  Icons.location_on_outlined,
+                  Icons.location_on_rounded,
                   color: hasLocation
                       ? AppColors.primaryOrange
                       : Theme.of(context).iconTheme.color,
@@ -1293,7 +1293,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                   ),
                 ),
                 Icon(
-                  Icons.chevron_right,
+                  Icons.chevron_right_rounded,
                   color: Theme.of(context).iconTheme.color,
                   size: 20,
                 ),
@@ -1361,7 +1361,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.close,
+                          Icons.close_rounded,
                           size: 14,
                           color: Colors.white,
                         ),
@@ -1389,7 +1389,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
-                        Icons.add_photo_alternate_outlined,
+                        Icons.add_photo_alternate_rounded,
                         color: AppColors.primaryOrange,
                         size: 26,
                       ),
@@ -1455,13 +1455,13 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
             ),
             if (isSaved)
               Icon(
-                Icons.check_circle,
+                Icons.check_circle_rounded,
                 color: AppColors.secondaryGreen,
                 size: 20,
               )
             else
               Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 color: Theme.of(context).iconTheme.color,
                 size: 20,
               ),
@@ -1589,7 +1589,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.check_circle, color: AppColors.secondaryGreen, size: 20),
+            const Icon(Icons.check_circle_rounded, color: AppColors.secondaryGreen, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -1600,7 +1600,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
             ),
             GestureDetector(
               onTap: onRemove,
-              child: const Icon(Icons.close, color: AppColors.error, size: 20),
+              child: const Icon(Icons.close_rounded, color: AppColors.error, size: 20),
             ),
           ],
         ),
@@ -1619,7 +1619,7 @@ class _VendorJoinViewState extends State<_VendorJoinView> {
         child: Row(
           children: [
             const Icon(
-              Icons.cloud_upload_outlined,
+              Icons.cloud_upload_rounded,
               color: AppColors.primaryOrange,
               size: 28,
             ),

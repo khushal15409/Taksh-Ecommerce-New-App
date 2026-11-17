@@ -38,32 +38,32 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   /// Navigation items configuration
   static final List<_NavItem> _navItems = [
     _NavItem(
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home,
+      icon: Icons.home_rounded,
+      activeIcon: Icons.home_rounded,
       labelKey: (context) => AppLocalizations.of(context)!.homeTab,
       route: AppRoutes.home,
     ),
     _NavItem(
-      icon: Icons.category_outlined,
-      activeIcon: Icons.category,
+      icon: Icons.category_rounded,
+      activeIcon: Icons.category_rounded,
       labelKey: (context) => AppLocalizations.of(context)!.categoriesTab,
       route: AppRoutes.categories,
     ),
     _NavItem(
-      icon: Icons.shopping_cart_outlined,
-      activeIcon: Icons.shopping_cart,
+      icon: Icons.shopping_cart_rounded,
+      activeIcon: Icons.shopping_cart_rounded,
       labelKey: (context) => AppLocalizations.of(context)!.cartTab,
       route: AppRoutes.cart,
     ),
     _NavItem(
-      icon: Icons.receipt_long_outlined,
-      activeIcon: Icons.receipt_long,
+      icon: Icons.receipt_long_rounded,
+      activeIcon: Icons.receipt_long_rounded,
       labelKey: (context) => AppLocalizations.of(context)!.ordersTab,
       route: AppRoutes.orders,
     ),
     _NavItem(
-      icon: Icons.person_outline,
-      activeIcon: Icons.person,
+      icon: Icons.person_outline_rounded,
+      activeIcon: Icons.person_rounded,
       labelKey: (context) => AppLocalizations.of(context)!.profileTab,
       route: AppRoutes.profile,
     ),

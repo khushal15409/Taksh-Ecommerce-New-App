@@ -37,10 +37,10 @@ class _AddressSearchBarState extends State<AddressSearchBar> {
         decoration: InputDecoration(
           hintText: AppLocalizations.of(context)!.searchSavedAddresses,
           hintStyle: TextStyle(color: Colors.grey[500]),
-          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+          prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[600]),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear, color: Colors.grey[600]),
+                  icon: Icon(Icons.clear_rounded, color: Colors.grey[600]),
                   onPressed: () {
                     _controller.clear();
                     widget.onSearchChanged('');

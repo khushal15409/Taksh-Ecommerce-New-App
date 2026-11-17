@@ -154,8 +154,8 @@ class AddressSelectionCard extends StatelessWidget {
               const SizedBox(width: 8),
               Icon(
                 isSelected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_unchecked_rounded,
                 color: isSelected
                     ? Theme.of(context).primaryColor
                     : Colors.grey[400],
@@ -176,11 +176,11 @@ class AddressSelectionCard extends StatelessWidget {
 
   IconData _getAddressIcon() {
     if (address.type == AddressType.home) {
-      return Icons.home;
+      return Icons.home_rounded;
     } else if (address.type == AddressType.work) {
-      return Icons.work;
+      return Icons.work_rounded;
     } else {
-      return Icons.location_on;
+      return Icons.location_on_rounded;
     }
   }
 

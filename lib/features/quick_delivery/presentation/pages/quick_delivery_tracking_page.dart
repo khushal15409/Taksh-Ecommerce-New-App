@@ -84,7 +84,7 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () => context.go(AppRoutes.home),
           ),
           title: const Text('Quick Delivery Tracking'),
@@ -206,7 +206,7 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         else
-                          const Icon(Icons.location_searching, size: 16),
+                          const Icon(Icons.location_searching_rounded, size: 16),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -293,7 +293,7 @@ class _OrderCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.local_shipping_outlined, size: 18),
+                const Icon(Icons.local_shipping_rounded, size: 18),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -307,7 +307,7 @@ class _OrderCard extends StatelessWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.schedule, size: 18),
+                  const Icon(Icons.schedule_rounded, size: 18),
                   const SizedBox(width: 8),
                   Text(
                     'Updated: ${_formatTime(updatedAt!)}',
@@ -344,7 +344,7 @@ class _StatusCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
-              isError ? Icons.error_outline : Icons.info_outline,
+              isError ? Icons.error_outline_rounded : Icons.info_outline_rounded,
               color: isError ? Colors.red : Theme.of(context).primaryColor,
             ),
             const SizedBox(width: 10),

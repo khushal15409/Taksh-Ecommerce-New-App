@@ -126,7 +126,7 @@ class _MockMapWidgetState extends State<MockMapWidget> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.info_outline, color: Colors.amber[900], size: 20),
+                    Icon(Icons.info_outline_rounded, color: Colors.amber[900], size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -176,7 +176,7 @@ class _MockMapWidgetState extends State<MockMapWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.location_on,
+                Icons.location_on_rounded,
                 size: 48,
                 color: _isDragging
                     ? Theme.of(context).primaryColor.withOpacity(0.7)
@@ -216,7 +216,7 @@ class _MockMapWidgetState extends State<MockMapWidget> {
               backgroundColor: Colors.white,
               onPressed: widget.onCurrentLocationPressed,
               child: Icon(
-                Icons.my_location,
+                Icons.my_location_rounded,
                 color: Theme.of(context).primaryColor,
               ),
             ),

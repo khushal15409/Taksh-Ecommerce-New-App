@@ -68,7 +68,7 @@ class _SearchPageState extends State<SearchPage> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0.5,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.pop(),
         ),
         title: Text(AppLocalizations.of(context)!.search),
@@ -112,7 +112,7 @@ class _SearchPageState extends State<SearchPage> {
 
                 if (state is SearchError) {
                   return _buildEmptyState(
-                    icon: Icons.error_outline,
+                    icon: Icons.error_outline_rounded,
                     title: AppLocalizations.of(context)!.somethingWentWrong,
                     subtitle: state.message,
                   );
@@ -121,7 +121,7 @@ class _SearchPageState extends State<SearchPage> {
                 if (state is SearchLoaded) {
                   if (state.results.isEmpty) {
                     return _buildEmptyState(
-                      icon: Icons.inventory_2_outlined,
+                      icon: Icons.inventory_2_rounded,
                       title: AppLocalizations.of(context)!.noResultsFound,
                       subtitle:
                           AppLocalizations.of(context)!.tryAdjustingFilters, // Reusing or add new
@@ -174,12 +174,12 @@ class _SearchPageState extends State<SearchPage> {
               ),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(Icons.search, color: Theme.of(context).colorScheme.onPrimary, size: 18),
+            child: Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onPrimary, size: 18),
           ),
           suffixIcon: _controller.text.isEmpty
               ? null
               : IconButton(
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const Icon(Icons.close_rounded, size: 18),
                   onPressed: _onClear,
                 ),
           filled: true,
@@ -237,7 +237,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Row(
               children: [
                 Icon(
-                  Icons.history,
+                  Icons.history_rounded,
                   size: 18,
                   color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
@@ -381,7 +381,7 @@ class _SearchResultCard extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Icon(Icons.image_not_supported, size: 30),
+        child: const Icon(Icons.image_not_supported_rounded, size: 30),
       );
     }
 
@@ -404,7 +404,7 @@ class _SearchResultCard extends StatelessWidget {
           width: 72,
           height: 72,
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: const Icon(Icons.broken_image, size: 28),
+          child: const Icon(Icons.broken_image_rounded, size: 28),
         ),
       ),
     );
@@ -584,7 +584,7 @@ class _RecentSearchItem extends StatelessWidget {
                 ),
               ),
               Icon(
-                Icons.north_west,
+                Icons.north_west_rounded,
                 size: 16,
                 color: Theme.of(context).disabledColor,
               ),

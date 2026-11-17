@@ -142,7 +142,7 @@ class AddressCard extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Icons.near_me_outlined,
+                              Icons.near_me_rounded,
                               size: AppTokens.iconXS,
                               color:
                                   colorScheme.onSurface.withOpacity(0.45),
@@ -175,14 +175,14 @@ class AddressCard extends StatelessWidget {
                           children: [
                             if (address.location.postalCode != null)
                               _InfoChip(
-                                icon: Icons.pin_drop_outlined,
+                                icon: Icons.pin_drop_rounded,
                                 label:
                                     'PIN: ${address.location.postalCode}',
                                 colorScheme: colorScheme,
                               ),
                             if (address.recipientPhone.isNotEmpty)
                               _InfoChip(
-                                icon: Icons.phone_outlined,
+                                icon: Icons.phone_rounded,
                                 label: address.recipientPhone,
                                 colorScheme: colorScheme,
                               ),
@@ -294,7 +294,7 @@ class _DefaultChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.check_circle,
+            Icons.check_circle_rounded,
             size: 12,
             color: AppColors.secondaryGreen,
           ),
@@ -385,7 +385,7 @@ class _ActionRow extends StatelessWidget {
             const Spacer(),
             if (onEdit != null)
               _ActionButton(
-                icon: Icons.edit_outlined,
+                icon: Icons.edit_rounded,
                 label: 'Edit',
                 color: Theme.of(context)
                     .colorScheme

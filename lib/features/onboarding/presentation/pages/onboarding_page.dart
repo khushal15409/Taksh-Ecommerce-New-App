@@ -29,18 +29,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
       titleKey: _TitleKey.title1,
       subtitleKey: _TitleKey.subtitle1,
       backgroundColor: Color(0xFFFFF7F0), // Soft peach white
+      accent: Color(0xFFF97316),
     ),
     _OnboardingStep(
       image: 'assets/images/illustrations/onboarding_shop.svg',
       titleKey: _TitleKey.title2,
       subtitleKey: _TitleKey.subtitle2,
       backgroundColor: Color(0xFFF1FAF4), // Soft mint white
+      accent: Color(0xFF2F7A4B),
     ),
     _OnboardingStep(
       image: 'assets/images/illustrations/onboarding_service.svg',
       titleKey: _TitleKey.title3,
       subtitleKey: _TitleKey.subtitle3,
       backgroundColor: Color(0xFFF6F1FF), // Soft lilac white
+      accent: Color(0xFF7C3AED),
     ),
   ];
 
@@ -161,10 +164,32 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   final step = _steps[index];
                   return Column(
                     children: [
+                      SafeArea(
+                        bottom: false,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 14),
+                          child: Image.asset(
+                            'assets/images/logo/taksh_logo.png',
+                            height: 44,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox(height: 44),
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(28, 64, 28, 12),
-                          child: Center(
+                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: step.accent.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(32),
+                              border: Border.all(
+                                color: step.accent.withOpacity(0.15),
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(16),
                             child: SvgPicture.asset(
                               step.image,
                               fit: BoxFit.contain,
@@ -185,7 +210,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 style: Theme.of(context).textTheme.headlineSmall
                                     ?.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.grey900,
+                                      color: step.accent,
                                     ),
                               ),
                               const SizedBox(height: 10),
@@ -255,7 +280,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     _PageIndicator(
                       count: _steps.length,
                       currentIndex: _currentPage,
-                      activeColor: AppColors.primaryOrange,
+                      activeColor: _steps[_currentPage].accent,
                       inactiveColor: AppColors.grey300,
                     ),
                     const SizedBox(height: 24),
@@ -266,7 +291,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: ElevatedButton(
                           onPressed: _nextPage,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryOrange,
+                            backgroundColor: _steps[_currentPage].accent,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -309,12 +334,14 @@ class _OnboardingStep {
   final _TitleKey titleKey;
   final _TitleKey subtitleKey;
   final Color backgroundColor;
+  final Color accent;
 
   const _OnboardingStep({
     required this.image,
     required this.titleKey,
     required this.subtitleKey,
     required this.backgroundColor,
+    required this.accent,
   });
 }
 

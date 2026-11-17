@@ -62,7 +62,7 @@ class _AddressSelectionBottomSheetState
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(Icons.close_rounded),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -134,7 +134,7 @@ class _AddressSelectionBottomSheetState
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.error_outline,
+                              Icons.error_outline_rounded,
                               size: 48,
                               color: Colors.red[300],
                             ),
@@ -173,8 +173,8 @@ class _AddressSelectionBottomSheetState
                             children: [
                               Icon(
                                 _searchQuery.isEmpty
-                                    ? Icons.location_off_outlined
-                                    : Icons.search_off,
+                                    ? Icons.location_off_rounded
+                                    : Icons.search_off_rounded,
                                 size: 64,
                                 color: Colors.grey[400],
                               ),

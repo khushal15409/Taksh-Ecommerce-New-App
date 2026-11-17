@@ -205,7 +205,7 @@ class _UpdateProfileDetailsPageState extends State<UpdateProfileDetailsPage> {
                           width: 1.5,
                         ),
                       ),
-                      suffixIcon: const Icon(Icons.cake_outlined),
+                      suffixIcon: const Icon(Icons.cake_rounded),
                     ),
                     child: Text(
                       _selectedBirthday ?? 'Select your birthday',

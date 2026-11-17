@@ -91,7 +91,7 @@ class ComingSoonWidget extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.rocket_launch, color: Colors.white, size: 22),
+                    Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 22),
                     SizedBox(width: 10),
                     Text(
                       'Coming Soon',

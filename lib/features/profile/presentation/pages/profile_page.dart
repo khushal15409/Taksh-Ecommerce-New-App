@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
             return const GuestAuthWall(
               redirectToRoute: AppRoutes.profile,
               contentLabel: 'your profile',
-              icon: Icons.person_outline,
+              icon: Icons.person_outline_rounded,
             );
           }
           return const Center(
@@ -189,7 +189,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: AppLocalizations.of(context)!.general,
                   items: [
                     _MenuItemData(
-                      icon: Icons.location_on_outlined,
+                      icon: Icons.location_on_rounded,
                       title: AppLocalizations.of(context)!.myAddress,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -202,7 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     // Coupons feature not available yet — hidden from UI.
                     // _MenuItemData(
-                    //   icon: Icons.card_giftcard_outlined,
+                    //   icon: Icons.card_giftcard_rounded,
                     //   title: AppLocalizations.of(context)!.coupons,
                     //   iconColor: AppColors.black,
                     //   onTap: () {
@@ -236,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   items: [
                     // TEMPORARILY HIDDEN: "Join as delivery man" and "Open vendor" menu items (commented out, not removed).
 //                    _MenuItemData(
-//                      icon: Icons.delivery_dining,
+//                      icon: Icons.delivery_dining_rounded,
 //                      title: AppLocalizations.of(context)!.joinAsDeliveryMan,
 //                      iconColor: AppColors.black,
 //                      onTap: () {
@@ -250,7 +250,7 @@ class _ProfilePageState extends State<ProfilePage> {
 //                      },
 //                    ),
 //                    _MenuItemData(
-//                      icon: Icons.store_outlined,
+//                      icon: Icons.store_rounded,
 //                      title: AppLocalizations.of(context)!.openVendor,
 //                      iconColor: AppColors.black,
 //                      onTap: () {
@@ -263,7 +263,7 @@ class _ProfilePageState extends State<ProfilePage> {
 //                      },
 //                    ),
                     _MenuItemData(
-                      icon: Icons.phone_android_outlined,
+                      icon: Icons.phone_android_rounded,
                       title: AppLocalizations.of(context)!.createApplication,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -280,7 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     _MenuItemData(
-                      icon: Icons.web_outlined,
+                      icon: Icons.web_rounded,
                       title: AppLocalizations.of(context)!.createWebsite,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -307,7 +307,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: AppLocalizations.of(context)!.helpSupport,
                   items: [
                     _MenuItemData(
-                      icon: Icons.help_outline,
+                      icon: Icons.help_outline_rounded,
                       title: AppLocalizations.of(context)!.helpAndSupport,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -342,7 +342,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     _MenuItemData(
-                      icon: Icons.business_outlined,
+                      icon: Icons.business_rounded,
                       title: AppLocalizations.of(context)!.aboutUs,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -355,7 +355,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     _MenuItemData(
-                      icon: Icons.description_outlined,
+                      icon: Icons.description_rounded,
                       title: AppLocalizations.of(context)!.termsAndConditions,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -368,7 +368,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     _MenuItemData(
-                      icon: Icons.shield_outlined,
+                      icon: Icons.shield_rounded,
                       title: AppLocalizations.of(context)!.privacyPolicy,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -381,7 +381,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     _MenuItemData(
-                      icon: Icons.currency_exchange_outlined,
+                      icon: Icons.currency_exchange_rounded,
                       title: AppLocalizations.of(context)!.refundPolicy,
                       iconColor: AppColors.black,
                       onTap: () {
@@ -407,7 +407,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () {
                         _showLogoutDialog(context);
                       },
-                      icon: const Icon(Icons.logout),
+                      icon: const Icon(Icons.logout_rounded),
                       label: Text(
                         AppLocalizations.of(context)!.logout,
                         style: const TextStyle(
@@ -523,7 +523,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
-                      Icons.language_outlined,
+                      Icons.language_rounded,
                       color: AppColors.black,
                       size: 24,
                     ),
@@ -537,7 +537,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   trailing: Icon(
-                    _isLanguageExpanded ? Icons.expand_less : Icons.expand_more,
+                    _isLanguageExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                     color: AppColors.grey400,
                     size: 24,
                   ),
@@ -589,9 +589,9 @@ class _ProfilePageState extends State<ProfilePage> {
   ) {
     IconData flagIcon;
     if (langCode == 'en') {
-      flagIcon = Icons.language;
+      flagIcon = Icons.language_rounded;
     } else {
-      flagIcon = Icons.translate;
+      flagIcon = Icons.translate_rounded;
     }
 
     return InkWell(
@@ -640,7 +640,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const Spacer(),
             if (isSelected)
               const Icon(
-                Icons.check_circle,
+                Icons.check_circle_rounded,
                 color: AppColors.secondaryGreen,
                 size: 20,
               ),
@@ -718,7 +718,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: _buildQuickActionCard(
                   context,
-                  icon: Icons.shopping_basket_outlined,
+                  icon: Icons.shopping_basket_rounded,
                   title: 'Your Accounts',
                   onTap: () {
                     Navigator.push(
@@ -734,7 +734,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: _buildQuickActionCard(
                   context,
-                  icon: Icons.account_balance_wallet_outlined,
+                  icon: Icons.account_balance_wallet_rounded,
                   title: 'Gift Cards',
                   onTap: () {
                     Navigator.push(
@@ -874,7 +874,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       trailing: Icon(
-        Icons.chevron_right,
+        Icons.chevron_right_rounded,
         color: Theme.of(context).disabledColor,
         size: 24,
       ),
@@ -1055,7 +1055,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.phone_callback,
+                    Icons.phone_callback_rounded,
                     color: AppColors.secondaryGreen,
                   ),
                 ),
@@ -1073,7 +1073,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontSize: 13,
                   ),
                 ),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () {
                   Navigator.of(bottomSheetContext).pop();
                   _showCallbackConfirmationDialog(context);
@@ -1089,7 +1089,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.email_outlined,
+                    Icons.email_rounded,
                     color: AppColors.primaryOrange,
                   ),
                 ),
@@ -1107,7 +1107,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontSize: 13,
                   ),
                 ),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () async {
                   Navigator.of(bottomSheetContext).pop();
                   final emailUri = SupportContacts.mailtoUri(
@@ -1166,7 +1166,7 @@ class _ProfilePageState extends State<ProfilePage> {
               title: Row(
                 children: [
                   const Icon(
-                    Icons.phone_callback,
+                    Icons.phone_callback_rounded,
                     color: AppColors.secondaryGreen,
                   ),
                   const SizedBox(width: 8),

@@ -101,7 +101,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.location_on, color: AppColors.primaryOrange),
+            const Icon(Icons.location_on_rounded, color: AppColors.primaryOrange),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -111,7 +111,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 16),
           ],
         ),
       ),
@@ -220,7 +220,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
                         child: Row(
                           children: [
                             const Icon(
-                              Icons.info_outline,
+                              Icons.info_outline_rounded,
                               size: 13,
                               color: Colors.blue,
                             ),
@@ -294,7 +294,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close),
+                          icon: const Icon(Icons.close_rounded),
                           onPressed: () => Navigator.pop(bottomSheetContext),
                         ),
                       ],
@@ -312,7 +312,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    Icons.location_off,
+                                    Icons.location_off_rounded,
                                     size: 64,
                                     color: Theme.of(context).disabledColor,
                                   ),
@@ -324,7 +324,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
                                       Navigator.pop(bottomSheetContext);
                                       context.push(AppRoutes.addAddress);
                                     },
-                                    icon: const Icon(Icons.add),
+                                    icon: const Icon(Icons.add_rounded),
                                     label: const Text('Add Address'),
                                   ),
                                 ],
@@ -345,7 +345,7 @@ class _AddressSelectorWidgetState extends State<AddressSelectorWidget> {
                                       Navigator.pop(bottomSheetContext);
                                       context.push(AppRoutes.addAddress);
                                     },
-                                    icon: const Icon(Icons.add),
+                                    icon: const Icon(Icons.add_rounded),
                                     label: const Text('Add New Address'),
                                   ),
                                 );
@@ -454,7 +454,7 @@ class _AddressListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 16),
             ],
           ),
         ),

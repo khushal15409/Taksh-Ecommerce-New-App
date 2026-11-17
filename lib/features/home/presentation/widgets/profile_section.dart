@@ -35,7 +35,7 @@ class ProfileSection extends StatelessWidget {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.settings_outlined),
+                  icon: const Icon(Icons.settings_rounded),
                   onPressed: () {
                     // TODO: Navigate to settings
                   },
@@ -109,7 +109,7 @@ class ProfileSection extends StatelessWidget {
                           onPressed: () {
                             // TODO: Navigate to edit profile
                           },
-                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          icon: const Icon(Icons.edit_rounded, size: 18),
                           label: const Text('Edit Profile'),
                         ),
                       ],
@@ -127,7 +127,7 @@ class ProfileSection extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.shopping_bag_outlined,
+                        icon: Icons.shopping_bag_rounded,
                         label: 'Orders',
                         value: '12',
                         colorScheme: colorScheme,
@@ -136,7 +136,7 @@ class ProfileSection extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.favorite_outline,
+                        icon: Icons.favorite_outline_rounded,
                         label: 'Favorites',
                         value: '8',
                         colorScheme: colorScheme,
@@ -145,7 +145,7 @@ class ProfileSection extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.location_on_outlined,
+                        icon: Icons.location_on_rounded,
                         label: 'Addresses',
                         value: '3',
                         colorScheme: colorScheme,
@@ -172,7 +172,7 @@ class ProfileSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     _MenuItem(
-                      icon: Icons.person_outline,
+                      icon: Icons.person_outline_rounded,
                       title: 'Personal Information',
                       onTap: () {
                         // TODO: Navigate to personal info
@@ -180,7 +180,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.location_on_outlined,
+                      icon: Icons.location_on_rounded,
                       title: 'My Addresses',
                       onTap: () {
                         // TODO: Navigate to addresses
@@ -188,7 +188,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.payment_outlined,
+                      icon: Icons.payment_rounded,
                       title: 'Payment Methods',
                       onTap: () {
                         // TODO: Navigate to payment methods
@@ -205,7 +205,7 @@ class ProfileSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     _MenuItem(
-                      icon: Icons.notifications_outlined,
+                      icon: Icons.notifications_rounded,
                       title: 'Notifications',
                       onTap: () {
                         // TODO: Navigate to notifications settings
@@ -213,7 +213,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.language_outlined,
+                      icon: Icons.language_rounded,
                       title: 'Language',
                       subtitle: 'English',
                       onTap: () {
@@ -222,7 +222,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.dark_mode_outlined,
+                      icon: Icons.dark_mode_rounded,
                       title: 'Dark Mode',
                       trailing: Switch(
                         value: false,
@@ -242,7 +242,7 @@ class ProfileSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     _MenuItem(
-                      icon: Icons.help_outline,
+                      icon: Icons.help_outline_rounded,
                       title: 'Help & Support',
                       onTap: () {
                         // TODO: Navigate to help
@@ -250,7 +250,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.info_outline,
+                      icon: Icons.info_outline_rounded,
                       title: 'About',
                       onTap: () {
                         // TODO: Navigate to about
@@ -258,7 +258,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.privacy_tip_outlined,
+                      icon: Icons.privacy_tip_rounded,
                       title: 'Privacy Policy',
                       onTap: () {
                         // TODO: Navigate to privacy policy
@@ -266,7 +266,7 @@ class ProfileSection extends StatelessWidget {
                       colorScheme: colorScheme,
                     ),
                     _MenuItem(
-                      icon: Icons.description_outlined,
+                      icon: Icons.description_rounded,
                       title: 'Terms & Conditions',
                       onTap: () {
                         // TODO: Navigate to terms
@@ -281,7 +281,7 @@ class ProfileSection extends StatelessWidget {
                         onPressed: () {
                           _showLogoutDialog(context);
                         },
-                        icon: const Icon(Icons.logout, color: Colors.red),
+                        icon: const Icon(Icons.logout_rounded, color: Colors.red),
                         label: const Text(
                           'Logout',
                           style: TextStyle(color: Colors.red),
@@ -440,7 +440,7 @@ class _MenuItem extends StatelessWidget {
             : null,
         trailing: trailing ??
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: colorScheme.onSurface.withOpacity(0.4),
             ),
         onTap: onTap,

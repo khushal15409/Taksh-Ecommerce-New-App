@@ -100,7 +100,7 @@ class _OrdersSectionState extends State<OrdersSection>
                         ),
                         const Spacer(),
                         IconButton(
-                          icon: const Icon(Icons.search),
+                          icon: const Icon(Icons.search_rounded),
                           onPressed: () {
                             // TODO: Implement search
                           },
@@ -231,13 +231,13 @@ class _Order {
   IconData get statusIcon {
     switch (status) {
       case OrderStatus.preparing:
-        return Icons.restaurant;
+        return Icons.restaurant_rounded;
       case OrderStatus.onTheWay:
-        return Icons.delivery_dining;
+        return Icons.delivery_dining_rounded;
       case OrderStatus.delivered:
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
       case OrderStatus.cancelled:
-        return Icons.cancel;
+        return Icons.cancel_rounded;
     }
   }
 }
@@ -261,7 +261,7 @@ class _EmptyOrders extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.receipt_long_outlined,
+            Icons.receipt_long_rounded,
             size: 120,
             color: colorScheme.onSurface.withOpacity(0.3),
           ),
@@ -398,7 +398,7 @@ class _OrderCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.shopping_bag_outlined,
+                        Icons.shopping_bag_rounded,
                         size: 16,
                         color: colorScheme.onSurface.withOpacity(0.6),
                       ),
@@ -426,7 +426,7 @@ class _OrderCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.access_time,
+                    Icons.access_time_rounded,
                     size: 16,
                     color: colorScheme.onSurface.withOpacity(0.6),
                   ),
@@ -450,7 +450,7 @@ class _OrderCard extends StatelessWidget {
                         onPressed: () {
                           // TODO: Track order
                         },
-                        icon: const Icon(Icons.location_on_outlined, size: 18),
+                        icon: const Icon(Icons.location_on_rounded, size: 18),
                         label: const Text('Track Order'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -463,7 +463,7 @@ class _OrderCard extends StatelessWidget {
                         onPressed: () {
                           // TODO: Contact support
                         },
-                        icon: const Icon(Icons.headset_mic_outlined, size: 18),
+                        icon: const Icon(Icons.headset_mic_rounded, size: 18),
                         label: const Text('Help'),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -480,7 +480,7 @@ class _OrderCard extends StatelessWidget {
                     onPressed: () {
                       // TODO: Reorder
                     },
-                    icon: const Icon(Icons.refresh, size: 18),
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
                     label: const Text('Reorder'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 8),

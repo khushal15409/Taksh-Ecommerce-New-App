@@ -575,7 +575,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                             ),
                             child: selected
                                 ? const Icon(
-                                    Icons.check,
+                                    Icons.check_rounded,
                                     size: 14,
                                     color: Colors.white,
                                   )
@@ -832,7 +832,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _nameController,
                     label: 'Customer Name',
                     hint: 'Enter full name',
-                    icon: Icons.person_outline,
+                    icon: Icons.person_outline_rounded,
                     capitalization: TextCapitalization.words,
                     validator: (v) =>
                         ServiceFormValidators.name(v, label: 'customer name'),
@@ -843,7 +843,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _mobileController,
                     label: 'Mobile Number',
                     hint: '10-digit mobile number',
-                    icon: Icons.phone_outlined,
+                    icon: Icons.phone_rounded,
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
                     digitsOnly: true,
@@ -855,7 +855,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _pickupAddressController,
                     label: l10n.pickupAddress,
                     hint: l10n.enterPickupAddress,
-                    icon: Icons.home_outlined,
+                    icon: Icons.home_rounded,
                     maxLines: 2,
                     validator: (v) => ServiceFormValidators.address(
                       v,
@@ -868,7 +868,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _pickupPincodeController,
                     label: l10n.pickupPincode,
                     hint: '6-digit pincode',
-                    icon: Icons.pin_drop_outlined,
+                    icon: Icons.pin_drop_rounded,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
                     digitsOnly: true,
@@ -890,7 +890,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _deliveryNameController,
                     label: 'Delivery Contact Name',
                     hint: 'Enter receiver name',
-                    icon: Icons.person_outline,
+                    icon: Icons.person_outline_rounded,
                     capitalization: TextCapitalization.words,
                     validator: (v) =>
                         ServiceFormValidators.name(v, label: 'receiver name'),
@@ -901,7 +901,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _deliveryMobileController,
                     label: 'Delivery Mobile Number',
                     hint: '10-digit mobile number',
-                    icon: Icons.phone_outlined,
+                    icon: Icons.phone_rounded,
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
                     digitsOnly: true,
@@ -913,7 +913,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _deliveryAddressController,
                     label: 'Delivery Address',
                     hint: 'Enter full delivery address',
-                    icon: Icons.flag_outlined,
+                    icon: Icons.flag_rounded,
                     maxLines: 2,
                     validator: (v) => ServiceFormValidators.address(
                       v,
@@ -926,7 +926,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _deliveryPincodeController,
                     label: 'Delivery Pincode',
                     hint: '6-digit pincode',
-                    icon: Icons.pin_drop_outlined,
+                    icon: Icons.pin_drop_rounded,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
                     digitsOnly: true,
@@ -948,7 +948,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _productDetailsController,
                     label: l10n.productDetails,
                     hint: l10n.enterProductDetails,
-                    icon: Icons.description_outlined,
+                    icon: Icons.description_rounded,
                     maxLines: 2,
                     capitalization: TextCapitalization.sentences,
                     validator: (v) => ServiceFormValidators.requiredText(
@@ -962,7 +962,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _packagingDetailsController,
                     label: l10n.packagingDetails,
                     hint: l10n.enterPackagingDetails,
-                    icon: Icons.inventory_2_outlined,
+                    icon: Icons.inventory_2_rounded,
                     capitalization: TextCapitalization.sentences,
                     validator: (v) => ServiceFormValidators.requiredText(
                       v,
@@ -985,7 +985,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     controller: _weightController,
                     label: 'Weight (grams)',
                     hint: 'e.g. 500',
-                    icon: Icons.scale_outlined,
+                    icon: Icons.scale_rounded,
                     decimal: true,
                     validator: (v) =>
                         ServiceFormValidators.positiveNumber(v, 'weight'),
@@ -1113,7 +1113,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.info_outline,
+                          Icons.info_outline_rounded,
                           size: 14,
                           color: Color(0xFFE65100),
                         ),
@@ -1148,7 +1148,7 @@ class _CourierBookingFormState extends State<_CourierBookingForm> {
                     decoration: _inputDecoration(
                       label: 'Customer Notes (optional)',
                       hint: 'e.g. Handle with care',
-                      prefixIcon: Icons.notes_outlined,
+                      prefixIcon: Icons.notes_rounded,
                     ),
                     maxLines: 3,
                   ),

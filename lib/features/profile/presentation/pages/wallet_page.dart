@@ -47,7 +47,7 @@ class WalletPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
-                          Icons.account_balance_wallet,
+                          Icons.account_balance_wallet_rounded,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -91,7 +91,7 @@ class WalletPage extends StatelessWidget {
                 onPressed: () {
                   _showWithdrawDialog(context);
                 },
-                icon: const Icon(Icons.account_balance_outlined, size: 24),
+                icon: const Icon(Icons.account_balance_rounded, size: 24),
                 label: const Text(
                   'Withdraw to Bank Account',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -119,7 +119,7 @@ class WalletPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                  Icon(Icons.info_outline_rounded, color: Colors.blue[700], size: 20),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -162,7 +162,7 @@ class WalletPage extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Points to withdraw',
                   hintText: 'Enter amount',
-                  prefixIcon: const Icon(Icons.currency_rupee),
+                  prefixIcon: const Icon(Icons.currency_rupee_rounded),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -180,7 +180,7 @@ class WalletPage extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.info_outline,
+                      Icons.info_outline_rounded,
                       size: 16,
                       color: Colors.amber[900],
                     ),

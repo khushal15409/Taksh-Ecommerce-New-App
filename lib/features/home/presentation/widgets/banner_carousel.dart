@@ -248,7 +248,7 @@ class _BannerItem extends StatelessWidget {
               ),
               errorWidget: (context, url, error) => Container(
                 color: Colors.grey[200],
-                child: const Icon(Icons.error, size: 48),
+                child: const Icon(Icons.error_rounded, size: 48),
               ),
             ),
           ),

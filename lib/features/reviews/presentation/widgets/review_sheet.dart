@@ -251,9 +251,9 @@ class _ReviewSheetState extends State<ReviewSheet> {
                     imageUrl: url,
                     fit: BoxFit.cover,
                     errorWidget: (_, __, ___) =>
-                        const Icon(Icons.image_outlined, color: AppColors.grey400),
+                        const Icon(Icons.image_rounded, color: AppColors.grey400),
                   )
-                : const Icon(Icons.image_outlined, color: AppColors.grey400),
+                : const Icon(Icons.image_rounded, color: AppColors.grey400),
           ),
         ),
         const SizedBox(width: 12),

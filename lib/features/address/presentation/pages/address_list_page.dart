@@ -248,7 +248,7 @@ class _AddressListView extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.add_location_alt_outlined,
+                Icons.add_location_alt_rounded,
                 size: 48,
                 color: colorScheme.primary.withOpacity(0.6),
               ),

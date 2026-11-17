@@ -160,7 +160,7 @@ class _PayNowPageState extends State<PayNowPage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          unconfirmed ? Icons.hourglass_bottom : Icons.error_outline,
+          unconfirmed ? Icons.hourglass_bottom_rounded : Icons.error_outline_rounded,
           size: 56,
           color: unconfirmed ? Colors.orange : Colors.red,
         ),
@@ -179,7 +179,7 @@ class _PayNowPageState extends State<PayNowPage> {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _start,
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh_rounded),
               label: const Text('Try again'),
             ),
           ),
@@ -188,7 +188,7 @@ class _PayNowPageState extends State<PayNowPage> {
           width: double.infinity,
           child: OutlinedButton.icon(
             onPressed: () => context.go(AppRoutes.orders),
-            icon: const Icon(Icons.receipt_long),
+            icon: const Icon(Icons.receipt_long_rounded),
             label: const Text('My Orders'),
           ),
         ),

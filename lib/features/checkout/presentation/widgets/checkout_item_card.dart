@@ -31,7 +31,7 @@ class CheckoutItemCard extends StatelessWidget {
                     height: 50,
                     color:
                         Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: Icon(Icons.image_not_supported,
+                    child: Icon(Icons.image_not_supported_rounded,
                         size: 20, color: Theme.of(context).disabledColor),
                   );
                 },

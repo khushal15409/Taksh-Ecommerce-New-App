@@ -79,7 +79,7 @@ class _OrdersPageState extends State<OrdersPage> {
           return const GuestAuthWall(
             redirectToRoute: AppRoutes.orders,
             contentLabel: 'your orders',
-            icon: Icons.receipt_long_outlined,
+            icon: Icons.receipt_long_rounded,
           );
         }
         return _buildOrdersContent(context);
@@ -365,7 +365,7 @@ class _OrdersPageState extends State<OrdersPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.calendar_today_outlined,
+                Icons.calendar_today_rounded,
                 size: 16,
                 color: hasDate ? Colors.white : AppColors.secondaryGreen,
               ),
@@ -648,8 +648,8 @@ class _OrdersPageState extends State<OrdersPage> {
                 children: [
                   Icon(
                     order.isExpress
-                        ? Icons.flash_on_outlined
-                        : Icons.local_shipping_outlined,
+                        ? Icons.flash_on_rounded
+                        : Icons.local_shipping_rounded,
                     size: 14,
                     color: Colors.grey.shade500,
                   ),
@@ -676,7 +676,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         orderNumber: order.orderNumber,
                       ),
                     ),
-                    icon: const Icon(Icons.payment),
+                    icon: const Icon(Icons.payment_rounded),
                     label: const Text('Pay now'),
                   ),
                 ),
@@ -1072,9 +1072,9 @@ class _OrderProductPreviewState extends State<_OrderProductPreview> {
                     imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.image_outlined, color: Colors.grey),
+                        const Icon(Icons.image_rounded, color: Colors.grey),
                   )
-                : const Icon(Icons.image_outlined, color: Colors.grey),
+                : const Icon(Icons.image_rounded, color: Colors.grey),
           ),
         ),
         const SizedBox(width: 12),
@@ -1165,13 +1165,13 @@ class _OrderProductPreviewState extends State<_OrderProductPreview> {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(
-                              Icons.image_outlined,
+                              Icons.image_rounded,
                               size: 20,
                               color: Colors.grey,
                             ),
                       )
                     : const Icon(
-                        Icons.image_outlined,
+                        Icons.image_rounded,
                         size: 20,
                         color: Colors.grey,
                       ),

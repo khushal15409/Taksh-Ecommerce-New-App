@@ -377,9 +377,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: BlocBuilder<AddressBloc, AddressState>(
-                    builder: (context, _) => Align(
-                      alignment: Alignment.centerLeft,
+                    builder: (context, _) => SizedBox(
+                      width: double.infinity,
                       child: AddressHeaderWidget(
+                        expand: true,
                         selectedAddress: _effectiveAddress,
                         onTap: _pickQuickAddress,
                       ),

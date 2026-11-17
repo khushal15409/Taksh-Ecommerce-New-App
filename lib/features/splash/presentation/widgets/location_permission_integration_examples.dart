@@ -185,7 +185,7 @@ class OnboardingLocationScreen extends StatelessWidget {
             children: [
               // Illustration
               Icon(
-                Icons.location_city,
+                Icons.location_city_rounded,
                 size: 120,
                 color: Theme.of(context).primaryColor,
               ),
@@ -267,7 +267,7 @@ class DeliveryAddressPage extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              leading: const Icon(Icons.my_location),
+              leading: const Icon(Icons.my_location_rounded),
               title: Text(AppLocalizations.of(context)!.useCurrentLocation),
               subtitle: Text(AppLocalizations.of(context)!.autoDetectLocation),
               onTap: () async {
@@ -388,12 +388,12 @@ class SettingsPage extends StatelessWidget {
                   }
                 },
                 secondary: Icon(
-                  hasPermission ? Icons.location_on : Icons.location_off,
+                  hasPermission ? Icons.location_on_rounded : Icons.location_off_rounded,
                 ),
               ),
               if (hasPermission)
                 ListTile(
-                  leading: const Icon(Icons.info_outline),
+                  leading: const Icon(Icons.info_outline_rounded),
                   title: Text(AppLocalizations.of(context)!.currentLocation),
                   subtitle: Text(
                     splashCubit.currentLocation != null
@@ -402,7 +402,7 @@ class SettingsPage extends StatelessWidget {
                         : 'Not available', // TODO: Add key
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh_rounded),
                     onPressed: () async {
                       await splashCubit.refreshLocation();
                     },

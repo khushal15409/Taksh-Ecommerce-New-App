@@ -42,7 +42,7 @@ class AddressHeader extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.location_on,
+                  Icons.location_on_rounded,
                   color: Theme.of(context).primaryColor,
                   size: 20,
                 ),
@@ -73,7 +73,7 @@ class AddressHeader extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  Icons.keyboard_arrow_down,
+                  Icons.keyboard_arrow_down_rounded,
                   color: Theme.of(context).primaryColor,
                 ),
               ],

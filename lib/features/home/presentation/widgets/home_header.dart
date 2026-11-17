@@ -661,39 +661,39 @@ class _HomeHeaderState extends State<HomeHeader>
   IconData _iconForCategoryName(String name) {
     final lower = name.toLowerCase();
 
-    if (lower.contains('pizza')) return Icons.local_pizza;
-    if (lower.contains('fast')) return Icons.fastfood;
-    if (lower.contains('burger')) return Icons.lunch_dining;
+    if (lower.contains('pizza')) return Icons.local_pizza_rounded;
+    if (lower.contains('fast')) return Icons.fastfood_rounded;
+    if (lower.contains('burger')) return Icons.lunch_dining_rounded;
     if (lower.contains('restaurant') || lower.contains('dining')) {
-      return Icons.restaurant;
+      return Icons.restaurant_rounded;
     }
     if (lower.contains('dessert') || lower.contains('cake')) {
-      return Icons.cake;
+      return Icons.cake_rounded;
     }
     if (lower.contains('beverage') || lower.contains('drink')) {
-      return Icons.local_cafe;
+      return Icons.local_cafe_rounded;
     }
     if (lower.contains('coffee') || lower.contains('tea')) {
-      return Icons.coffee;
+      return Icons.coffee_rounded;
     }
-    if (lower.contains('breakfast')) return Icons.breakfast_dining;
-    if (lower.contains('snack')) return Icons.cookie;
+    if (lower.contains('breakfast')) return Icons.breakfast_dining_rounded;
+    if (lower.contains('snack')) return Icons.cookie_rounded;
     if (lower.contains('bakery') || lower.contains('bread')) {
-      return Icons.bakery_dining;
+      return Icons.bakery_dining_rounded;
     }
     if (lower.contains('seafood') || lower.contains('fish')) {
-      return Icons.set_meal;
+      return Icons.set_meal_rounded;
     }
-    if (lower.contains('fruit')) return Icons.local_florist;
+    if (lower.contains('fruit')) return Icons.local_florist_rounded;
     if (lower.contains('vegetable') || lower.contains('vegg')) {
-      return Icons.spa;
+      return Icons.spa_rounded;
     }
     if (lower.contains('meat') || lower.contains('chicken')) {
-      return Icons.set_meal;
+      return Icons.set_meal_rounded;
     }
-    if (lower.contains('grocery')) return Icons.storefront;
+    if (lower.contains('grocery')) return Icons.storefront_rounded;
 
-    return Icons.category_outlined;
+    return Icons.category_rounded;
   }
 }
 

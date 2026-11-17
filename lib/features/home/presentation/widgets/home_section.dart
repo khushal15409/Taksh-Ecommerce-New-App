@@ -29,7 +29,7 @@ class HomeSection extends StatelessWidget {
               title: Row(
                 children: [
                   Icon(
-                    Icons.restaurant_menu,
+                    Icons.restaurant_menu_rounded,
                     color: colorScheme.primary,
                     size: 28,
                   ),
@@ -45,7 +45,7 @@ class HomeSection extends StatelessWidget {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
+                  icon: const Icon(Icons.notifications_rounded),
                   onPressed: () {
                     // TODO: Navigate to notifications
                   },
@@ -68,7 +68,7 @@ class HomeSection extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: AppLocalizations.of(context)!.searchRestaurantsDishes,
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search_rounded),
                     filled: true,
                     fillColor: colorScheme.surfaceContainerHighest,
                     border: OutlineInputBorder(
@@ -160,27 +160,27 @@ class HomeSection extends StatelessWidget {
                         physics: const BouncingScrollPhysics(),
                         children: [
                           _CategoryCard(
-                            icon: Icons.fastfood,
+                            icon: Icons.fastfood_rounded,
                             label: 'Fast Food',
                             color: colorScheme.primary,
                           ),
                           _CategoryCard(
-                            icon: Icons.local_pizza,
+                            icon: Icons.local_pizza_rounded,
                             label: 'Pizza',
                             color: colorScheme.secondary,
                           ),
                           _CategoryCard(
-                            icon: Icons.restaurant,
+                            icon: Icons.restaurant_rounded,
                             label: 'Fine Dining',
                             color: colorScheme.tertiary,
                           ),
                           _CategoryCard(
-                            icon: Icons.cake,
+                            icon: Icons.cake_rounded,
                             label: 'Desserts',
                             color: colorScheme.error,
                           ),
                           _CategoryCard(
-                            icon: Icons.local_cafe,
+                            icon: Icons.local_cafe_rounded,
                             label: 'Beverages',
                             color: colorScheme.primary,
                           ),
@@ -323,7 +323,7 @@ class _RestaurantCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.restaurant,
+                  Icons.restaurant_rounded,
                   size: 40,
                   color: colorScheme.primary,
                 ),
@@ -351,7 +351,7 @@ class _RestaurantCard extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(
-                          Icons.star,
+                          Icons.star_rounded,
                           size: 16,
                           color: Colors.amber,
                         ),
@@ -364,7 +364,7 @@ class _RestaurantCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         Icon(
-                          Icons.access_time,
+                          Icons.access_time_rounded,
                           size: 16,
                           color: colorScheme.onSurface.withOpacity(0.6),
                         ),

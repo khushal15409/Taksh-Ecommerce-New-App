@@ -69,7 +69,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
             onPressed: () async {
               await LocationPermissionBottomSheet.show(context);
             },
-            icon: const Icon(Icons.location_on),
+            icon: const Icon(Icons.location_on_rounded),
             label: const Text('Show Bottom Sheet'),
           ),
           const SizedBox(height: 24),
@@ -83,7 +83,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
             onPressed: () async {
               await LocationPermissionHandler.showPermissionRationale(context);
             },
-            icon: const Icon(Icons.info_outline),
+            icon: const Icon(Icons.info_outline_rounded),
             label: const Text('Show Rationale Dialog'),
           ),
           const SizedBox(height: 24),
@@ -97,7 +97,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
             onPressed: () async {
               await LocationPermissionHandler.showAppSettingsDialog(context);
             },
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings_rounded),
             label: const Text('Show Settings Dialog'),
           ),
           const SizedBox(height: 24),
@@ -122,7 +122,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
                 );
               }
             },
-            icon: const Icon(Icons.touch_app),
+            icon: const Icon(Icons.touch_app_rounded),
             label: const Text('Request Permission (Full Flow)'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -152,7 +152,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
                 );
               }
             },
-            icon: const Icon(Icons.my_location),
+            icon: const Icon(Icons.my_location_rounded),
             label: const Text('Get Current Location'),
           ),
           const SizedBox(height: 48),
@@ -170,7 +170,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.lightbulb_outline, color: Colors.blue.shade700),
+                    Icon(Icons.lightbulb_outline_rounded, color: Colors.blue.shade700),
                     const SizedBox(width: 8),
                     Text(
                       'Implementation Tip',
@@ -222,7 +222,7 @@ class LocationPermissionUIShowcase extends StatelessWidget {
           Row(
             children: [
               Icon(
-                hasPermission ? Icons.check_circle : Icons.info_outline,
+                hasPermission ? Icons.check_circle_rounded : Icons.info_outline_rounded,
                 color: hasPermission
                     ? Colors.green.shade700
                     : Colors.orange.shade700,

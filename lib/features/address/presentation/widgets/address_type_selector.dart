@@ -19,7 +19,7 @@ class AddressTypeSelector extends StatelessWidget {
         Expanded(
           child: _AddressTypeChip(
             type: AddressType.home,
-            icon: Icons.home,
+            icon: Icons.home_rounded,
             label: 'Home',
             isSelected: selectedType == AddressType.home,
             onTap: () => onTypeSelected(AddressType.home),
@@ -29,7 +29,7 @@ class AddressTypeSelector extends StatelessWidget {
         Expanded(
           child: _AddressTypeChip(
             type: AddressType.work,
-            icon: Icons.work,
+            icon: Icons.work_rounded,
             label: 'Work',
             isSelected: selectedType == AddressType.work,
             onTap: () => onTypeSelected(AddressType.work),
@@ -39,7 +39,7 @@ class AddressTypeSelector extends StatelessWidget {
         Expanded(
           child: _AddressTypeChip(
             type: AddressType.other,
-            icon: Icons.location_on,
+            icon: Icons.location_on_rounded,
             label: 'Other',
             isSelected: selectedType == AddressType.other,
             onTap: () => onTypeSelected(AddressType.other),
