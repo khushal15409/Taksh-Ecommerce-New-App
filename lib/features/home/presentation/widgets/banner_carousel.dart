@@ -34,6 +34,13 @@ class _BannerCarouselState extends State<BannerCarousel> {
   static const int _loopStart = 1000;
   static const Duration _autoPlayEvery = Duration(seconds: 4);
 
+  /// Banner shape assumed until the real image size is known.
+  static const double _defaultAspect = 16 / 7;
+
+  /// Real width / height of each banner image, by URL. The slider takes the height of
+  /// the banner on screen, so any banner shape shows complete (never cropped).
+  final Map<String, double> _aspects = {};
+
   late PageController _pageController;
   int _page = 0;
   Timer? _autoPlay;
@@ -47,6 +54,42 @@ class _BannerCarouselState extends State<BannerCarousel> {
     super.initState();
     _resetPager();
     _startAutoPlay();
+    _loadAspects();
+  }
+
+  /// Reads each banner's real size from the (cached) image so its box can match it.
+  void _loadAspects() {
+    for (final banner in widget.banners) {
+      final url = banner.imageUrl;
+      if (url.isEmpty || _aspects.containsKey(url)) continue;
+      final stream = CachedNetworkImageProvider(url)
+          .resolve(const ImageConfiguration());
+      late final ImageStreamListener listener;
+      listener = ImageStreamListener(
+        (info, synchronousCall) {
+          stream.removeListener(listener);
+          final w = info.image.width.toDouble();
+          final h = info.image.height.toDouble();
+          if (h <= 0 || w <= 0 || !mounted) return;
+          if (synchronousCall) {
+            // Already cached and called while building/initialising: no setState.
+            _aspects[url] = w / h;
+          } else {
+            setState(() => _aspects[url] = w / h);
+          }
+        },
+        onError: (_, __) => stream.removeListener(listener),
+      );
+      stream.addListener(listener);
+    }
+  }
+
+  /// Height for the banner at [index] given the width it is drawn in.
+  double _heightFor(int index, double width) {
+    if (_count == 0) return 0;
+    final aspect = _aspects[widget.banners[index].imageUrl] ?? _defaultAspect;
+    // Wide ribbons are not allowed to collapse, very tall images not to take the page.
+    return (width / aspect).clamp(110.0, 320.0);
   }
 
   @override
@@ -64,6 +107,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
       WidgetsBinding.instance.addPostFrameCallback((_) => old.dispose());
       _startAutoPlay();
     }
+    _loadAspects();
   }
 
   void _resetPager() {
@@ -106,44 +150,56 @@ class _BannerCarouselState extends State<BannerCarousel> {
       return const SizedBox.shrink();
     }
 
-    // Standard single banner: static card, no slider/indicator.
-    if (widget.banners.length == 1) {
-      final banner = widget.banners.first;
-      return SizedBox(
-        height: 180,
-        child: _BannerItem(
-          banner: banner,
-          horizontalPadding: widget.horizontalPadding,
-          onTap: () => widget.onBannerTap?.call(banner),
-        ),
-      );
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth - widget.horizontalPadding * 2;
 
-    return Column(
-      children: [
-        SizedBox(
-          height: 180,
-          child: Listener(
-            onPointerDown: (_) => _onTouch(true),
-            onPointerUp: (_) => _onTouch(false),
-            onPointerCancel: (_) => _onTouch(false),
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: (page) => setState(() => _page = page),
-              itemBuilder: (context, page) {
-                final banner = widget.banners[page % _count];
-                return _BannerItem(
-                  banner: banner,
-                  horizontalPadding: widget.horizontalPadding,
-                  onTap: () => widget.onBannerTap?.call(banner),
-                );
-              },
+        // Standard single banner: static card, no slider/indicator.
+        if (widget.banners.length == 1) {
+          final banner = widget.banners.first;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            height: _heightFor(0, width),
+            child: _BannerItem(
+              banner: banner,
+              horizontalPadding: widget.horizontalPadding,
+              onTap: () => widget.onBannerTap?.call(banner),
             ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        _PageIndicator(itemCount: _count, currentIndex: _currentIndex),
-      ],
+          );
+        }
+
+        return Column(
+          children: [
+            // The height follows the banner on screen, so every banner is shown
+            // in full, whatever size was uploaded.
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              height: _heightFor(_currentIndex, width),
+              child: Listener(
+                onPointerDown: (_) => _onTouch(true),
+                onPointerUp: (_) => _onTouch(false),
+                onPointerCancel: (_) => _onTouch(false),
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (page) => setState(() => _page = page),
+                  itemBuilder: (context, page) {
+                    final banner = widget.banners[page % _count];
+                    return _BannerItem(
+                      banner: banner,
+                      horizontalPadding: widget.horizontalPadding,
+                      onTap: () => widget.onBannerTap?.call(banner),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _PageIndicator(itemCount: _count, currentIndex: _currentIndex),
+          ],
+        );
+      },
     );
   }
 }
@@ -181,7 +237,8 @@ class _BannerItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: CachedNetworkImage(
               imageUrl: banner.imageUrl,
-              fit: BoxFit.cover,
+              // Whole banner, never cropped (the box already has the image's shape).
+              fit: BoxFit.contain,
               width: double.infinity,
               placeholder: (context, url) => Container(
                 color: Colors.grey[200],
