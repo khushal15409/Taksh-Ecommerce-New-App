@@ -113,6 +113,7 @@ flutter:
     - assets/images/logo/
     - assets/images/splash/
     - assets/images/backgrounds/
+    - assets/images/illustrations/
     # - assets/icons/
 
   # fonts:

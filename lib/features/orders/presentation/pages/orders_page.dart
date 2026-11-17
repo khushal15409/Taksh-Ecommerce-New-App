@@ -1,5 +1,6 @@
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/di/injector.dart';
@@ -449,10 +450,9 @@ class _OrdersPageState extends State<OrdersPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 60,
-            color: Theme.of(context).disabledColor,
+          SvgPicture.asset(
+            'assets/images/illustrations/no_results.svg',
+            height: 160,
           ),
           const SizedBox(height: 16),
           Text(
@@ -482,23 +482,9 @@ class _OrdersPageState extends State<OrdersPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryOrange.withOpacity(0.2),
-                  blurRadius: 20,
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.receipt_long,
-              size: 60,
-              color: AppColors.primaryOrange,
-            ),
+          SvgPicture.asset(
+            'assets/images/illustrations/no_orders.svg',
+            height: 180,
           ),
           const SizedBox(height: 24),
           Text(

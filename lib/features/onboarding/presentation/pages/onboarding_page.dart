@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taksh_e_commerce/core/widgets/animated_backdrop.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
@@ -25,22 +25,22 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   static const List<_OnboardingStep> _steps = [
     _OnboardingStep(
-      image: 'assets/images/onboarding/onboarding_shop_bg.jpg',
+      image: 'assets/images/illustrations/onboarding_delivery.svg',
       titleKey: _TitleKey.title1,
       subtitleKey: _TitleKey.subtitle1,
-      backgroundColor: Color(0xFFFFF5E8), // Warm cream
+      backgroundColor: Color(0xFFFFF7F0), // Soft peach white
     ),
     _OnboardingStep(
-      image: 'assets/images/onboarding/onboarding_delivery_bg.jpg',
+      image: 'assets/images/illustrations/onboarding_shop.svg',
       titleKey: _TitleKey.title2,
       subtitleKey: _TitleKey.subtitle2,
-      backgroundColor: Color(0xFFF0FAEC), // Soft green cream
+      backgroundColor: Color(0xFFF1FAF4), // Soft mint white
     ),
     _OnboardingStep(
-      image: 'assets/images/onboarding/onboarding_payment_bg.jpg',
+      image: 'assets/images/illustrations/onboarding_service.svg',
       titleKey: _TitleKey.title3,
       subtitleKey: _TitleKey.subtitle3,
-      backgroundColor: Color(0xFFF5EEFF), // Soft lavender
+      backgroundColor: Color(0xFFF6F1FF), // Soft lilac white
     ),
   ];
 
@@ -162,51 +162,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   return Column(
                     children: [
                       Expanded(
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            AnimatedBackdrop(
-                              palette: const [
-                                BackdropPalette.saffron,
-                                BackdropPalette.emerald,
-                                BackdropPalette.royal,
-                              ][index % 3],
-                              coverage: 1.0,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(28, 64, 28, 12),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              step.image,
+                              fit: BoxFit.contain,
                             ),
-                            Center(
-                              child: _FloatingHeroIcon(
-                                icon: const [
-                                  Icons.shopping_bag_rounded,
-                                  Icons.delivery_dining_rounded,
-                                  Icons.account_balance_wallet_rounded,
-                                ][index % 3],
-                                color: const [
-                                  Color(0xFFE8412C),
-                                  Color(0xFF1FA34A),
-                                  Color(0xFF8B3FE0),
-                                ][index % 3],
-                              ),
-                            ),
-                            // Fade the artwork into the page colour.
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              height: 90,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      step.backgroundColor.withOpacity(0),
-                                      step.backgroundColor,
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                       Padding(
@@ -259,7 +222,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   child: TextButton(
                   onPressed: _completeOnboarding,
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.55),
+                    backgroundColor: Colors.transparent,
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
@@ -269,7 +232,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   child: Text(
                     l10n.skip,
                     style: const TextStyle(
-                      color: AppColors.grey900,
+                      color: AppColors.grey600,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -394,56 +357,3 @@ class _PageIndicator extends StatelessWidget {
   }
 }
 
-
-/// Large glass medallion with a gently bobbing icon, used as onboarding art.
-class _FloatingHeroIcon extends StatefulWidget {
-  final IconData icon;
-  final Color color;
-
-  const _FloatingHeroIcon({required this.icon, required this.color});
-
-  @override
-  State<_FloatingHeroIcon> createState() => _FloatingHeroIconState();
-}
-
-class _FloatingHeroIconState extends State<_FloatingHeroIcon>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 3),
-  )..repeat(reverse: true);
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (context, child) => Transform.translate(
-        offset: Offset(0, -12 * Curves.easeInOut.transform(_c.value)),
-        child: child,
-      ),
-      child: Container(
-        width: 190,
-        height: 190,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.7),
-          border: Border.all(color: Colors.white.withOpacity(0.55), width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.18),
-              blurRadius: 40,
-              offset: const Offset(0, 18),
-            ),
-          ],
-        ),
-        child: Icon(widget.icon, size: 96, color: widget.color),
-      ),
-    );
-  }
-}

@@ -11,7 +11,7 @@ class AppBackground extends StatelessWidget {
   static const String asset = 'assets/images/backgrounds/app_background.jpg';
 
   /// Solid colour shown for the first frame and if the image cannot load.
-  static const Color fallback = Color(0xFFDAE5E6);
+  static const Color fallback = Color(0xFFF3F9F5);
 
   @override
   Widget build(BuildContext context) {

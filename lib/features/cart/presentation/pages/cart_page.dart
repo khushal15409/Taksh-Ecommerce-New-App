@@ -2,6 +2,7 @@ import 'package:taksh_e_commerce/core/utils/money_format.dart';
 import 'package:taksh_e_commerce/features/cart/presentation/widgets/coupon_section.dart';
 import 'package:taksh_e_commerce/core/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taksh_e_commerce/core/routing/app_routes.dart';
@@ -468,8 +469,8 @@ class _CartPageState extends State<CartPage>
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                child: Image.asset(
-                  'assets/images/redesign/empty_cart_art.png',
+                child: SvgPicture.asset(
+                  'assets/images/illustrations/empty_cart.svg',
                   height: 220,
                   fit: BoxFit.contain,
                 ),

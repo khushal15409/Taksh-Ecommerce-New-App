@@ -92,169 +92,74 @@ class _SplashPageState extends State<SplashPage> {
           },
         ),
       ],
-      // Branding: festive light backdrop, the Taksh logo, a short promise and
-      // three highlights. Navigation logic above is unchanged.
+      // Branding (reference design): light mint-white page, the Taksh logo with its
+      // tagline, a shopping illustration and a green loading bar. Navigation logic
+      // above is unchanged.
       child: Scaffold(
-        backgroundColor: AppColors.primaryOrange,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  const Spacer(flex: 1),
-                  Flexible(
-                    flex: 6,
-                    child: FadeSlideIn(
-                      duration: const Duration(milliseconds: 700),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: SvgPicture.asset(
-                            'assets/images/splash/splash_hero.svg',
-                            width: 360,
-                            height: 290,
-                          ),
-                        ),
-                      ),
-                    ),
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Spacer(flex: 3),
+              FadeSlideIn(
+                offset: -16,
+                duration: const Duration(milliseconds: 700),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 56),
+                  child: Image.asset(
+                    'assets/images/logo/taksh_logo_mark.png',
+                    filterQuality: FilterQuality.high,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 16),
-                  FadeSlideIn(
-                    offset: -20,
-                    duration: const Duration(milliseconds: 800),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 28,
-                        vertical: 22,
-                      ),
-                      margin: const EdgeInsets.symmetric(horizontal: 36),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.92),
-                        borderRadius: BorderRadius.circular(32),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
-                            blurRadius: 36,
-                            offset: const Offset(0, 14),
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        'assets/images/logo/taksh_logo_mark.png',
-                        filterQuality: FilterQuality.high,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  const FadeSlideIn(
-                    delay: Duration(milliseconds: 350),
-                    child: Text(
-                      'Everything you need, in one app',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const FadeSlideIn(
-                    delay: Duration(milliseconds: 500),
-                    child: Text(
-                      'Shopping  •  30-minute delivery  •  Services',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  const FadeSlideIn(
-                    delay: Duration(milliseconds: 700),
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        _SplashChip(Icons.shopping_bag_rounded, 'Shop'),
-                        _SplashChip(Icons.bolt_rounded, 'Express'),
-                        _SplashChip(Icons.home_repair_service_rounded, 'Services'),
-                      ],
-                    ),
-                  ),
-                  const Spacer(flex: 1),
-                  const SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Made with ♥ in India',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              const FadeSlideIn(
+                delay: Duration(milliseconds: 250),
+                child: Text(
+                  'All in One Ecommerce, Logistics & Services',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF3D4A5C),
+                  ),
+                ),
+              ),
+              const Spacer(flex: 2),
+              Flexible(
+                flex: 6,
+                child: FadeSlideIn(
+                  delay: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 48),
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: SvgPicture.asset(
+                        'assets/images/illustrations/onboarding_shop.svg',
+                        width: 360,
+                        height: 300,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const Spacer(flex: 2),
+              SizedBox(
+                width: 140,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: const LinearProgressIndicator(
+                    minHeight: 5,
+                    color: AppColors.secondaryGreen,
+                    backgroundColor: Color(0xFFDDEFE3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 36),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _SplashChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _SplashChip(this.icon, this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: AppColors.primaryOrange),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1F2A44),
-            ),
-          ),
-        ],
       ),
     );
   }

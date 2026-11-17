@@ -2398,25 +2398,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getStarted => 'Get Started';
 
   @override
-  String get onboardingTitle1 => 'Shop everything you need';
+  String get onboardingTitle1 => 'Get it in 30 Minutes';
 
   @override
   String get onboardingSubtitle1 =>
-      'Find products from local stores, delivered to your door.';
+      'Daily essentials, groceries and more delivered super fast to your door.';
 
   @override
-  String get onboardingTitle2 => 'Fast & reliable delivery';
+  String get onboardingTitle2 => 'Shop Everything You Love';
 
   @override
   String get onboardingSubtitle2 =>
-      'Track your order live from the store to your door.';
+      'Ecommerce, groceries, electronics and more, all in one app.';
 
   @override
-  String get onboardingTitle3 => 'Safe & secure payments';
+  String get onboardingTitle3 => 'Trusted Home Services';
 
   @override
   String get onboardingSubtitle3 =>
-      'Pay securely online, or choose Cash on Delivery where available.';
+      'Electrician, Plumber, Salon, Cleaning and more at your doorstep.';
 
   @override
   String get exitAppSavedNote => 'Your shopping cart and progress will be saved.';

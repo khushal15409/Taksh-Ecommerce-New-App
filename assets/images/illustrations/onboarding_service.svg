@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="360" height="300">
+  <circle cx="180" cy="150" r="124" fill="#EFE7FF"/>
+  <ellipse cx="180" cy="278" rx="100" ry="8" fill="#000000" fill-opacity="0.1"/>
+  <!-- icon badges -->
+  <circle cx="66" cy="96" r="28" fill="#FFFFFF"/><circle cx="66" cy="96" r="22" fill="#FFF1C9"/>
+  <path d="M66 82 a10 10 0 0 1 6 18 v6 h-12 v-6 a10 10 0 0 1 6 -18Z" fill="#F4B400"/><rect x="60" y="108" width="12" height="4" rx="2" fill="#B58100"/>
+  <circle cx="298" cy="84" r="28" fill="#FFFFFF"/><circle cx="298" cy="84" r="22" fill="#FFE1CC"/>
+  <path d="M286 98 L308 70" stroke="#F97316" stroke-width="6" stroke-linecap="round"/><circle cx="310" cy="68" r="7" fill="#F97316"/><circle cx="312" cy="66" r="3.5" fill="#FFE1CC"/>
+  <circle cx="58" cy="206" r="28" fill="#FFFFFF"/><circle cx="58" cy="206" r="22" fill="#D7F0DF"/>
+  <path d="M50 222 L66 198" stroke="#2F7A4B" stroke-width="6" stroke-linecap="round"/><path d="M62 190 L74 186 L72 200 Z" fill="#2F7A4B"/>
+  <circle cx="304" cy="204" r="28" fill="#FFFFFF"/><circle cx="304" cy="204" r="22" fill="#F5D9F1"/>
+  <circle cx="296" cy="214" r="6" fill="none" stroke="#C026A8" stroke-width="3.5"/><circle cx="312" cy="214" r="6" fill="none" stroke="#C026A8" stroke-width="3.5"/>
+  <path d="M299 210 L314 190 M309 210 L294 190" stroke="#C026A8" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- worker -->
+  <path d="M104 282 Q104 206 180 200 Q256 206 256 282 Z" fill="#1E3A8A"/>
+  <path d="M150 204 L180 238 L210 204 Z" fill="#FFFFFF"/>
+  <rect x="166" y="170" width="28" height="36" rx="10" fill="#E9A97F"/>
+  <circle cx="180" cy="140" r="38" fill="#F2B48C"/>
+  <path d="M140 136 A40 40 0 0 1 220 136 L220 128 Q180 100 140 128 Z" fill="#26303F"/>
+  <path d="M146 112 Q180 80 214 112 L214 118 L146 118 Z" fill="#F97316"/>
+  <rect x="140" y="112" width="80" height="9" rx="4" fill="#EA580C"/>
+  <circle cx="166" cy="144" r="3.4" fill="#1B1F27"/><circle cx="194" cy="144" r="3.4" fill="#1B1F27"/>
+  <path d="M168 160 Q180 172 192 160" stroke="#A8553B" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M120 250 Q150 226 180 250 Q210 226 240 250 L240 282 L120 282 Z" fill="#1E3A8A"/>
+  <path d="M120 250 Q150 226 180 250" stroke="#2B4FB5" stroke-width="5" fill="none"/>
+  <rect x="150" y="236" width="60" height="9" rx="4.5" fill="#F2B48C"/>
+</svg>

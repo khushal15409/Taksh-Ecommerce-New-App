@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="360" height="300">
+  <circle cx="190" cy="140" r="122" fill="#FFE9D6"/>
+  <circle cx="300" cy="60" r="10" fill="#FFD2A8"/><circle cx="50" cy="90" r="7" fill="#C9ECD5"/><circle cx="330" cy="200" r="6" fill="#FFD2A8"/>
+  <ellipse cx="195" cy="266" rx="130" ry="9" fill="#000000" fill-opacity="0.12"/>
+  <rect x="14" y="150" width="46" height="8" rx="4" fill="#F97316"/>
+  <rect x="30" y="172" width="38" height="8" rx="4" fill="#F97316" fill-opacity="0.6"/>
+  <rect x="8" y="194" width="30" height="8" rx="4" fill="#F97316" fill-opacity="0.35"/>
+  <!-- delivery box -->
+  <rect x="82" y="92" width="86" height="72" rx="9" fill="#F97316"/>
+  <rect x="82" y="92" width="86" height="14" rx="7" fill="#EA580C"/>
+  <path d="M132 112 L108 140 L124 140 L118 160 L146 128 L130 128 Z" fill="#FFFFFF"/>
+  <!-- scooter body -->
+  <path d="M112 206 Q118 158 168 158 L238 158 Q268 158 276 188 L282 210 Q285 228 266 228 L132 228 Q108 228 112 206Z" fill="#1FA34A"/>
+  <path d="M130 228 L260 228 L256 238 L134 238 Z" fill="#168A3D"/>
+  <rect x="136" y="146" width="92" height="16" rx="8" fill="#26303F"/>
+  <rect x="262" y="104" width="12" height="76" rx="6" fill="#26303F"/>
+  <rect x="246" y="100" width="46" height="9" rx="4.5" fill="#26303F"/>
+  <circle cx="300" cy="118" r="9" fill="#FFD54A"/>
+  <path d="M268 180 L300 226 L286 232 L262 196 Z" fill="#168A3D"/>
+  <!-- wheels -->
+  <circle cx="120" cy="244" r="28" fill="#1B1F27"/><circle cx="120" cy="244" r="12" fill="#C8CED6"/><circle cx="120" cy="244" r="5" fill="#1B1F27"/>
+  <circle cx="292" cy="244" r="28" fill="#1B1F27"/><circle cx="292" cy="244" r="12" fill="#C8CED6"/><circle cx="292" cy="244" r="5" fill="#1B1F27"/>
+  <!-- rider -->
+  <path d="M190 148 L228 222 L246 214 L214 140 Z" fill="#1E2A44"/>
+  <path d="M232 214 L250 214 L252 236 L230 236 Z" fill="#1E2A44"/>
+  <rect x="172" y="70" width="54" height="82" rx="24" fill="#F97316"/>
+  <path d="M212 94 L262 108" stroke="#F97316" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="266" cy="110" r="8" fill="#F2B48C"/>
+  <rect x="190" y="52" width="22" height="26" rx="8" fill="#F2B48C"/>
+  <circle cx="200" cy="44" r="22" fill="#F2B48C"/>
+  <path d="M178 44 A22 22 0 0 1 222 44 L222 48 L178 48 Z" fill="#E8590C"/>
+  <rect x="176" y="44" width="48" height="7" rx="3" fill="#FFFFFF" fill-opacity="0.85"/>
+  <circle cx="209" cy="54" r="2.4" fill="#1B1F27"/>
+  <path d="M203 63 Q208 67 213 63" stroke="#B5654A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- leaves -->
+  <path d="M310 258 Q326 226 348 240 Q336 270 310 258Z" fill="#6FB383"/>
+  <path d="M30 262 Q44 236 66 246 Q58 270 30 262Z" fill="#6FB383"/>
+</svg>

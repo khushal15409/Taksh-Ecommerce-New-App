@@ -2407,25 +2407,25 @@ class AppLocalizationsHi extends AppLocalizations {
   String get getStarted => 'शुरू करें';
 
   @override
-  String get onboardingTitle1 => 'जो चाहिए वो सब खरीदें';
+  String get onboardingTitle1 => '30 मिनट में पाएं';
 
   @override
   String get onboardingSubtitle1 =>
-      'स्थानीय स्टोर्स से उत्पाद खोजें, सीधे आपके दरवाज़े तक।';
+      'रोज़मर्रा का सामान, किराना और बहुत कुछ सुपर फास्ट आपके दरवाज़े तक।';
 
   @override
-  String get onboardingTitle2 => 'तेज़ और भरोसेमंद डिलीवरी';
+  String get onboardingTitle2 => 'जो पसंद है सब खरीदें';
 
   @override
   String get onboardingSubtitle2 =>
-      'अपने ऑर्डर को स्टोर से आपके दरवाज़े तक लाइव ट्रैक करें।';
+      'ई-कॉमर्स, किराना, इलेक्ट्रॉनिक्स और बहुत कुछ, सब एक ही ऐप में।';
 
   @override
-  String get onboardingTitle3 => 'सुरक्षित भुगतान';
+  String get onboardingTitle3 => 'भरोसेमंद होम सर्विसेज़';
 
   @override
   String get onboardingSubtitle3 =>
-      'सुरक्षित रूप से ऑनलाइन भुगतान करें, या जहाँ उपलब्ध हो कैश ऑन डिलीवरी चुनें।';
+      'इलेक्ट्रीशियन, प्लंबर, सैलून, क्लीनिंग और बहुत कुछ आपके दरवाज़े पर।';
 
   @override
   String get exitAppSavedNote => 'आपकी शॉपिंग कार्ट और प्रगति सहेज ली जाएगी।';
