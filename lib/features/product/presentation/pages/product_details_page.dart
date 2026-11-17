@@ -536,7 +536,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFE9D6), Color(0xFFFFF6EE), Colors.white],
+          colors: [Color(0x00FFFFFF), Color(0x00FFFFFF), Color(0x00FFFFFF)],
           stops: [0, 0.28, 0.55],
         ),
       ),

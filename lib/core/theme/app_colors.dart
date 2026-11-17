@@ -148,21 +148,12 @@ class IndiaGradients {
     ],
   );
 
-  /// Subtle tricolor for backgrounds
-  /// Little orange at top (header already has orange), half white, half green
+  /// Page backgrounds are now one shared image (AppBackground); kept transparent so every
+  /// page shows the same backdrop.
   static const LinearGradient subtleTricolor = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFFE9EFF3),
-      Color(0xFFEEF3F6),
-      Color(0xFFF3F6F9),
-      AppColors.pureWhite, // Pure white (middle)
-      Color(0xFFF1F5F8),
-      Color(0xFFE3EEE7),
-      Color(0xFFD3E5DA),
-    ],
-    stops: [0.0, 0.1, 0.2, 0.45, 0.6, 0.8, 1.0],
+    colors: [Color(0x00FFFFFF), Color(0x00FFFFFF)],
   );
 
   /// Splash screen gradient - beautiful tricolor blend

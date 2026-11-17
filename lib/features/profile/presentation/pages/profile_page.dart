@@ -88,26 +88,15 @@ class _ProfilePageState extends State<ProfilePage> {
         SliverAppBar(
           expandedHeight: 220,
           pinned: true,
-          backgroundColor: AppColors.secondaryGreen,
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          foregroundColor: AppColors.grey900,
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF4DB45E), Color(0xFF8ED57F)],
-                ),
-              ),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    FestiveHeaderBackdrop.festiveGreenAsset,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                  ),
                   SafeArea(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            color: AppColors.grey900,
                           ),
                         ),
                         Text(
@@ -155,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.grey600,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -163,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 100,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: Colors.amber,
+                            color: AppColors.primaryOrange,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -181,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // Content
         SliverToBoxAdapter(
           child: Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
+            color: Colors.transparent,
             child: Column(
               children: [
                 const SizedBox(height: 24),

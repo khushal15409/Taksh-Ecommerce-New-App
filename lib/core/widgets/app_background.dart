@@ -8,7 +8,7 @@ class AppBackground extends StatelessWidget {
 
   const AppBackground({super.key, required this.child});
 
-  static const String asset = 'assets/images/backgrounds/app_background.jpg';
+  static const String asset = 'assets/images/backgrounds/home_standard_bg.jpg';
 
   /// Solid colour shown for the first frame and if the image cannot load.
   static const Color fallback = Color(0xFFF3F9F5);

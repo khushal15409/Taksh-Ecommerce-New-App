@@ -71,25 +71,9 @@ class AnimatedBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: FractionallySizedBox(
-        alignment: Alignment.topCenter,
-        heightFactor: coverage.clamp(0.0, 1.0),
-        widthFactor: 1,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: fadeBottom
-                  ? [palette.top, palette.mid, palette.mid.withOpacity(0)]
-                  : [palette.top, palette.mid],
-              stops: fadeBottom ? const [0.0, 0.62, 1.0] : null,
-            ),
-          ),
-        ),
-      ),
-    );
+    // Every page now shows the same shared background (AppBackground), so no
+    // extra header tint is painted here.
+    return const SizedBox.shrink();
   }
 }
 

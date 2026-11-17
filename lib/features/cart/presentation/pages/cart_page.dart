@@ -118,8 +118,7 @@ class _CartPageState extends State<CartPage>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFEFD9), Color(0xFFFFFBF5), Color(0xFFDFF3DC)],
-            stops: [0, 0.4, 1],
+            colors: [Color(0x00FFFFFF), Color(0x00FFFFFF)],
           ),
         ),
         child: BlocConsumer<CartCubit, CartState>(
