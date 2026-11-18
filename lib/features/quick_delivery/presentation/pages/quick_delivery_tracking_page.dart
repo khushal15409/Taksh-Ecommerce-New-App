@@ -110,9 +110,7 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
                 QuickDeliveryTrackingState
               >(
                 listener: (context, state) {
-                  if (state.hasCustomerLocation) {
-                    _focusCustomer(state.customerLocation!);
-                  }
+                  _focusMap(state);
                 },
                 builder: (context, state) {
                   final isLoading =
@@ -155,12 +153,29 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
         ? LatLng(customer.latitude, customer.longitude)
         : const LatLng(20.5937, 78.9629);
 
+    final rider = state.riderLocation;
+    final store = state.storeLocation;
+
     final markers = <Marker>{
       if (customer != null)
         Marker(
           markerId: const MarkerId('customer'),
           position: LatLng(customer.latitude, customer.longitude),
-          infoWindow: const InfoWindow(title: 'Your location'),
+          infoWindow: const InfoWindow(title: 'Delivery address'),
+        ),
+      if (store != null)
+        Marker(
+          markerId: const MarkerId('store'),
+          position: LatLng(store.latitude, store.longitude),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          infoWindow: const InfoWindow(title: 'Store'),
+        ),
+      if (rider != null)
+        Marker(
+          markerId: const MarkerId('rider'),
+          position: LatLng(rider.latitude, rider.longitude),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          infoWindow: const InfoWindow(title: 'Delivery partner'),
         ),
     };
 
@@ -173,13 +188,11 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
             GoogleMap(
               initialCameraPosition: CameraPosition(
                 target: initialTarget,
-                zoom: hasCustomerLocation ? 16 : 4,
+                zoom: hasCustomerLocation ? 15 : 4,
               ),
               onMapCreated: (controller) {
                 _mapController = controller;
-                if (customer != null) {
-                  _focusCustomer(customer);
-                }
+                _focusMap(state);
               },
               markers: markers,
               myLocationEnabled: false,
@@ -212,7 +225,7 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
                           child: Text(
                             isLoading
                                 ? 'Loading map and your location...'
-                                : 'Enable location permissions to pin your location.',
+                                : 'Delivery location will appear here shortly.',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
@@ -237,6 +250,12 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
       return 'Rider is nearby. Live location is visible on the map.';
     }
 
+    // before a rider is on the way the map shows the delivery address and the store
+    if (state.hasCustomerLocation &&
+        state.message.toLowerCase().contains('not yet available')) {
+      return 'Your order is being prepared. The delivery partner will appear on the map once the order is on its way.';
+    }
+
     if (state.message.trim().isNotEmpty) {
       return state.message;
     }
@@ -244,20 +263,43 @@ class _QuickDeliveryTrackingPageState extends State<QuickDeliveryTrackingPage> {
     return 'Waiting for rider to enter your 1km delivery perimeter.';
   }
 
-  Future<void> _fitBounds({required GeoPoint customer}) async {
+  /// Shows everything we know on the map: the delivery address, the store and the rider (when moving).
+  Future<void> _focusMap(QuickDeliveryTrackingState state) async {
     final controller = _mapController;
     if (controller == null) return;
 
-    await controller.animateCamera(
-      CameraUpdate.newLatLngZoom(
-        LatLng(customer.latitude, customer.longitude),
-        16,
-      ),
-    );
-  }
+    final points = <LatLng>[
+      if (state.customerLocation != null)
+        LatLng(state.customerLocation!.latitude, state.customerLocation!.longitude),
+      if (state.storeLocation != null)
+        LatLng(state.storeLocation!.latitude, state.storeLocation!.longitude),
+      if (state.riderLocation != null)
+        LatLng(state.riderLocation!.latitude, state.riderLocation!.longitude),
+    ];
+    if (points.isEmpty) return;
 
-  Future<void> _focusCustomer(GeoPoint customer) async {
-    await _fitBounds(customer: customer);
+    final minLat = points.map((p) => p.latitude).reduce((a, b) => a < b ? a : b);
+    final maxLat = points.map((p) => p.latitude).reduce((a, b) => a > b ? a : b);
+    final minLng = points.map((p) => p.longitude).reduce((a, b) => a < b ? a : b);
+    final maxLng = points.map((p) => p.longitude).reduce((a, b) => a > b ? a : b);
+
+    try {
+      if ((maxLat - minLat).abs() < 0.0005 && (maxLng - minLng).abs() < 0.0005) {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(points.first, 16));
+      } else {
+        await controller.animateCamera(
+          CameraUpdate.newLatLngBounds(
+            LatLngBounds(
+              southwest: LatLng(minLat, minLng),
+              northeast: LatLng(maxLat, maxLng),
+            ),
+            60,
+          ),
+        );
+      }
+    } catch (_) {
+      // the map is not laid out yet; the next update focuses it again
+    }
   }
 }
 

@@ -9,6 +9,7 @@ class QuickDeliveryTrackingState extends Equatable {
   final String orderStatus;
   final GeoPoint? riderLocation;
   final GeoPoint? customerLocation;
+  final GeoPoint? storeLocation;
   final String message;
   final String? errorMessage;
   final DateTime? lastUpdatedAt;
@@ -19,6 +20,7 @@ class QuickDeliveryTrackingState extends Equatable {
     this.orderStatus = '',
     this.riderLocation,
     this.customerLocation,
+    this.storeLocation,
     this.message = '',
     this.errorMessage,
     this.lastUpdatedAt,
@@ -39,6 +41,7 @@ class QuickDeliveryTrackingState extends Equatable {
     bool clearRiderLocation = false,
     GeoPoint? customerLocation,
     bool clearCustomerLocation = false,
+    GeoPoint? storeLocation,
     String? message,
     String? errorMessage,
     bool clearErrorMessage = false,
@@ -54,6 +57,7 @@ class QuickDeliveryTrackingState extends Equatable {
       customerLocation: clearCustomerLocation
           ? null
           : (customerLocation ?? this.customerLocation),
+      storeLocation: storeLocation ?? this.storeLocation,
       message: message ?? this.message,
       errorMessage:
           clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
@@ -69,6 +73,7 @@ class QuickDeliveryTrackingState extends Equatable {
         orderStatus,
         riderLocation,
         customerLocation,
+        storeLocation,
         message,
         errorMessage,
         lastUpdatedAt,

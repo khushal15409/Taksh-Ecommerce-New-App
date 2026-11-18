@@ -19,6 +19,11 @@ class QuickDeliveryTracking extends Equatable {
   final GeoPoint? riderLocation;
   final String message;
 
+  /// The order's delivery address and the shop, sent by the server even before a rider is moving,
+  /// so the map always has something to show.
+  final GeoPoint? destination;
+  final GeoPoint? store;
+
   bool get isLocationAvailable => riderLocation != null;
 
   const QuickDeliveryTracking({
@@ -26,8 +31,11 @@ class QuickDeliveryTracking extends Equatable {
     required this.orderStatus,
     required this.riderLocation,
     required this.message,
+    this.destination,
+    this.store,
   });
 
   @override
-  List<Object?> get props => [orderId, orderStatus, riderLocation, message];
+  List<Object?> get props =>
+      [orderId, orderStatus, riderLocation, message, destination, store];
 }

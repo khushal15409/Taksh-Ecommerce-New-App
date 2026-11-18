@@ -6,6 +6,8 @@ class QuickDeliveryTrackingModel extends QuickDeliveryTracking {
     required super.orderStatus,
     required super.riderLocation,
     required super.message,
+    super.destination,
+    super.store,
   });
 
   factory QuickDeliveryTrackingModel.fromJson(Map<String, dynamic> json) {
@@ -33,7 +35,19 @@ class QuickDeliveryTrackingModel extends QuickDeliveryTracking {
           ((data['message'] ?? data['tracking_message'] ?? json['message']) ??
                   '')
               .toString(),
+      destination: _parsePoint(data['destination']),
+      store: _parsePoint(data['store']),
     );
+  }
+
+  static GeoPoint? _parsePoint(dynamic raw) {
+    if (raw is! Map<String, dynamic>) return null;
+    final lat = _toDouble(raw['latitude'] ?? raw['lat']);
+    final lng = _toDouble(raw['longitude'] ?? raw['lng']);
+    if (lat == null || lng == null) return null;
+    if (lat == 0 && lng == 0) return null;
+    if (lat.abs() > 90 || lng.abs() > 180) return null;
+    return GeoPoint(latitude: lat, longitude: lng);
   }
 
   static GeoPoint? _parseLocation(dynamic raw) {

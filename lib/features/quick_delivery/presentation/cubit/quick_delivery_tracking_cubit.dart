@@ -94,6 +94,10 @@ class QuickDeliveryTrackingCubit extends Cubit<QuickDeliveryTrackingState> {
             orderStatus: trackingData.orderStatus,
             riderLocation: trackingData.riderLocation,
             clearRiderLocation: trackingData.riderLocation == null,
+            // the delivery address from the server is the fallback for the customer pin
+            // (GPS / the checkout address still win when the app has them)
+            customerLocation: state.customerLocation ?? trackingData.destination,
+            storeLocation: trackingData.store,
             message: trackingData.message,
             clearErrorMessage: true,
             lastUpdatedAt: DateTime.now(),
