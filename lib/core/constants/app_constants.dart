@@ -5,7 +5,7 @@ class AppConstants {
   AppConstants._();
 
   /// App information
-  static const String appName = 'Taksh E-Commerce';
+  static const String appName = 'TakshAllInOne';
   static const String appVersion = '1.0.0';
   static const String appBuildNumber = '1';
 

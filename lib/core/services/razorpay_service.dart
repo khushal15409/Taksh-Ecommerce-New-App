@@ -63,7 +63,7 @@ class RazorpayService {
     final options = {
       'key': razorpayKey, // PUBLIC key from backend
       'amount': amountInPaise, // Amount in paise from backend
-      'name': 'Taksh E-Commerce',
+      'name': 'TakshAllInOne',
       'order_id': razorpayOrderId, // Razorpay order ID from backend
       'description':
           orderNumber != null ? 'Order #$orderNumber' : 'Order Payment',

@@ -189,7 +189,7 @@ class TakshECommerceApp extends material.StatelessWidget {
             }
 
             return material.MaterialApp.router(
-              title: 'Taksh E-Commerce',
+              title: 'TakshAllInOne',
               locale: locale,
               localizationsDelegates: const [
                 AppLocalizations.delegate,

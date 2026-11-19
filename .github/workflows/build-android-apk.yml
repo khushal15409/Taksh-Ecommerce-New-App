@@ -71,6 +71,16 @@ jobs:
           MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
         run: flutter build apk --release -t lib/main.dart
 
+      # A blank Maps key builds fine but every map in the app then draws grey with only the Google logo.
+      # Looks inside the finished APK (key value is never printed) and warns when it is empty.
+      - name: Check the Maps key made it into the APK
+        run: |
+          APK=$(find build/app/outputs -name '*.apk' -path '*release*' | head -n 1)
+          AAPT=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 2>/dev/null | sort -V | tail -n 1)
+          if [ -z "$APK" ] || [ -z "$AAPT" ]; then echo "::notice::could not inspect the APK manifest"; exit 0; fi
+          VAL=$("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" | grep -A2 'com.google.android.geo.API_KEY' | grep -o 'AIza[A-Za-z0-9_-]*' | head -n 1 || true)
+          if [ -n "$VAL" ]; then echo "Maps key present in the APK (length ${#VAL})"; else echo "::warning::The APK has NO Maps key - maps will be grey. Set the GOOGLE_MAPS_ANDROID_API_KEY repository secret and build again."; fi
+
       - name: Locate APK
         id: apk
         run: |
