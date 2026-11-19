@@ -36,6 +36,10 @@ val mapsApiKey: String = (System.getenv("MAPS_API_KEY")
     ?: (project.findProperty("MAPS_API_KEY") as String?)
     ?: localProperties.getProperty("MAPS_API_KEY")
     ?: "").trim()
+if (mapsApiKey.isEmpty()) {
+    // Without a key every Google Map in the app (e.g. Quick delivery tracking) draws grey with only the Google logo.
+    logger.warn("WARNING: MAPS_API_KEY is not set - maps will be blank. Put MAPS_API_KEY=... in android/local.properties (git-ignored) or export it before building.")
+}
 
 /** Why release signing can't be used, or null when key.properties and the keystore are complete. */
 fun releaseSigningProblem(): String? {
