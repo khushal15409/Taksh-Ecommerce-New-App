@@ -1,7 +1,7 @@
 name: taksh_e_commerce
 description: "Taksh All In One: shopping, 30-minute delivery and services, built with Clean Architecture"
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=3.8.0 <4.0.0"

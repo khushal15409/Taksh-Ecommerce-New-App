@@ -75,7 +75,7 @@ android {
             // For more information, see: https://flutter.dev/to/review-gradle-config.
             minSdk = 24 // flutter.minSdkVersion
             targetSdk = 36 // Google Play target API level (was flutter.targetSdkVersion)
-            versionCode = 1 // flutter.versionCode
+            versionCode = 2 // flutter.versionCode (1 was the first Play upload)
             versionName = "1.0.0" // flutter.versionName
             manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         }
